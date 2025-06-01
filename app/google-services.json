@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "255594141988",
+    "firebase_url": "https://hamrothrift-74efa-default-rtdb.firebaseio.com",
+    "project_id": "hamrothrift-74efa",
+    "storage_bucket": "hamrothrift-74efa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:255594141988:android:ce07af8a4576d2a19f7bb1",
+        "android_client_info": {
+          "package_name": "com.example.hamrothrift"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmobbd7S4Zb8-UAYuQvZnyrIMcZkXsAgc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

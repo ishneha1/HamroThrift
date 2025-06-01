@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">HamroThrift</string>
+    <string name="title_activity_homepage">HomepageActivity</string>
+    <string name="title_activity_splash_screen">SplashScreenActivity</string>
 </resources>
