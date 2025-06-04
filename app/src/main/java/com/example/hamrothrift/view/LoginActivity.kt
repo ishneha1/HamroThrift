@@ -1,4 +1,4 @@
-package com.example.hamrothrift
+package com.example.hamrothrift.view
 
 import android.app.Activity
 import android.content.Context
@@ -28,7 +28,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -66,16 +65,10 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.hamrothrift.ui.theme.Red
-import com.example.hamrothrift.ui.theme.Teal
-import com.example.hamrothrift.ui.theme.bg
+import com.example.hamrothrift.R
 import com.example.hamrothrift.ui.theme.bg1
-import com.example.hamrothrift.ui.theme.bg2
 import com.example.hamrothrift.ui.theme.bg3
 import com.example.hamrothrift.ui.theme.card1
-import com.example.hamrothrift.ui.theme.text
-import com.example.hamrothrift.ui.theme.text1
-import com.example.hamrothrift.ui.theme.text2
 
 
 class HomepageActivity : ComponentActivity() {

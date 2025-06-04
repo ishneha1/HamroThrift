@@ -1,4 +1,4 @@
-package com.example.hamrothrift
+package com.example.hamrothrift.view
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
