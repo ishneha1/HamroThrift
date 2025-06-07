@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">HamroThrift</string>
+    <string name="title_activity_welcome_and_onboarding_screen">WelcomeAndOnboardingScreen</string>
 </resources>
