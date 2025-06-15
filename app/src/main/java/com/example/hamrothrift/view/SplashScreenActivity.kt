@@ -56,7 +56,7 @@ fun SplashScreenBody(){
         Context.MODE_PRIVATE
     )
 
-    val editor = sharedPreferences.edit()
+    sharedPreferences.edit()
 
     val localEmail: String = sharedPreferences.getString("email", "").toString()
 

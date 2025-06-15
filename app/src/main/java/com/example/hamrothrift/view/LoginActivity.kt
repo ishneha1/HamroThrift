@@ -89,10 +89,9 @@ fun HomepageBody(){
     var passwordVisibility by remember { mutableStateOf(false) }
     var rememberMe by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val activity = context as? Activity
-    val coroutineScope = rememberCoroutineScope()
-    val snackBarHostScope = remember { SnackbarHostState() }
-    var showDialog by remember { mutableStateOf(false) }
+    context as? Activity
+    rememberCoroutineScope()
+    remember { SnackbarHostState() }
     val sharedPreferences = context.getSharedPreferences("User", Context.MODE_PRIVATE)
     val editor = sharedPreferences.edit()
 
@@ -353,8 +352,7 @@ fun HomepageBody(){
                                 color = Color.White
                             )
 
-                            Row(
-                            ) {
+                            Row {
                                 Text(
                                     "Register Now",
                                     style = TextStyle(
