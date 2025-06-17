@@ -223,6 +223,3 @@ fun LargeProductCard() {
 fun ExplorePreview() {
     ExploreNavigation()
 }
-
-
-
