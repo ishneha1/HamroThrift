@@ -2,6 +2,7 @@ package com.example.hamrothrift.view
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -49,7 +51,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -66,9 +70,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hamrothrift.R
-import com.example.hamrothrift.ui.theme.bg1
-import com.example.hamrothrift.ui.theme.bg3
-import com.example.hamrothrift.ui.theme.card1
+import com.example.hamrothrift.view.theme.bg
+import com.example.hamrothrift.view.theme.buttton
+import com.example.hamrothrift.view.theme.card
+import com.example.hamrothrift.view.theme.deepBlue
+import com.example.hamrothrift.view.theme.text
 
 
 class HomepageActivity : ComponentActivity() {
@@ -99,6 +105,7 @@ fun HomepageBody(){
     val localEmail: String = sharedPreferences.getString("email", "").toString()
     val localPassword: String = sharedPreferences.getString("password", "").toString()
     var scrollState= rememberScrollState()
+    val gradientColors = listOf(text, deepBlue,Black)
 
 
     email = localEmail
@@ -114,18 +121,18 @@ fun HomepageBody(){
                 .padding(innerPadding)
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .background(bg1)
+                .background(bg)
         ) {
             ElevatedCard(
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = 10.dp
                 ),
-                colors = CardDefaults.cardColors(bg3),
+                colors = CardDefaults.cardColors(card),
                 modifier = Modifier
-                    .height(800.dp)
-                    .width(900.dp)
-                    .padding(top = 50.dp, start = 20.dp, end = 20.dp)
-                    .clip(shape = RoundedCornerShape(20.dp))
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(top = 50.dp, end = 20.dp, start = 20.dp, bottom = 50.dp)
+                    .clip(shape = RoundedCornerShape(30.dp))
 
             ) {
                     Column(
@@ -142,36 +149,46 @@ fun HomepageBody(){
                             modifier = Modifier
                                 .height(200.dp)
                                 .width(180.dp)
-                                .padding(top = 20.dp)
+                                .padding(top = 30.dp)
                                 .clip(CircleShape)
                                 .clip(shape = RoundedCornerShape(100.dp))
                         )
                         Spacer(
-                            modifier = Modifier.height(10.dp)
+                            modifier = Modifier.height(20.dp)
                         )
-                        Row(modifier = Modifier
+                        Row (modifier = Modifier
                             .fillMaxWidth()
                             .padding(start=10.dp)
-                            , verticalAlignment = Alignment.CenterVertically
-                        ) {
+                            , verticalAlignment = Alignment.CenterVertically){
                             Text(
-                                "Welcome to, ",
+                                text = "Welcome to,",
                                 style = TextStyle(
+                                    brush = Brush.linearGradient(
+                                        colors = gradientColors
+                                    ),
                                     fontSize = 30.sp,
-                                    fontFamily = font,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                    fontFamily = font, fontWeight = FontWeight.Bold
+                                ),
                             )
+                            Spacer(
+                                modifier = Modifier.width(10.dp)
+                            )
+
                             Text(
-                                "HamroThrift! ",
+                                text="HamroThrift! ",
                                 style = TextStyle(
                                     fontSize = 30.sp,
                                     fontWeight = FontWeight.Bold,
                                     fontFamily = font,
-                                    fontStyle = FontStyle.Italic
+                                    fontStyle = FontStyle.Italic,
+                                    //textDecoration = TextDecoration.Underline,
+                                    brush = Brush.linearGradient(
+                                        colors = gradientColors
+                                    )
                                 )
                             )
                         }
+
 
                         OutlinedTextField(
                             value = email,
@@ -181,7 +198,7 @@ fun HomepageBody(){
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 10.dp)
-                                .padding(top = 10.dp)
+                                .padding(top = 20.dp)
                                 .padding(bottom = 20.dp),
                             shape = RoundedCornerShape(12.dp),
                             prefix = {
@@ -270,14 +287,15 @@ fun HomepageBody(){
                                         checkmarkColor = Color.White
                                     )
                                 )
-                                Text("Remember me")
+                                Text("Remember me",
+                                    color = text)
                             }
                             Text(
                                 "Forgot Password?",
                                 style = TextStyle(
                                     fontStyle = FontStyle.Italic,
                                     textDecoration = TextDecoration.Underline
-                                ),
+                                ),color = text,
                                 modifier = Modifier
                                     .clickable {
 
@@ -323,7 +341,7 @@ fun HomepageBody(){
                                 },
                                 shape = RoundedCornerShape(100.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = card1,
+                                    containerColor = buttton,
                                     contentColor = Color.Black
                                 ), modifier = Modifier
                                     .width(250.dp)
@@ -350,7 +368,12 @@ fun HomepageBody(){
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.SemiBold
                                 ),
-                                color = Color.White
+                                color = text
+                            )
+
+                            Spacer(
+                                modifier = Modifier.width(10.dp)
+
                             )
 
                             Row(
@@ -362,12 +385,12 @@ fun HomepageBody(){
                                         fontStyle = FontStyle.Italic,
                                         fontWeight = FontWeight.SemiBold,
                                         textDecoration = TextDecoration.Underline
-                                    ), color = Color.White,
+                                    ), color = text,
                                     modifier = Modifier
                                         .clickable {
-//                                            val intent =
-//                                                Intent(context, RegisterActivity::class.java)
-//                                            context.startActivity(intent)
+                                            val intent =
+                                                Intent(context, RegisterActivity::class.java)
+                                            context.startActivity(intent)
                                         })
 
                             }
@@ -399,7 +422,8 @@ fun HomepageBody(){
                                     .background(color = Color.Black)
                             )
                         }
-                        Row {
+                        Row (modifier = Modifier
+                            .padding(bottom = 30.dp)){
                             Image(
                                 painter = painterResource(R.drawable.email),
                                 contentDescription = null,
@@ -445,12 +469,10 @@ fun HomepageBody(){
                                     .clip(shape = RoundedCornerShape(100.dp))
 
                             )
-                            Spacer(
-                                modifier = Modifier.width(10.dp)
-                            )
 
 
                         }
+
 
 
 

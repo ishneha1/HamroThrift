@@ -33,7 +33,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.hamrothrift.R
-import com.example.hamrothrift.ui.theme.bg1
+import com.example.hamrothrift.view.theme.bg
 import kotlinx.coroutines.delay
 
 class SplashScreenActivity : ComponentActivity() {
@@ -86,7 +86,7 @@ fun SplashScreenBody(){
     Scaffold { innerPadding->
         Column(
             modifier = Modifier
-                .padding(innerPadding).background(color = bg1)
+                .padding(innerPadding).background(color = bg)
                 .fillMaxSize(),
 
             horizontalAlignment = Alignment.CenterHorizontally,

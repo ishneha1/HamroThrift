@@ -1,4 +1,4 @@
-package com.example.hamrothrift.view
+package com.example.hamrothrift.view.pages
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.hamrothrift.view.theme.HamroThriftTheme
 
-class MainActivity : ComponentActivity() {
+class NotificationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
