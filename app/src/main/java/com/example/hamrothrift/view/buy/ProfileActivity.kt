@@ -1,4 +1,4 @@
-package com.example.hamrothrift.view
+package com.example.hamrothrift.view.buy
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
@@ -39,33 +40,30 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.hamrothrift.R
-import com.example.hamrothrift.view.buy.NotificationActivity
-import com.example.hamrothrift.view.buy.ProfileActivity
-import com.example.hamrothrift.view.buy.SaleActivity
+import com.example.hamrothrift.view.DashboardActivityBuy
 import com.example.hamrothrift.view.theme.White
 import com.example.hamrothrift.view.theme.appBar
 import com.example.hamrothrift.view.theme.deepBlue
 
-class DashboardActivityBuy : ComponentActivity() {
+class ProfileActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            DashboardActivityBuyBody()
+
         }
     }
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardActivityBuyBody() {
+fun ProfileActivityBody() {
     data class NavItem(val label: String, val icon: ImageVector)
 
     val navItems = listOf(
         NavItem("Home", Icons.Default.Home),
-        NavItem("Search", Icons.Default.Search),
-        NavItem("Sale", Icons.Filled.Star),
-        NavItem("Notification", Icons.Default.Notifications)
+        NavItem("Search", Icons.Filled.Star),
+        NavItem("Sale", Icons.Default.Notifications),
+        NavItem("Notification", Icons.Default.Person)
     )
     val gradientColors = listOf(White, deepBlue,Black)
     val font = FontFamily(
@@ -73,7 +71,7 @@ fun DashboardActivityBuyBody() {
     )
 
 
-    var selectedTab by remember { mutableIntStateOf(0) }
+    var selectedTab by remember { mutableIntStateOf(3) }
 
     Scaffold(
         topBar = {
@@ -126,6 +124,6 @@ fun DashboardActivityBuyBody() {
 }
 @Preview(showBackground = true)
 @Composable
-fun DashboardActivityBuyPreview() {
-    DashboardActivityBuyBody()
+fun ProfileActivityPreview() {
+    ProfileActivityBody()
 }

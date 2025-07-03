@@ -1,4 +1,4 @@
-package com.example.hamrothrift.view.pages
+package com.example.hamrothrift.view.buy
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -27,15 +27,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hamrothrift.R
-import com.example.hamrothrift.view.SplashScreenBody
-import com.example.hamrothrift.view.theme.Black
 import com.example.hamrothrift.view.theme.Teal
 import com.example.hamrothrift.view.theme.White
 import com.example.hamrothrift.view.theme.appBar
 import com.example.hamrothrift.view.theme.bg
-import com.example.hamrothrift.view.theme.card
 import com.example.hamrothrift.view.theme.deepBlue
-import com.example.hamrothrift.view.theme.options
 import com.example.hamrothrift.view.theme.text
 
 class NotificationActivity : ComponentActivity() {
@@ -55,12 +51,12 @@ fun NotificationActivityBody() {
 
     val navItems = listOf(
         NavItem("Home", Icons.Default.Home),
-        NavItem("Search", Icons.Default.Search),
-        NavItem("Sale", Icons.Filled.Star),
-        NavItem("Notification", Icons.Default.Notifications)
+        NavItem("Search", Icons.Filled.Star),
+        NavItem("Sale", Icons.Default.Notifications),
+        NavItem("Notification", Icons.Default.Person)
     )
     val gradientColors = listOf(White, deepBlue, Color.Companion.Black)
-    var selectedTab by remember { mutableStateOf(3) }
+    var selectedTab by remember { mutableStateOf(2) }
     val notifications = remember {
         mutableStateListOf(
             NotificationItem(

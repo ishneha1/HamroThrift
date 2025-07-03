@@ -1,4 +1,4 @@
-package com.example.hamrothrift.view.pages
+package com.example.hamrothrift.view.buy
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -60,9 +60,9 @@ fun SaleActivityBody() {
 
     val navItems = listOf(
         NavItem("Home", Icons.Default.Home),
-        NavItem("Search", Icons.Default.Search),
-        NavItem("Sale", Icons.Filled.Star),
-        NavItem("Notification", Icons.Default.Notifications)
+        NavItem("Search", Icons.Filled.Star),
+        NavItem("Sale", Icons.Default.Notifications),
+        NavItem("Notification", Icons.Default.Person)
     )
     val gradientColors = listOf(White, deepBlue,Black)
     val font = FontFamily(
@@ -70,8 +70,7 @@ fun SaleActivityBody() {
     )
 
 
-    var selectedTab by remember { mutableIntStateOf(2) } // Default to "Sale"
-
+    var selectedTab by remember { mutableIntStateOf(1) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -114,9 +113,9 @@ fun SaleActivityBody() {
         ) {
             when (selectedTab) {
                 0 -> DashboardActivityBuy()
-                1 -> SearchActivity()
-                2 -> SaleScreen()
-                3 -> NotificationActivity()
+                1 -> SaleActivity()
+                2 -> NotificationActivity()
+                3 -> ProfileActivity()
             }
         }
     }

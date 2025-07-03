@@ -60,6 +60,9 @@ dependencies {
 
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
 //    implementation platform('com.google.firebase:firebase-bom:32.7.0')
 //    implementation 'com.google.android.gms:play-services-auth:21.0.0'
 
@@ -86,6 +89,11 @@ dependencies {
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
+
+
+
+    // Google Sign In
+    implementation("com.google.android.gms:play-services-auth:21.3.0")
 
 
 }

@@ -70,26 +70,76 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hamrothrift.R
+import com.example.hamrothrift.repository.UserRepoImpl
 import com.example.hamrothrift.view.theme.bg
 import com.example.hamrothrift.view.theme.buttton
 import com.example.hamrothrift.view.theme.card
 import com.example.hamrothrift.view.theme.deepBlue
 import com.example.hamrothrift.view.theme.text
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 
 
 class HomepageActivity : ComponentActivity() {
+    private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var userRepo: UserRepoImpl
+    private val RC_SIGN_IN = 9001
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize Google Sign In
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.webClientID))
+            .requestEmail()
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
+        userRepo = UserRepoImpl()
+
         enableEdgeToEdge()
         setContent {
-            HomepageBody()
+            HomepageBody(
+                onGoogleSignInClick = { signInWithGoogle() }
+            )
 
+        }
+    }
+
+    private fun signInWithGoogle() {
+        val signInIntent = googleSignInClient.signInIntent
+        startActivityForResult(signInIntent, RC_SIGN_IN)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == RC_SIGN_IN) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                account.idToken?.let { token ->
+                    userRepo.registerWithGoogle(token) { success, message, userId ->
+                        if (success) {
+                            startActivity(Intent(this, HomepageActivity::class.java))
+                            finish()
+                        } else {
+                            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            } catch (e: ApiException) {
+                Toast.makeText(this, "Google sign in failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }
 
 @Composable
-fun HomepageBody(){
+fun HomepageBody(
+    onGoogleSignInClick: () -> Unit = {}
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
@@ -323,12 +373,12 @@ fun HomepageBody(){
                                         editor.apply()
                                     }
 
-//                                    val intent = Intent(context, DashboardActivity::class.java)
-//                                    intent.putExtra("email", email)
-//                                    intent.putExtra("password", password)
+                                    val intent = Intent(context, DashboardActivity::class.java)
+                                    intent.putExtra("email", email)
+                                    intent.putExtra("password", password)
 
-//                                    context.startActivity(intent)
-//                                    activity?.finish()
+                                    context.startActivity(intent)
+                                    activity?.finish()
                                     Toast.makeText(
                                         context,
                                         "Login Success",
@@ -448,7 +498,10 @@ fun HomepageBody(){
                                     .height(80.dp)
                                     .width(60.dp)
                                     .padding(top = 20.dp)
-                                    .clickable {}
+                                    .clickable {
+                                        Toast.makeText(context, "Connecting to Google...", Toast.LENGTH_SHORT).show()
+                                        onGoogleSignInClick()
+                                    }
                                     .fillMaxWidth()
                                     .clip(shape = RoundedCornerShape(100.dp))
 
