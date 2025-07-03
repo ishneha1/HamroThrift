@@ -75,11 +75,11 @@ fun SplashScreenBody(){
             val intent = Intent(context, HomepageActivity::class.java)
             context.startActivity(intent)
             activity?.finish() }
-        //else {
-//            val intent = Intent(context, DashboardActivity::class.java)
-//            context.startActivity(intent)
-//            activity?.finish()
-//        }
+        else {
+            val intent = Intent(context, DashboardActivity::class.java)
+            context.startActivity(intent)
+            activity?.finish()
+        }
 
 
    }

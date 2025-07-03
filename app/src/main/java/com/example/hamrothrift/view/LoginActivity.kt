@@ -76,6 +76,7 @@ import com.example.hamrothrift.view.theme.buttton
 import com.example.hamrothrift.view.theme.card
 import com.example.hamrothrift.view.theme.deepBlue
 import com.example.hamrothrift.view.theme.text
+import com.example.hamrothrift.viewmodel.UserViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -156,6 +157,9 @@ fun HomepageBody(
     val localPassword: String = sharedPreferences.getString("password", "").toString()
     var scrollState= rememberScrollState()
     val gradientColors = listOf(text, deepBlue,Black)
+
+    val repo = remember { UserRepoImpl() }
+    val userViewModel = remember { UserViewModel(repo) }
 
 
     email = localEmail
@@ -258,7 +262,7 @@ fun HomepageBody(
 
                                 )
                             },
-                            placeholder = {},
+                            placeholder = {Text("Email")},
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Email
                             ),
@@ -301,7 +305,7 @@ fun HomepageBody(
                                 )
                             },
                             placeholder = {
-                                Text("")
+                                Text("Password")
                             },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Password
@@ -363,9 +367,15 @@ fun HomepageBody(
                         ) {
                             Button(
                                 onClick = {
+                                    userViewModel.login(email,password) { success, message ->
 
-
-
+                                        if (success) {
+                                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                            activity?.finish()
+                                        } else {
+                                            Toast.makeText(context,message, Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
 
                                     if (rememberMe) {
                                         editor.putString("email", email)

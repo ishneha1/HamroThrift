@@ -1,5 +1,12 @@
 package com.example.hamrothrift.repository
 
+import android.content.Context
+import android.net.Uri
+import android.os.Handler
+import android.os.Looper
+import android.provider.OpenableColumns
+import com.cloudinary.Cloudinary
+import com.cloudinary.utils.ObjectUtils
 import com.example.hamrothrift.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -10,6 +17,8 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.auth.FacebookAuthProvider
+import java.io.InputStream
+import java.util.concurrent.Executors
 
 class UserRepoImpl : UserRepo {
     val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -17,6 +26,14 @@ class UserRepoImpl : UserRepo {
     val database: FirebaseDatabase = FirebaseDatabase.getInstance()
 
     val ref: DatabaseReference = database.reference.child("users")
+
+    private val cloudinary = Cloudinary(
+        mapOf(
+            "cloud_name" to "dbmwufxbn",
+            "api_key" to "511933986824672",
+            "api_secret" to "C7WUm7KiQWZl7XaR9guDFTW3wU0"
+        )
+    )
 
     override fun login(
         email: String,
@@ -170,5 +187,53 @@ class UserRepoImpl : UserRepo {
                 }
             }
 
+    }
+    override fun uploadImage(context: Context, imageUri: Uri, callback: (String?) -> Unit) {
+        val executor = Executors.newSingleThreadExecutor()
+        executor.execute {
+            try {
+                val inputStream: InputStream? = context.contentResolver.openInputStream(imageUri)
+                var fileName = getFileNameFromUri(context, imageUri)
+
+
+                fileName = fileName?.substringBeforeLast(".") ?: "uploaded_image"
+
+                val response = cloudinary.uploader().upload(
+                    inputStream, ObjectUtils.asMap(
+                        "public_id", fileName,
+                        "resource_type", "image"
+                    )
+                )
+
+                var imageUrl = response["url"] as String?
+
+                imageUrl = imageUrl?.replace("http://", "https://")
+
+
+                Handler(Looper.getMainLooper()).post {
+                    callback(imageUrl)
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Handler(Looper.getMainLooper()).post {
+                    callback(null)
+                }
+            }
+        }
+    }
+
+    override fun getFileNameFromUri(context: Context, uri: Uri): String? {
+        var fileName: String? = null
+        val cursor = context.contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (nameIndex != -1) {
+                    fileName = it.getString(nameIndex)
+                }
+            }
+        }
+        return fileName
     }
 }

@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
+    //Firebase
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database)
     implementation(libs.androidx.credentials)
@@ -95,5 +96,10 @@ dependencies {
     // Google Sign In
     implementation("com.google.android.gms:play-services-auth:21.3.0")
 
+    //Cloudinary
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.0")
+    implementation("com.cloudinary:cloudinary-android:2.1.0")
+    implementation("com.squareup.picasso:picasso:2.8")
+    implementation("io.coil-kt:coil-compose:2.2.2")
 
 }

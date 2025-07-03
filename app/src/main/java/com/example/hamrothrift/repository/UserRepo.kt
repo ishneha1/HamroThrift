@@ -1,5 +1,7 @@
 package com.example.hamrothrift.repository
 
+import android.content.Context
+import android.net.Uri
 import com.example.hamrothrift.model.UserModel
 import com.google.firebase.auth.FirebaseUser
 
@@ -41,4 +43,8 @@ interface UserRepo {
         idToken: String,
         callback: (Boolean, String, String) -> Unit
     )
+
+    fun uploadImage(context: Context,imageUri: Uri, callback: (String?) -> Unit)
+
+    fun getFileNameFromUri(context: Context,uri: Uri): String?
 }
