@@ -9,13 +9,14 @@ val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)
 val Black = Color(0xFF020202)
 
-val Teal= Color(0xFF3A9898)
+val Teal= Color(0xFF4BB7B7)
 
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 
 val card= Color(0xFFA4CCD9)
+val options= Color(0xFF28A4C7)
 val appBar= Color(0xFF3A5A6A)
 val bg= Color(0xFFDAD3C7)
 val buttton= Color(0xFF3C8DAD)

@@ -52,6 +52,7 @@ fun HamroThriftApp() {
     SaleActivityBody()
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SaleActivityBody() {
@@ -69,7 +70,7 @@ fun SaleActivityBody() {
     )
 
 
-    var selectedTab by remember { mutableStateOf(2) } // Default to "Sale"
+    var selectedTab by remember { mutableIntStateOf(2) } // Default to "Sale"
 
     Scaffold(
         topBar = {
@@ -108,13 +109,13 @@ fun SaleActivityBody() {
     ) { innerPadding ->
         Box(
             modifier = Modifier
-                .padding(innerPadding)
                 .fillMaxSize()
+                .padding(innerPadding)
         ) {
             when (selectedTab) {
                 0 -> DashboardActivityBuy()
                 1 -> SearchActivity()
-                2 -> SaleActivity()
+                2 -> SaleScreen()
                 3 -> NotificationActivity()
             }
         }
@@ -126,7 +127,7 @@ fun SaleScreen() {
     val font = FontFamily(
         Font(R.font.font)
     )
-    LazyColumn (
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(color = bg)
@@ -134,15 +135,21 @@ fun SaleScreen() {
     ) {
         item {
             Button(
-            onClick = { /* TODO: Buy click */ },
-            colors = ButtonDefaults.buttonColors(containerColor = buttton),
-        ) {
-            Text("Buy", color = Color.White, fontFamily = font, fontSize = 20.sp)
-        }
+                onClick = { /* TODO: Buy click */ },
+                colors = ButtonDefaults.buttonColors(containerColor = buttton),
+            ) {
+                Text("Buy", color = Color.White, fontFamily = font, fontSize = 20.sp)
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text("HOT SALE", color = text, fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = font)
+            Text(
+                "HOT SALE",
+                color = text,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = font
+            )
 
             Spacer(modifier = Modifier.height(10.dp))
 
@@ -157,8 +164,10 @@ fun SaleScreen() {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            Text("For You", color = text, fontSize = 20.sp, fontWeight = FontWeight.Bold,
-                fontFamily = font)
+            Text(
+                "For You", color = text, fontSize = 20.sp, fontWeight = FontWeight.Bold,
+                fontFamily = font
+            )
 
             Spacer(modifier = Modifier.height(15.dp))
 
@@ -174,7 +183,8 @@ fun SaleScreen() {
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                 }
-            }  }
+            }
+        }
 
     }
 }
@@ -193,7 +203,8 @@ fun SmallProductCard() {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
-                .background(color = text,
+                .background(
+                    color = text,
                     shape = RoundedCornerShape(bottomStart = 10.dp, bottomEnd = 10.dp)
                 ),
             contentAlignment = Alignment.Center
