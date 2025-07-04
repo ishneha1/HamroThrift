@@ -23,17 +23,20 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.Coil.imageLoader
+import coil.ImageLoader
+import coil.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.hamrothrift.R
-import com.example.hamrothrift.view.theme.bg
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
 import kotlinx.coroutines.delay
 
 class SplashScreenActivity : ComponentActivity() {
@@ -60,17 +63,30 @@ fun SplashScreenBody(){
 
     val localEmail: String = sharedPreferences.getString("email", "").toString()
 
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
-    val progress by animateLottieCompositionAsState(
-        composition = composition,
-        iterations = 2,
-    )
+    //val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
+//    val progress by animateLottieCompositionAsState(
+//        composition = composition,
+//        iterations = 2,
+//    )
+
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            if (android.os.Build.VERSION.SDK_INT >= 28) {
+                add(ImageDecoderDecoder.Factory())
+            } else {
+                add(GifDecoder.Factory())
+            }
+        }
+        .build()
+
+
+
 
 
     LaunchedEffect(Unit)
 
     {
-        delay(2000)
+        delay(3000)
         if (localEmail.isEmpty()) {
             val intent = Intent(context, HomepageActivity::class.java)
             context.startActivity(intent)
@@ -83,38 +99,46 @@ fun SplashScreenBody(){
 
 
    }
-    Scaffold { innerPadding->
+    Scaffold { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(innerPadding).background(color = bg)
+                .padding(innerPadding).background(color = Color.White)
                 .fillMaxSize(),
 
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
 
         ) {
-            Image(
-                painter = painterResource(R.drawable.logo),
+//            Image(
+//                painter = painterResource(R.drawable.logo),
+//                contentDescription = null,
+//                modifier = Modifier
+//                    .clip(
+//                        shape = CircleShape
+//
+//                    )
+//
+//            )
+//            Spacer(
+//                modifier = Modifier
+//                    .height(30.dp)
+//            )
+//            LottieAnimation(
+//                composition = composition,
+//                progress = { progress },
+//                modifier = Modifier.size(90.dp)
+//            )
+//
+//        }
+            AsyncImage(
+                model = "file:///android_asset/clip.gif",
                 contentDescription = null,
-                modifier = Modifier
-                    .clip(
-                        shape = CircleShape
+                imageLoader = imageLoader,
+                modifier = Modifier.size(500.dp)
+            )
 
-                    )
-
-            )
-            Spacer(
-                modifier = Modifier
-                    .height(30.dp)
-            )
-            LottieAnimation(
-                composition = composition,
-                progress = { progress },
-                modifier = Modifier.size(90.dp)
-            )
 
         }
-
     }
 
 

@@ -87,6 +87,8 @@ dependencies {
 
     // Add Lottie directly (no TOML needed)
     implementation("com.airbnb.android:lottie-compose:6.1.0")
+    implementation ("io.coil-kt:coil-gif:2.4.0")
+    implementation ("io.coil-kt:coil-compose:2.4.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -100,6 +102,6 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.6.0")
     implementation("com.cloudinary:cloudinary-android:2.1.0")
     implementation("com.squareup.picasso:picasso:2.8")
-    implementation("io.coil-kt:coil-compose:2.2.2")
+
 
 }
