@@ -69,7 +69,7 @@ fun DashboardActivityBuyBody() {
     )
     val gradientColors = listOf(White, deepBlue,Black)
     val font = FontFamily(
-        Font(R.font.font)
+        Font(R.font.handmade)
     )
 
 

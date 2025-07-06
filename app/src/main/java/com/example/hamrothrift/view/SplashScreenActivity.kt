@@ -63,11 +63,6 @@ fun SplashScreenBody(){
 
     val localEmail: String = sharedPreferences.getString("email", "").toString()
 
-    //val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
-//    val progress by animateLottieCompositionAsState(
-//        composition = composition,
-//        iterations = 2,
-//    )
 
     val imageLoader = ImageLoader.Builder(context)
         .components {
@@ -86,7 +81,7 @@ fun SplashScreenBody(){
     LaunchedEffect(Unit)
 
     {
-        delay(3000)
+        delay(1000)
         if (localEmail.isEmpty()) {
             val intent = Intent(context, HomepageActivity::class.java)
             context.startActivity(intent)
@@ -109,27 +104,7 @@ fun SplashScreenBody(){
             verticalArrangement = Arrangement.Center
 
         ) {
-//            Image(
-//                painter = painterResource(R.drawable.logo),
-//                contentDescription = null,
-//                modifier = Modifier
-//                    .clip(
-//                        shape = CircleShape
 //
-//                    )
-//
-//            )
-//            Spacer(
-//                modifier = Modifier
-//                    .height(30.dp)
-//            )
-//            LottieAnimation(
-//                composition = composition,
-//                progress = { progress },
-//                modifier = Modifier.size(90.dp)
-//            )
-//
-//        }
             AsyncImage(
                 model = "file:///android_asset/clip.gif",
                 contentDescription = null,

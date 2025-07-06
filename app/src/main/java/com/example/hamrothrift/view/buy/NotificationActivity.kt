@@ -80,7 +80,7 @@ fun NotificationActivityBody() {
         )
     }
     val font = FontFamily(
-        Font(R.font.font)
+        Font(R.font.handmade)
     )
     Scaffold(
         topBar= {
@@ -132,10 +132,9 @@ fun NotificationActivityBody() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "NOTIFICATIONS",
-                    fontSize = 25.sp,
+                    text = "Notifications",
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    fontFamily = font,
                     color = text
                 )
                 Row {

@@ -94,6 +94,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".view.DashboardActivityBuy"
+            android:exported="true"
+            android:label="@string/title_activity_dashboard_buy"
+            android:theme="@style/Theme.HamroThrift" />
 
     </application>
 

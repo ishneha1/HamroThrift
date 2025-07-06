@@ -78,28 +78,27 @@ class RegisterActivity : ComponentActivity() {
         enableEdgeToEdge()
         imageUtils = ImageUtils(this, this)
         imageUtils.registerLaunchers { uri ->
-            selectedImageUri = uri
+            selectedImageUri = uri}
             setContent {
                 RegisterActivityBody(
                     selectedImageUri = selectedImageUri,
                     onPickImage = { imageUtils.launchImagePicker() }
                 )
             }
-        }
     }
 }
+
 
 @Composable
 fun RegisterActivityBody(
         selectedImageUri: Uri?,
-        onPickImage: () -> Unit
-    ) {
+        onPickImage: () -> Unit) {
         Scaffold { innerPadding ->
             val context = LocalContext.current
             val activity = context as? Activity
 
             val font = FontFamily(
-                Font(R.font.font)
+                Font(R.font.handmade)
             )
 
             var email by remember { mutableStateOf("") }
@@ -110,7 +109,7 @@ fun RegisterActivityBody(
             var lastName by remember { mutableStateOf("") }
 
             val genderOption = listOf("Male", "Female", "Others")
-            var selectedOption by remember { mutableStateOf(genderOption[0]) }
+            var selectedOption by remember { mutableStateOf("") }
 
             val repo = remember { UserRepoImpl() }
             val userViewModel = remember { UserViewModel(repo) }
@@ -351,21 +350,21 @@ fun RegisterActivityBody(
                                 },
                             color = text
                         )
-                            if (selectedImageUri != null) {
-                                AsyncImage(
-                                    model = selectedImageUri,
-                                    contentDescription = "Selected Image",
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop
-                                )
-                            } else {
-                                Image(
-                                    painterResource(R.drawable.images),
-                                    contentDescription = null,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop
-                                )
-                            }
+//                            if (selectedImageUri != null) {
+//                                AsyncImage(
+//                                    model = selectedImageUri,
+//                                    contentDescription = "Selected Image",
+//                                    modifier = Modifier.fillMaxSize(),
+//                                    contentScale = ContentScale.Crop
+//                                )
+//                            } else {
+//                                Image(
+//                                    painterResource(R.drawable.images),
+//                                    contentDescription = null,
+//                                    modifier = Modifier.fillMaxSize(),
+//                                    contentScale = ContentScale.Crop
+//                                )
+//                            }
 
 
                     }
@@ -389,6 +388,8 @@ fun RegisterActivityBody(
                                         if (success) {
                                             Toast.makeText(context, message, Toast.LENGTH_SHORT)
                                                 .show()
+                                            val intent = Intent(context, HomepageActivity::class.java)
+                                            context.startActivity(intent)
                                             activity?.finish()
                                         } else {
                                             Toast.makeText(context, message, Toast.LENGTH_SHORT)
@@ -408,7 +409,7 @@ fun RegisterActivityBody(
                             contentColor = text
                         ), modifier = Modifier
                             .width(250.dp)
-                            .padding(top = 30.dp, start = 60.dp)
+                            .padding(top = 30.dp, start = 90.dp)
                     ) {
                         Text(
                             "Register",
@@ -425,10 +426,8 @@ fun RegisterActivityBody(
 
 
             }
-
-
         }
-    }
+}
 
 
 

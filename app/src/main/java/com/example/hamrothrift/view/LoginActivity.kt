@@ -147,9 +147,9 @@ fun HomepageBody(
     var rememberMe by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val activity = context as? Activity
-    val coroutineScope = rememberCoroutineScope()
-    val snackBarHostScope = remember { SnackbarHostState() }
-    var showDialog by remember { mutableStateOf(false) }
+//    val coroutineScope = rememberCoroutineScope()
+//    val snackBarHostScope = remember { SnackbarHostState() }
+//    var showDialog by remember { mutableStateOf(false) }
     val sharedPreferences = context.getSharedPreferences("User", Context.MODE_PRIVATE)
     val editor = sharedPreferences.edit()
 
@@ -166,7 +166,7 @@ fun HomepageBody(
     password = localPassword
 
     val font = FontFamily(
-        Font(R.font.font)
+        Font(R.font.handmade)
     )
 
     Scaffold { innerPadding ->
@@ -217,10 +217,8 @@ fun HomepageBody(
                             Text(
                                 text = "Welcome to,",
                                 style = TextStyle(
-                                    brush = Brush.linearGradient(
-                                        colors = gradientColors
-                                    ),
-                                    fontSize = 30.sp,
+                                    color = Color.White,
+                                    fontSize = 25.sp,
                                     fontFamily = font, fontWeight = FontWeight.Bold
                                 ),
                             )
@@ -231,14 +229,12 @@ fun HomepageBody(
                             Text(
                                 text="HamroThrift! ",
                                 style = TextStyle(
-                                    fontSize = 30.sp,
+                                    fontSize = 25.sp,
                                     fontWeight = FontWeight.Bold,
                                     fontFamily = font,
                                     fontStyle = FontStyle.Italic,
-                                    //textDecoration = TextDecoration.Underline,
-                                    brush = Brush.linearGradient(
-                                        colors = gradientColors
-                                    )
+                                    color = Color.White
+
                                 )
                             )
                         }
@@ -371,6 +367,10 @@ fun HomepageBody(
 
                                         if (success) {
                                             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                            val intent = Intent(context, DashboardActivity::class.java)
+                                            context.startActivity(intent)
+                                            intent.putExtra("email", email)
+                                            intent.putExtra("password", password)
                                             activity?.finish()
                                         } else {
                                             Toast.makeText(context,message, Toast.LENGTH_SHORT).show()
@@ -383,18 +383,9 @@ fun HomepageBody(
                                         editor.apply()
                                     }
 
-                                    val intent = Intent(context, DashboardActivity::class.java)
-                                    intent.putExtra("email", email)
-                                    intent.putExtra("password", password)
 
-                                    context.startActivity(intent)
-                                    activity?.finish()
-                                    Toast.makeText(
-                                        context,
-                                        "Login Success",
-                                        Toast.LENGTH_SHORT
-                                    )
-                                        .show()
+
+
 
 
 
@@ -448,8 +439,7 @@ fun HomepageBody(
                                     ), color = text,
                                     modifier = Modifier
                                         .clickable {
-                                            val intent =
-                                                Intent(context, RegisterActivity::class.java)
+                                            val intent = Intent(context, RegisterActivity::class.java)
                                             context.startActivity(intent)
                                         })
 
