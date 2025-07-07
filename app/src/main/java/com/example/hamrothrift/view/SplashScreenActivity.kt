@@ -21,6 +21,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,7 +62,7 @@ fun SplashScreenBody(){
         Context.MODE_PRIVATE
     )
 
-    val editor = sharedPreferences.edit()
+    var value by remember { mutableStateOf(0) }
 
     val localEmail: String = sharedPreferences.getString("email", "").toString()
 
@@ -79,13 +82,18 @@ fun SplashScreenBody(){
 
 
     LaunchedEffect(Unit)
-
     {
         delay(1000)
+        if (value==0){
+            val intent = Intent(context, WelcomeAndOnboardingActivity::class.java)
+            context.startActivity(intent)
+            activity?.finish()
+        }
         if (localEmail.isEmpty()) {
             val intent = Intent(context, HomepageActivity::class.java)
             context.startActivity(intent)
-            activity?.finish() }
+            activity?.finish()
+        }
         else {
             val intent = Intent(context, DashboardActivity::class.java)
             context.startActivity(intent)

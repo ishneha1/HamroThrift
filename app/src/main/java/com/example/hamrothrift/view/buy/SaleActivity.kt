@@ -28,7 +28,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import com.example.hamrothrift.R
-import com.example.hamrothrift.view.DashboardActivityBuy
 import com.example.hamrothrift.view.theme.White
 import com.example.hamrothrift.view.theme.appBar
 import com.example.hamrothrift.view.theme.bg

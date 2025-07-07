@@ -9,4 +9,5 @@
     <string name="title_activity_dashboard_buy">DashboardActivityBuy</string>
     <string name="webClientID">255594141988-udma6e3ujbt5hrcacr7u8boh3p0ttl6o.apps.googleusercontent.com</string>
     <string name="title_activity_dashboard">DashboardActivity</string>
+    <string name="title_activity_welcome_onboarding">WelcomeOnboardingActivity</string>
 </resources>

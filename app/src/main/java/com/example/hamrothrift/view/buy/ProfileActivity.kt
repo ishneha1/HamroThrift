@@ -40,7 +40,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.hamrothrift.R
-import com.example.hamrothrift.view.DashboardActivityBuy
 import com.example.hamrothrift.view.theme.White
 import com.example.hamrothrift.view.theme.appBar
 import com.example.hamrothrift.view.theme.deepBlue

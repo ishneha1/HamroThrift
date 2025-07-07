@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -14,9 +14,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HamroThrift"
-        tools:targetApi="31"
-        tools:replace="android:fullBackupContent">
+        tools:replace="android:fullBackupContent"
+        tools:targetApi="31">
+        <activity
+            android:name=".view.WelcomeAndOnboardingActivity"
+            android:exported="true"
+            android:label="@string/title_activity_welcome_onboarding"
+            android:theme="@style/Theme.HamroThrift">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".view.DashboardActivity"
             android:exported="true"
@@ -94,12 +104,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".view.DashboardActivityBuy"
-            android:exported="true"
-            android:label="@string/title_activity_dashboard_buy"
-            android:theme="@style/Theme.HamroThrift" />
 
     </application>
 
 </manifest>
+
