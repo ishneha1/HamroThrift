@@ -295,7 +295,8 @@ fun HomepageBody() {
                             ), color = text,
                             modifier = Modifier
                                 .clickable {
-
+                                    val intent = Intent(context, ForgotPasswordActivity::class.java)
+                                    context.startActivity(intent)
                                 }
 
 
