@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -50,8 +51,8 @@ import com.example.hamrothrift.repository.UserRepoImpl
 import com.example.hamrothrift.view.theme.White
 import com.example.hamrothrift.view.theme.appBar
 import com.example.hamrothrift.view.theme.bg
+import com.example.hamrothrift.view.theme.buttton
 import com.example.hamrothrift.view.theme.deepBlue
-import com.example.hamrothrift.view.ui.theme.HamroThriftTheme
 import com.example.hamrothrift.viewmodel.UserViewModel
 
 class ForgotPasswordActivity : ComponentActivity() {
@@ -102,9 +103,12 @@ fun ForgotPasswordBody(){
             .padding(innerPadding)
             .fillMaxSize()
             .background(bg)
-            .padding(top=20.dp,start=15.dp)) {
+            .padding(top = 250.dp),
+            horizontalAlignment = Alignment.CenterHorizontally)
+        {
             Text("Forgot Password",
                 style = TextStyle(
+                    fontFamily = font,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 25.sp
                 ))
@@ -116,7 +120,7 @@ fun ForgotPasswordBody(){
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top=25.dp,bottom = 20.dp,end=15.dp),
+                    .padding(top=35.dp,bottom = 20.dp,end=15.dp, start = 15.dp),
                 shape = RoundedCornerShape(12.dp),
                 prefix = {
                     Icon(
@@ -126,17 +130,14 @@ fun ForgotPasswordBody(){
                     )
                 },
                 placeholder = {
-                    Text("abc@gmail.com")
+                    Text("E-mail")
                 },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email
                 ),
                 colors = TextFieldDefaults.colors(
-                    //focusedContainerColor =Color.Gray.copy(0.2f),
-
-                    //color ko shade dinu
-                    unfocusedIndicatorColor = Color.Blue,
-                    focusedIndicatorColor = Color.Green
+                    unfocusedIndicatorColor = Color.Black,
+                    focusedIndicatorColor = Color.Blue
                 )
             )
             Button(onClick = {
@@ -150,11 +151,11 @@ fun ForgotPasswordBody(){
                 }
             },
                 modifier= Modifier
-                    .width(200.dp)
+                    .width(180.dp)
                     .fillMaxWidth(),
                 shape= RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Blue,
+                    containerColor = buttton,
                     contentColor = Color.White
                 )
             ) {
