@@ -78,7 +78,7 @@ fun SaleActivityBody() {
                         brush = Brush.linearGradient(
                             colors = gradientColors
                         ),
-                    fontSize = 30.sp,
+                    fontSize = 25.sp,
                     fontFamily = font, fontStyle = FontStyle.Italic
                 )) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = appBar),

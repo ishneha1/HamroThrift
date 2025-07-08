@@ -9,7 +9,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.CircleShape
@@ -54,18 +53,14 @@ class WelcomeAndOnboardingActivity : ComponentActivity() {
 
 @Composable
 fun WelcomeAndOnboardingBody(modifier: Modifier = Modifier) {
-    var currentPage by remember { mutableStateOf(0) }
+    var currentPage by remember { mutableIntStateOf(0) }
     val font = FontFamily(
         Font(R.font.handmade)
     )
     val context = LocalContext.current
     val activity = context as? Activity
-    val sharedPreferences = context.getSharedPreferences(
-        "User",
-        Context.MODE_PRIVATE
-    )
 
-    var value by remember { mutableStateOf(0) }
+    var value by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(value) {
         value==1

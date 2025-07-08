@@ -6,5 +6,6 @@ data class UserModel(
     var lastName : String="",
     var gender: String="",
     var email : String="",
+    var password: String="",
     var userImage : String ="",
 )
