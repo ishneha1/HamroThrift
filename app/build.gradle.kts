@@ -5,8 +5,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
-//    id 'com.android.application'
-//    id 'com.google.gms.google-services'
 
 }
 
@@ -48,6 +46,7 @@ android {
 }
 
 dependencies {
+    val nav_version = "2.7.7"
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -58,14 +57,18 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    //Firebase
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.database)
-    implementation(libs.androidx.credentials)
-    implementation(libs.androidx.credentials.play.services.auth)
-    implementation(libs.googleid)
-//    implementation platform('com.google.firebase:firebase-bom:32.7.0')
-//    implementation 'com.google.android.gms:play-services-auth:21.0.0'
+
+    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
+    // Force a specific version for firebase-common
+    implementation ("com.google.firebase:firebase-common:20.4.2")
+
+    // Other Firebase dependencies
+    implementation ("com.google.firebase:firebase-analytics")
+    implementation ("com.google.firebase:firebase-auth")
+    implementation ("com.google.firebase:firebase-database")
+    implementation ("com.google.firebase:firebase-firestore")
+    implementation ("com.google.firebase:firebase-storage")
+    implementation ("com.google.firebase:firebase-messaging")
 
 
     testImplementation(libs.junit)
@@ -102,6 +105,11 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.6.0")
     implementation("com.cloudinary:cloudinary-android:2.1.0")
     implementation("com.squareup.picasso:picasso:2.8")
+
+    //Navigation
+    implementation ("androidx.navigation:navigation-compose:$nav_version")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+    implementation ("androidx.compose.runtime:runtime-livedata:1.5.4")
 
 
 }

@@ -28,13 +28,14 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import com.example.hamrothrift.R
-import com.example.hamrothrift.view.theme.White
-import com.example.hamrothrift.view.theme.appBar
-import com.example.hamrothrift.view.theme.bg
-import com.example.hamrothrift.view.theme.buttton
-import com.example.hamrothrift.view.theme.card
-import com.example.hamrothrift.view.theme.deepBlue
-import com.example.hamrothrift.view.theme.text
+import com.example.hamrothrift.view.theme.ui.theme.White
+import com.example.hamrothrift.view.theme.ui.theme.appBar
+import com.example.hamrothrift.view.theme.ui.theme.bg
+import com.example.hamrothrift.view.theme.ui.theme.buttton
+import com.example.hamrothrift.view.theme.ui.theme.card
+import com.example.hamrothrift.view.theme.ui.theme.deepBlue
+import com.example.hamrothrift.view.theme.ui.theme.text
+import com.example.hamrothrift.view.ProfileActivity
 
 class SaleActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,10 +60,11 @@ fun SaleActivityBody() {
 
     val navItems = listOf(
         NavItem("Home", Icons.Default.Home),
-        NavItem("Search", Icons.Filled.Star),
-        NavItem("Sale", Icons.Default.Notifications),
-        NavItem("Notification", Icons.Default.Person)
+        NavItem("Sale", Icons.Default.Star),
+        NavItem("Notification", Icons.Filled.Notifications),
+        NavItem("Profile", Icons.Default.Person)
     )
+
     val gradientColors = listOf(White, deepBlue,Black)
     val font = FontFamily(
         Font(R.font.handmade)

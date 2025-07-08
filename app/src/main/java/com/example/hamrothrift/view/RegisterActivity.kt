@@ -2,7 +2,6 @@ package com.example.hamrothrift.view
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -10,14 +9,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -55,11 +52,10 @@ import androidx.compose.ui.unit.sp
 import com.example.hamrothrift.R
 import com.example.hamrothrift.model.UserModel
 import com.example.hamrothrift.repository.UserRepoImpl
-import com.example.hamrothrift.utils.ImageUtils
-import com.example.hamrothrift.view.theme.bg
-import com.example.hamrothrift.view.theme.buttton
-import com.example.hamrothrift.view.theme.card
-import com.example.hamrothrift.view.theme.text
+import com.example.hamrothrift.view.theme.ui.theme.bg
+import com.example.hamrothrift.view.theme.ui.theme.buttton
+import com.example.hamrothrift.view.theme.ui.theme.card
+import com.example.hamrothrift.view.theme.ui.theme.text
 import com.example.hamrothrift.viewmodel.UserViewModel
 
 

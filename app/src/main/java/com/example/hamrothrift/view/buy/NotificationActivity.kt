@@ -1,5 +1,6 @@
 package com.example.hamrothrift.view.buy
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,219 +14,242 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hamrothrift.R
-import com.example.hamrothrift.view.theme.Teal
-import com.example.hamrothrift.view.theme.White
-import com.example.hamrothrift.view.theme.appBar
-import com.example.hamrothrift.view.theme.bg
-import com.example.hamrothrift.view.theme.deepBlue
-import com.example.hamrothrift.view.theme.text
+import com.example.hamrothrift.model.NavigationItem
+import com.example.hamrothrift.model.NotificationModel
+import com.example.hamrothrift.repository.NotificationRepoImpl
+import com.example.hamrothrift.view.ProfileActivity
+import com.example.hamrothrift.view.theme.ui.theme.*
+import com.example.hamrothrift.viewmodel.NotificationViewModel
+import com.example.hamrothrift.viewmodel.NotificationViewModelFactory
 
 class NotificationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            NotificationActivityBody()
-
+            val notificationRepo = NotificationRepoImpl()
+            val viewModel: NotificationViewModel = viewModel(
+                factory = NotificationViewModelFactory(notificationRepo)
+            )
+            NotificationScreen(viewModel)
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationActivityBody() {
-    data class NavItem(val label: String, val icon: ImageVector)
-
-    val navItems = listOf(
-        NavItem("Home", Icons.Default.Home),
-        NavItem("Search", Icons.Filled.Star),
-        NavItem("Sale", Icons.Default.Notifications),
-        NavItem("Notification", Icons.Default.Person)
-    )
-    val gradientColors = listOf(White, deepBlue, Color.Companion.Black)
+fun NotificationScreen(viewModel: NotificationViewModel) {
+    val context = LocalContext.current
+    val gradientColors = listOf(White, deepBlue, Color.Black)
     var selectedTab by remember { mutableStateOf(2) }
-    val notifications = remember {
-        mutableStateListOf(
-            NotificationItem(
-                title = "Order Shipped",
-                message = "Your order #1234 has been shipped.",
-                time = "2 hrs ago",
-                icon = Icons.Default.CheckCircle
-            ),
-            NotificationItem(
-                title = "Message Received",
-                message = "Seller replied to your question.",
-                time = "5 hrs ago",
-                icon = Icons.Default.Email
-            ),
-            NotificationItem(
-                title = "New Offer",
-                message = "Up to 50% off on denim jackets!",
-                time = "2 days ago",
-                icon = Icons.Default.Star
-            )
-        )
+    val font = FontFamily(Font(R.font.handmade))
+
+    // Observe ViewModel states
+    val notifications by viewModel.notifications.observeAsState(initial = emptyList<NotificationModel>())
+    val isLoading by viewModel.loading.observeAsState(initial = false)
+    val error by viewModel.error.observeAsState(initial = null)
+
+    // Load notifications when screen is created
+    LaunchedEffect(Unit) {
+        viewModel.loadNotifications()
     }
-    val font = FontFamily(
-        Font(R.font.handmade)
-    )
+
+    // Show error if any
+    error?.let { errorMessage ->
+        LaunchedEffect(errorMessage) {
+            // Handle error (e.g., show a toast)
+            viewModel.clearError()
+        }
+    }
+
     Scaffold(
-        topBar= {
+        topBar = {
             TopAppBar(
-                title = { Text("HamroThrift"
-                    ,style = TextStyle(
-                        brush = Brush.linearGradient(
-                            colors = gradientColors
-                        ),
-                        fontSize = 25.sp,
-                        fontFamily = font, fontStyle = FontStyle.Italic
-                    )) },
+                title = {
+                    Text(
+                        "HamroThrift",
+                        style = TextStyle(
+                            brush = Brush.linearGradient(colors = gradientColors),
+                            fontSize = 25.sp,
+                            fontFamily = font,
+                            fontStyle = FontStyle.Italic
+                        )
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = appBar),
                 actions = {
                     IconButton(onClick = {}) {
-                        Icon(Icons.Default.ShoppingCart, contentDescription = "Cart", tint = Color.White)
+                        Icon(Icons.Default.ShoppingCart, "Cart", tint = Color.White)
                     }
                     IconButton(onClick = {}) {
-                        Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White)
+                        Icon(Icons.Default.Search, "Search", tint = Color.White)
                     }
                 }
             )
-    },
+        },
         bottomBar = {
             NavigationBar(containerColor = appBar) {
-                navItems.forEachIndexed { index, item ->
+                val items = listOf(
+                    NavigationItem(label = "Home", icon = Icons.Default.Home, index = 0),
+                    NavigationItem(label = "Sale", icon = Icons.Default.ShoppingCart, index = 1),
+                    NavigationItem(label = "Notification", icon = Icons.Default.Notifications, index = 2),
+                    NavigationItem(label = "Profile", icon = Icons.Default.Person, index = 3)
+                )
+
+                items.forEachIndexed { index, item ->
                     NavigationBarItem(
                         icon = { Icon(item.icon, contentDescription = item.label) },
                         label = { Text(item.label) },
                         selected = selectedTab == index,
-                        onClick = { selectedTab = index }
+                        onClick = {
+                            selectedTab = index
+                            when (index) {
+                                0 -> context.startActivity(Intent(context, DashboardActivityBuy::class.java))
+                                1 -> context.startActivity(Intent(context, SaleActivity::class.java))
+                                3 -> context.startActivity(Intent(context, ProfileActivity::class.java))
+                            }
+                        }
                     )
                 }
             }
-        }) { innerPadding ->
-        Column(
+        }
+    ) { innerPadding ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(bg)
                 .padding(innerPadding)
-                .padding(start = 15.dp, end = 15.dp)
         ) {
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                ,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Notifications",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = text
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
                 )
-                Row {
-                    TextButton(onClick = {
-                        notifications.clear()
-                    }) {
-                        Text("Clear All",
-                            fontSize = 15.sp,
-                            color = text)
-                    }
-
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            if (notifications.isEmpty()) {
-                Box(
+            } else {
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = 40.dp),
-                    contentAlignment = Alignment.TopCenter
+                        .padding(horizontal = 15.dp)
                 ) {
-                    Text("No notifications", color = Color.Gray)
-                }
-            } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(notifications) { notification ->
-                        NotificationCard(notification)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Notifications",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = text
+                        )
+                        TextButton(
+                            onClick = { viewModel.clearAllNotifications() }
+                        ) {
+                            Text("Clear All", fontSize = 15.sp, color = text)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    if (notifications.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(top = 40.dp),
+                            contentAlignment = Alignment.TopCenter
+                        ) {
+                            Text("No notifications", color = Color.Gray)
+                        }
+                    } else {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(notifications) { notification ->
+                                NotificationCard(
+                                    notification = notification,
+                                    onDelete = { viewModel.deleteNotification(notification.notificationId) }
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
-
     }
-
-
 }
 
-data class NotificationItem(
-    val title: String,
-    val message: String,
-    val time: String,
-    val icon: ImageVector
-)
-
 @Composable
-fun NotificationCard(notification: NotificationItem) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(color = Teal, shape = RoundedCornerShape(12.dp))
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+fun NotificationCard(
+    notification: NotificationModel,
+    onDelete: () -> Unit
+) {
+    val icon = when (notification.type) {
+        "ORDER" -> Icons.Default.CheckCircle
+        "MESSAGE" -> Icons.Default.Email
+        "OFFER" -> Icons.Default.Star
+        else -> Icons.Default.Notifications
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Teal)
     ) {
-        Icon(
-            imageVector = notification.icon,
-            contentDescription = notification.title,
-            tint = Color.Black,
-            modifier = Modifier.size(35.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = notification.title,
+                tint = Color.Black,
+                modifier = Modifier.size(35.dp)
+            )
 
-        Spacer(modifier = Modifier.width(18.dp))
+            Spacer(modifier = Modifier.width(18.dp))
 
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = notification.title,
-                fontWeight = FontWeight.Bold,
-                fontSize =19.sp,
-                color = Color.Black
-            )
-            Text(
-                text = notification.message,
-                fontSize = 16.sp,
-                color = Color.DarkGray
-            )
-            Text(
-                text = notification.time,
-                fontSize = 15.sp,
-                color = Color.Gray
-            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = notification.title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 19.sp,
+                    color = Color.Black
+                )
+                Text(
+                    text = notification.message,
+                    fontSize = 16.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = notification.time,
+                    fontSize = 15.sp,
+                    color = Color.Gray
+                )
+            }
+
+            IconButton(onClick = onDelete) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = "Delete",
+                    tint = Color.Black
+                )
+            }
         }
     }
-}
-
-@Composable
-@Preview(showBackground = true)
-fun NotificationActivityPreview() {
-    NotificationActivityBody()
-    //NotificationCard(notification = NotificationItem)
-
 }

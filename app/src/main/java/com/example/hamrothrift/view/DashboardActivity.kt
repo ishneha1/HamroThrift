@@ -57,12 +57,12 @@ import androidx.compose.ui.unit.toSize
 import com.example.hamrothrift.R
 import com.example.hamrothrift.view.buy.DashboardActivityBuy
 import com.example.hamrothrift.view.sell.DashboardSellActivity
-import com.example.hamrothrift.view.theme.White
-import com.example.hamrothrift.view.theme.appBar
-import com.example.hamrothrift.view.theme.bg
-import com.example.hamrothrift.view.theme.buttton
-import com.example.hamrothrift.view.theme.deepBlue
-import com.example.hamrothrift.view.theme.text
+import com.example.hamrothrift.view.theme.ui.theme.White
+import com.example.hamrothrift.view.theme.ui.theme.appBar
+import com.example.hamrothrift.view.theme.ui.theme.bg
+import com.example.hamrothrift.view.theme.ui.theme.buttton
+import com.example.hamrothrift.view.theme.ui.theme.deepBlue
+import com.example.hamrothrift.view.theme.ui.theme.text
 
 class DashboardActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -237,3 +237,4 @@ fun DashboardBody() {
 fun DashboardPreview() {
     DashboardBody()
 }
+

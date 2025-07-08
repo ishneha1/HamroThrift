@@ -2,7 +2,6 @@ package com.example.hamrothrift.view
 
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -30,10 +29,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hamrothrift.R
-import com.example.hamrothrift.view.theme.HamroThriftTheme
-import com.example.hamrothrift.view.theme.bg
-import com.example.hamrothrift.view.theme.buttton
-import com.example.hamrothrift.view.theme.text
+import com.example.hamrothrift.view.theme.ui.theme.HamroThriftTheme
+import com.example.hamrothrift.view.theme.ui.theme.bg
+import com.example.hamrothrift.view.theme.ui.theme.buttton
+import com.example.hamrothrift.view.theme.ui.theme.text
 
 class WelcomeAndOnboardingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
