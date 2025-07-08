@@ -1,4 +1,4 @@
-package com.example.hamrothrift.ui.theme
+package com.example.hamrothrift.view.theme.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

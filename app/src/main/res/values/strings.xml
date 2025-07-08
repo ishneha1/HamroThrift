@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">HamroThrift</string>
+    <string name="title_activity_homepage">HomepageActivity</string>
+    <string name="title_activity_splash_screen">SplashScreenActivity</string>
+    <string name="title_activity_register">RegisterActivity</string>
+    <string name="title_activity_sale">SaleActivity</string>
+    <string name="title_activity_notification">NotificationActivity</string>
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="title_activity_dashboard_buy">DashboardActivityBuy</string>
+    <string name="webClientID">255594141988-udma6e3ujbt5hrcacr7u8boh3p0ttl6o.apps.googleusercontent.com</string>
+    <string name="title_activity_dashboard">DashboardActivity</string>
+    <string name="title_activity_welcome_onboarding">WelcomeOnboardingActivity</string>
+    <string name="title_activity_dashboard_sell">DashboardSellActivity</string>
+</resources>
