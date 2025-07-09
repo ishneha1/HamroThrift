@@ -14,4 +14,5 @@
     <string name="title_activity_forgot_password">ForgotPasswordActivity</string>
     <string name="title_activity_profile_screen">ProfileScreen</string>
     <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_all_orders">AllOrdersActivity</string>
 </resources>

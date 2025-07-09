@@ -1,10 +1,13 @@
 package com.example.hamrothrift.model
 
-data class ProductModel(
-    var productID : String ="",
-    var productName : String ="",
-    var price : Double =0.0,
-    var quantity : Int =0,
-    var description : String ="",
-    var productImage : String ="",
+class ProductModel(
+    val id: String = "",
+    val name: String = "",
+    val price: Double = 0.0,
+    val description: String = "",
+    val imageUrl: String = "",
+    val sellerId: String = "",
+    val category: String = "",
+    val isHotSale: Boolean = false,
+    val timestamp: Long = System.currentTimeMillis()
 )
