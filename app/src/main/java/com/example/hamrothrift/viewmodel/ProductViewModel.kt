@@ -40,6 +40,7 @@ class ProductViewModel(private val repository: ProductRepo) : ViewModel() {
                         _products.value = productsList
                         _isLoading.value = false
                     }
+
             } catch (e: Exception) {
                 _error.value = e.message
                 _isLoading.value = false
