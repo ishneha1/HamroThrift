@@ -122,5 +122,11 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx:24.10.2")
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
+    implementation("androidx.compose.ui:ui-window:1.5.4")
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
+
+
+
+
 
 }
