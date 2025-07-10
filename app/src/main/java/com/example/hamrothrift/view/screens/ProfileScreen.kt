@@ -108,6 +108,16 @@ fun ProfileScreen(navController: NavController,
         ProfileOption("All Orders", Icons.Default.List) { navController.navigate("all_orders") }
         ProfileOption("Billing Address", Icons.Default.LocationOn) { navController.navigate("billing_address") }
         ProfileOption("Change Password", Icons.Default.Lock) { navController.navigate("change_password") }
+        ProfileOption("Logout", Icons.Default.ExitToApp) {
+            viewModel.logout { success, message ->
+                if (success) {
+                    // Navigate to login screen
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            }
+        }
     }
 }
 
