@@ -353,7 +353,6 @@ fun RegisterActivityBody()
 //                            }
 
 
-                }
                 Button(
                     onClick = {
                         userViewModel.register(email, password) { success, message, userId ->
@@ -408,6 +407,7 @@ fun RegisterActivityBody()
                     )
 
                 }
+            }
 
 
 

@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.hamrothrift.R
-import com.example.hamrothrift.model.NavigationItem
 import com.example.hamrothrift.repository.UserRepoImpl
 import com.example.hamrothrift.view.components.CommonBottomBar
 import com.example.hamrothrift.view.screens.ProfileScreen
