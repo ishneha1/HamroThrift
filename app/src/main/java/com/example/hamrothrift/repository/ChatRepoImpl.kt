@@ -2,8 +2,10 @@ package com.example.hamrothrift.repository
 
 import com.example.hamrothrift.model.ChatMessage
 import com.example.hamrothrift.model.NotificationModel
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
@@ -25,11 +27,8 @@ class ChatRepoImpl : ChatRepo {
                 title = "New Message",
                 message = "You have a new message about a product",
                 type = "CHAT",
-                timestamp = System.currentTimeMillis(),
-                data = mapOf(
-                    "senderId" to message.senderId,
-                    "productId" to message.productId
-                )
+                timestamp = Timestamp.now(),
+                relatedId = message.productId
             )
             notificationsCollection.add(notification).await()
             true

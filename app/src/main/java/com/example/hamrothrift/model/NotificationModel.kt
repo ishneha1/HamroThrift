@@ -1,12 +1,15 @@
 package com.example.hamrothrift.model
 
-import androidx.compose.ui.graphics.vector.ImageVector
+import com.google.firebase.Timestamp
 
 data class NotificationModel(
-    var notificationId: String = "",
-    var title: String = "",
-    var message: String = "",
-    var time: String = "",
-    var userId: String = "",
-    var type: String = ""  // Can be "ORDER", "MESSAGE", "OFFER" etc.
+    val notificationId: String = "",
+    val userId: String = "",
+    val title: String = "",
+    val message: String = "",
+    val timestamp: Timestamp = Timestamp.now(),
+    val isRead: Boolean = false,
+    val type: String = "", // "BUYER_MESSAGE", "SELLER_REPLY", "ORDER", etc.
+    val relatedId: String = "", // productId, orderId, etc.
+    val senderInfo: String = "" // Additional sender information
 )

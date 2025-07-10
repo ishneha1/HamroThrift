@@ -3,13 +3,18 @@ package com.example.hamrothrift.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.hamrothrift.model.ChatMessage
 import com.example.hamrothrift.model.ProductModel
+import com.example.hamrothrift.repository.ChatRepo
+import com.example.hamrothrift.repository.ChatRepoImpl
 import com.example.hamrothrift.repository.ProductRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ProductViewModel(private val repository: ProductRepo) : ViewModel() {
+class ProductViewModel(private val repository: ProductRepo,
+                       private val chatRepo: ChatRepo = ChatRepoImpl()) : ViewModel()
+{
     private val _products = MutableStateFlow<List<ProductModel>>(emptyList())
     val products: StateFlow<List<ProductModel>> = _products
 
@@ -50,6 +55,15 @@ class ProductViewModel(private val repository: ProductRepo) : ViewModel() {
             } finally {
                 _isLoading.value = false
                 isLoadingMore = false
+            }
+        }
+    }
+    fun sendMessageToSeller(message: ChatMessage) {
+        viewModelScope.launch {
+            try {
+                chatRepo.sendMessage(message)
+            } catch (e: Exception) {
+                // Handle error
             }
         }
     }

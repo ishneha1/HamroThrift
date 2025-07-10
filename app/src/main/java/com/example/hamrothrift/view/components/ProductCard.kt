@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
@@ -124,8 +123,13 @@ fun ModeSelectorDropdown(
     }
 }
 
+// Update ProductCard.kt
 @Composable
-fun ProductCard(product: ProductModel, isSmall: Boolean) {
+fun ProductCard(
+    product: ProductModel,
+    isSmall: Boolean,
+    onMessageClick: (ProductModel) -> Unit
+) {
     val modifier = if (isSmall) {
         Modifier
             .width(120.dp)
@@ -157,18 +161,36 @@ fun ProductCard(product: ProductModel, isSmall: Boolean) {
                     .background(text)
                     .padding(8.dp)
             ) {
-                Text(
-                    text = product.name,
-                    color = White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = if (isSmall) 14.sp else 16.sp
-                )
-                Text(
-                    text = "Rs.${product.price}",
-                    color = White,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = if (isSmall) 12.sp else 14.sp
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = product.name,
+                            color = White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = if (isSmall) 14.sp else 16.sp
+                        )
+                        Text(
+                            text = "Rs.${product.price}",
+                            color = White,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = if (isSmall) 12.sp else 14.sp
+                        )
+                    }
+                    IconButton(
+                        onClick = { onMessageClick(product) },
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            Icons.Filled.Email,
+                            contentDescription = "Message Seller",
+                            tint = White
+                        )
+                    }
+                }
             }
         }
     }
