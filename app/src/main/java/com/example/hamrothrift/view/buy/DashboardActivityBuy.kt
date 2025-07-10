@@ -14,12 +14,12 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.hamrothrift.model.ChatMessage
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.ProductRepoImpl
 import com.example.hamrothrift.view.ProfileActivity
@@ -28,7 +28,6 @@ import com.example.hamrothrift.view.sell.DashboardSellActivity
 import com.example.hamrothrift.view.theme.ui.theme.bg
 import com.example.hamrothrift.viewmodel.ProductViewModel
 import com.example.hamrothrift.viewmodel.ProductViewModelFactory
-import com.google.firebase.auth.FirebaseAuth
 
 class DashboardActivityBuy : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -135,22 +134,13 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
             }
         }
 
-        // Message Dialog
-        if (showMessageDialog) {
+        // Message Dialog - Updated to match your MessageDialog component
+        if (showMessageDialog && selectedProduct != null) {
             MessageDialog(
-                showDialog = showMessageDialog,
-                onDismiss = { showMessageDialog = false },
-                onSendMessage = { message ->
-                    selectedProduct?.let { product ->
-                        viewModel.sendMessageToSeller(
-                            ChatMessage(
-                                senderId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
-                                receiverId = product.sellerId,
-                                message = message,
-                                productId = product.id
-                            )
-                        )
-                    }
+                product = selectedProduct!!,
+                onDismiss = {
+                    showMessageDialog = false
+                    selectedProduct = null
                 }
             )
         }
