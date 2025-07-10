@@ -91,7 +91,7 @@ dependencies {
     // Add Lottie directly (no TOML needed)
     implementation("com.airbnb.android:lottie-compose:6.1.0")
     implementation ("io.coil-kt:coil-gif:2.4.0")
-    implementation ("io.coil-kt:coil-compose:2.4.0")
+    implementation("io.coil-kt:coil-compose:2.5.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -112,6 +112,15 @@ dependencies {
     implementation ("androidx.compose.runtime:runtime-livedata:1.5.4")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+
+
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
+    implementation("com.google.firebase:firebase-firestore-ktx:24.10.2")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
 
 }

@@ -1,4 +1,4 @@
-package com.example.hamrothrift.view.screens.ui.theme
+package com.example.hamrothrift.view.components.ui.theme
 
 import android.app.Activity
 import android.os.Build

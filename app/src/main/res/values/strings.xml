@@ -15,4 +15,6 @@
     <string name="title_activity_profile_screen">ProfileScreen</string>
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="title_activity_all_orders">AllOrdersActivity</string>
+    <string name="title_activity_navigation_handler">NavigationHandler</string>
+    <string name="title_activity_common_bottom_bar">CommonBottomBar</string>
 </resources>

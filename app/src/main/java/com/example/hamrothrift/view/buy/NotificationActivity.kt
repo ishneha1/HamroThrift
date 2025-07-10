@@ -106,7 +106,7 @@ fun NotificationScreen(viewModel: NotificationViewModel) {
             NavigationBar(containerColor = appBar) {
                 val items = listOf(
                     NavigationItem(label = "Home", icon = Icons.Default.Home, index = 0),
-                    NavigationItem(label = "Sale", icon = Icons.Default.ShoppingCart, index = 1),
+                    NavigationItem(label = "Sale", icon = Icons.Default.Star, index = 1),
                     NavigationItem(label = "Notification", icon = Icons.Default.Notifications, index = 2),
                     NavigationItem(label = "Profile", icon = Icons.Default.Person, index = 3)
                 )
