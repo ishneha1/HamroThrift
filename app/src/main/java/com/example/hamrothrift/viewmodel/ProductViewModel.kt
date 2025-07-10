@@ -10,16 +10,22 @@ import com.example.hamrothrift.repository.ChatRepoImpl
 import com.example.hamrothrift.repository.ProductRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ProductViewModel(private val repository: ProductRepo,
-                       private val chatRepo: ChatRepo = ChatRepoImpl()) : ViewModel()
-{
+class ProductViewModel(
+    private val repository: ProductRepo,
+    private val chatRepo: ChatRepo = ChatRepoImpl()
+) : ViewModel() {
+
     private val _products = MutableStateFlow<List<ProductModel>>(emptyList())
-    val products: StateFlow<List<ProductModel>> = _products
+    val products: StateFlow<List<ProductModel>> = _products.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _messageSent = MutableStateFlow(false)
+    val messageSent: StateFlow<Boolean> = _messageSent.asStateFlow()
 
     private var isLoadingMore = false
     private var lastLoadedTimestamp: Long? = null
@@ -58,14 +64,20 @@ class ProductViewModel(private val repository: ProductRepo,
             }
         }
     }
+
     fun sendMessageToSeller(message: ChatMessage) {
         viewModelScope.launch {
             try {
                 chatRepo.sendMessage(message)
+                _messageSent.value = true
             } catch (e: Exception) {
                 // Handle error
             }
         }
+    }
+
+    fun resetMessageSent() {
+        _messageSent.value = false
     }
 }
 
