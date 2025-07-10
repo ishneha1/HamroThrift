@@ -1,143 +1,124 @@
 package com.example.hamrothrift.view.buy
-//
-//import android.app.Activity
-//import android.content.Intent
+
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.hamrothrift.repository.ProductRepoImpl
+import com.example.hamrothrift.view.ProfileActivity
+import com.example.hamrothrift.view.components.*
+import com.example.hamrothrift.view.sell.DashboardSellActivity
+import com.example.hamrothrift.view.theme.ui.theme.bg
+import com.example.hamrothrift.viewmodel.ProductViewModel
+import com.example.hamrothrift.viewmodel.ProductViewModelFactory
 
-//import androidx.compose.foundation.background
-//import androidx.compose.foundation.layout.*
-//import androidx.compose.foundation.lazy.LazyColumn
-//import androidx.compose.material3.*
-//import androidx.compose.runtime.*
-//import androidx.compose.ui.Alignment
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.platform.LocalContext
-//import androidx.compose.ui.text.font.FontWeight
-//import androidx.compose.ui.unit.dp
-//import androidx.compose.ui.unit.sp
-//import androidx.lifecycle.viewmodel.compose.viewModel
-//import com.example.hamrothrift.repository.*
-//import com.example.hamrothrift.view.components.*
-//import com.example.hamrothrift.view.theme.ui.theme.*
-//import com.example.hamrothrift.viewmodel.*
-//
 class DashboardActivityBuy : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Dashboardbodybuy()
-
+            val productRepository = ProductRepoImpl()
+            val viewModel: ProductViewModel = viewModel(
+                factory = ProductViewModelFactory(productRepository)
+            )
+            DashboardBuyBody(viewModel)
         }
     }
-
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Dashboardbodybuy() {
-    Text(text="WELCOME")
-}
-    //val context = LocalContext.current
-    //val activity = context as? Activity
+fun DashboardBuyBody(viewModel: ProductViewModel) {
+    var selectedTab by remember { mutableStateOf(0) }
+    val context = LocalContext.current
+    val activity = context as? Activity
+    val gridState = rememberLazyGridState()
+    val products by viewModel.products.collectAsState(initial = emptyList())
+    val isLoading by viewModel.isLoading.collectAsState()
 
-    //val gradientColors = listOf(White, deepBlue, Black)
-    //val font = FontFamily(Font(R.font.handmade))
-//    private val navigationRepo: NavigationRepo by lazy { NavigationRepoImpl() }
-//    private val sellerRepo: SellerRepo by lazy { SellerRepoImpl() }
-//
-//
-//            val navigationViewModel: NavigationViewModel = viewModel(
-//                factory = NavigationViewModelFactory(navigationRepo)
-//            )
-//            val sellerViewModel: SellerViewModel = viewModel(
-//                factory = SellerViewModelFactory(sellerRepo)
-//            )
-//            DashboardActivityBody(navigationViewModel, sellerViewModel)
-//        }
-//    }
-//}
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun DashboardActivityBody(
-//    navigationViewModel: NavigationViewModel,
-//    sellerViewModel: SellerViewModel
-//) {
-//    var selectedTab by remember { mutableIntStateOf(0) }
-//    val context = LocalContext.current
-//    val activity = context as? Activity
-//
-//    val sellers by sellerViewModel.sellers.collectAsState()
-//    val isLoading by sellerViewModel.isLoading.collectAsState()
-//    val error by sellerViewModel.error.collectAsState()
-//
-//    LaunchedEffect(Unit) {
-//        sellerViewModel.loadSellers()
-//    }
-//
-//    Scaffold(
-//        topBar = { CommonTopAppBar() },
-//        bottomBar = {
-//            CommonBottomBar(
-//                selectedTab = selectedTab,
-//                onTabSelected = { selectedTab = it }
-//            )
-//        }
-//    ) { paddingValues ->
-//        Box(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(paddingValues)
-//                .background(bg)
-//        ) {
-//            LazyColumn(
-//                modifier = Modifier.padding(16.dp)
-//            ) {
-//                item {
-//                    ModeSelectorDropdown(
-//                        currentMode = "Buy Mode",
-//                        onModeSelected = { mode ->
-//                            navigationViewModel.updateMode(mode)
-//                        }
-//                    )
-//
-//                    Spacer(modifier = Modifier.height(20.dp))
-//
-//                    when {
-//                        isLoading -> {
-//                            CircularProgressIndicator(
-//                                modifier = Modifier.align(Alignment.Center)
-//                            )
-//                        }
-//                        error != null -> {
-//                            Text(
-//                                text = error ?: "Unknown error occurred",
-//                                color = MaterialTheme.colorScheme.error,
-//                                modifier = Modifier.padding(16.dp)
-//                            )
-//                        }
-//                        else -> {
-//                            Text(
-//                                "Popular Sellers",
-//                                fontSize = 20.sp,
-//                                fontWeight = FontWeight.Bold,
-//                                color = text
-//                            )
-//
-//                            Spacer(modifier = Modifier.height(8.dp))
-//
-//                            sellers.forEach { seller ->
-//                                SellerCard(seller = seller)
-//                                Spacer(modifier = Modifier.height(8.dp))
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
+    LaunchedEffect(Unit) {
+        viewModel.loadInitialProducts()
+    }
+
+    // Implement infinite scrolling
+    LaunchedEffect(gridState) {
+        snapshotFlow { gridState.firstVisibleItemIndex }
+            .collect { firstVisibleItem ->
+                if (firstVisibleItem > products.size - 10) {
+                    viewModel.loadMoreProducts()
+                }
+            }
+    }
+
+    Scaffold(
+        topBar = { CommonTopAppBar() },
+        bottomBar = {
+            CommonBottomBar(
+                selectedTab = selectedTab,
+                onTabSelected = { index ->
+                    selectedTab = index
+                    when (index) {
+                        1 -> context.startActivity(Intent(context, SaleActivity::class.java))
+                        2 -> context.startActivity(Intent(context, NotificationActivity::class.java))
+                        3 -> context.startActivity(Intent(context, ProfileActivity::class.java))
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(bg)
+        ) {
+            ModeSelectorDropdown(
+                currentMode = "Buy Mode",
+                onModeSelected = { mode ->
+                    if (mode == "Sell Mode") {
+                        val intent = Intent(context, DashboardSellActivity::class.java)
+                        context.startActivity(intent)
+                        activity?.finish()
+                    }
+                }
+            )
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                state = gridState,
+                contentPadding = PaddingValues(8.dp),
+                modifier = Modifier.weight(1f)
+            ) {
+                items(products) { product ->
+                    ProductCard(product = product, isSmall = false)
+                }
+            }
+
+            if (isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(androidx.compose.ui.Alignment.Center)
+                    )
+                }
+            }
+        }
+    }
+}

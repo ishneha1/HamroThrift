@@ -7,108 +7,49 @@ import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.ProductRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 class ProductViewModel(private val repository: ProductRepo) : ViewModel() {
     private val _products = MutableStateFlow<List<ProductModel>>(emptyList())
     val products: StateFlow<List<ProductModel>> = _products
 
-    private val _hotSaleProducts = MutableStateFlow<List<ProductModel>>(emptyList())
-    val hotSaleProducts: StateFlow<List<ProductModel>> = _hotSaleProducts
-
-    private val _isLoading = MutableStateFlow(true)
+    private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
+    private var isLoadingMore = false
+    private var lastLoadedTimestamp: Long? = null
 
-    init {
-        loadProducts()
-        loadHotSaleProducts()
-    }
-
-    private fun loadProducts() {
+    fun loadInitialProducts() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                repository.getAllProducts()
-                    .catch { e ->
-                        _error.value = e.message
-                    }
-                    .collect { productsList ->
-                        _products.value = productsList
-                        _isLoading.value = false
-                    }
-
-            } catch (e: Exception) {
-                _error.value = e.message
+                repository.getAllProducts().collect { productsList ->
+                    _products.value = productsList
+                    lastLoadedTimestamp = productsList.lastOrNull()?.timestamp
+                }
+            } finally {
                 _isLoading.value = false
             }
         }
     }
 
-    private fun loadHotSaleProducts() {
-        viewModelScope.launch {
-            try {
-                repository.getHotSaleProducts()
-                    .catch { e ->
-                        _error.value = e.message
-                    }
-                    .collect { hotSales ->
-                        _hotSaleProducts.value = hotSales
-                    }
-            } catch (e: Exception) {
-                _error.value = e.message
-            }
-        }
-    }
+    fun loadMoreProducts() {
+        if (isLoadingMore) return
 
-    fun getProductsByCategory(category: String) {
         viewModelScope.launch {
+            isLoadingMore = true
             _isLoading.value = true
             try {
-                repository.getProductsByCategory(category)
-                    .catch { e ->
-                        _error.value = e.message
+                lastLoadedTimestamp?.let { timestamp ->
+                    repository.getAllProducts().collect { newProducts ->
+                        val filteredProducts = newProducts.filter { it.timestamp < timestamp }
+                        _products.value = _products.value + filteredProducts
+                        lastLoadedTimestamp = filteredProducts.lastOrNull()?.timestamp
                     }
-                    .collect { productsList ->
-                        _products.value = productsList
-                        _isLoading.value = false
-                    }
-            } catch (e: Exception) {
-                _error.value = e.message
+                }
+            } finally {
                 _isLoading.value = false
-            }
-        }
-    }
-
-    fun addProduct(product: ProductModel) {
-        viewModelScope.launch {
-            try {
-                repository.addProduct(product)
-            } catch (e: Exception) {
-                _error.value = e.message
-            }
-        }
-    }
-
-    fun updateProduct(product: ProductModel) {
-        viewModelScope.launch {
-            try {
-                repository.updateProduct(product)
-            } catch (e: Exception) {
-                _error.value = e.message
-            }
-        }
-    }
-
-    fun deleteProduct(productId: String) {
-        viewModelScope.launch {
-            try {
-                repository.deleteProduct(productId)
-            } catch (e: Exception) {
-                _error.value = e.message
+                isLoadingMore = false
             }
         }
     }
