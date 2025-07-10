@@ -8,48 +8,22 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -59,32 +33,37 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hamrothrift.R
+import com.example.hamrothrift.repository.SellerRepo
+import com.example.hamrothrift.repository.SellerRepoImpl
 import com.example.hamrothrift.view.sell.DashboardSellActivity
-import com.example.hamrothrift.view.theme.ui.theme.White
-import com.example.hamrothrift.view.theme.ui.theme.appBar
-import com.example.hamrothrift.view.theme.ui.theme.buttton
-import com.example.hamrothrift.view.theme.ui.theme.deepBlue
-import com.example.hamrothrift.view.theme.ui.theme.text
-import com.example.hamrothrift.view.ProfileActivity
+import com.example.hamrothrift.view.theme.ui.theme.*
+import com.example.hamrothrift.viewmodel.SellerViewModel
+import com.example.hamrothrift.viewmodel.SellerViewModelFactory
+
 
 class DashboardActivityBuy : ComponentActivity() {
+    private val repository: SellerRepo by lazy { SellerRepoImpl() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            DashboardActivityBuyBody()
+            val viewModel: SellerViewModel = viewModel(
+                factory = SellerViewModelFactory(repository)
+            )
+            DashboardActivityBuyBody(viewModel)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardActivityBuyBody() {
+fun DashboardActivityBuyBody(viewModel: SellerViewModel) {
     data class NavItem(val label: String, val icon: ImageVector)
 
     val navItems = listOf(
@@ -94,32 +73,35 @@ fun DashboardActivityBuyBody() {
         NavItem("Profile", Icons.Default.Person)
     )
 
-    val gradientColors = listOf(White, deepBlue,Black)
-    val font = FontFamily(
-        Font(R.font.handmade)
-    )
+    val sellers by viewModel.sellers.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf("Select Option") }
-    val options = listOf("Buy Mode","Sell Mode")
-    var textFieldSize by remember { mutableStateOf(Size.Zero)}
-
-
+    var selectedOptionText by remember { mutableStateOf("Buy Mode") }
+    var textFieldSize by remember { mutableStateOf(Size.Zero) }
     var selectedTab by remember { mutableIntStateOf(0) }
+
+    val options = listOf("Buy Mode", "Sell Mode")
     val context = LocalContext.current
     val activity = context as? Activity
+
+    val gradientColors = listOf(White, deepBlue, Black)
+    val font = FontFamily(Font(R.font.handmade))
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("HamroThrift"
-                    ,style = TextStyle(
-                        brush = Brush.linearGradient(
-                            colors = gradientColors
-                        ),
-                        fontSize = 25.sp,
-                        fontFamily = font, fontStyle = FontStyle.Italic
-                    )) },
+                title = {
+                    Text(
+                        "HamroThrift",
+                        style = TextStyle(
+                            brush = Brush.linearGradient(colors = gradientColors),
+                            fontSize = 25.sp,
+                            fontFamily = font,
+                            fontStyle = FontStyle.Italic
+                        )
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = appBar),
                 actions = {
                     IconButton(onClick = {}) {
@@ -144,114 +126,101 @@ fun DashboardActivityBuyBody() {
             }
         }
     ) { innerPadding ->
-        Box(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .padding(horizontal = 20.dp)
         ) {
-            when (selectedTab) {
-                0 -> DashboardActivityBuy()
-                1 -> SaleActivity()
-                2 -> NotificationActivity()
-                3 -> ProfileActivity()
-            }
-        }
-        LazyColumn(modifier = Modifier
-            .padding(top= 80.dp, start = 20.dp, end = 20.dp)){
             item {
                 OutlinedTextField(
                     value = selectedOptionText,
                     onValueChange = {},
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(vertical = 16.dp)
                         .onGloballyPositioned { coordinates ->
                             textFieldSize = coordinates.size.toSize()
-
                         }
-                        .clickable {
-                            expanded = true
-                        }
+                        .clickable { expanded = true }
                         .clip(RoundedCornerShape(10.dp)),
-
                     colors = TextFieldDefaults.colors(
                         disabledContainerColor = buttton,
                         disabledIndicatorColor = Black,
                         disabledTextColor = Black
                     ),
-                    placeholder = {
-                        Text(
-                            "Select Mode", fontSize = 20.sp, fontWeight = FontWeight.SemiBold
-                        )
-                    },
                     enabled = false,
                     trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = null
-                        )
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
                     }
-
                 )
+
                 DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .width(
-                            with(LocalDensity.current)
-                            { textFieldSize.width.toDp() })
+                    modifier = Modifier.width(with(LocalDensity.current) { textFieldSize.width.toDp() })
                 ) {
                     options.forEach { option ->
                         DropdownMenuItem(
                             text = { Text(option) },
                             onClick = {
-                                selectedOptionText = option
-                                expanded = false
-//                                if (option == "Buy Mode") {
-//                                    val intent = Intent(context, DashboardActivityBuy::class.java)
-//                                    context.startActivity(intent)
-//                                    activity?.finish()
-//                                }
                                 if (option == "Sell Mode") {
-                                    val intent =
-                                        Intent(context, DashboardSellActivity::class.java)
+                                    val intent = Intent(context, DashboardSellActivity::class.java)
                                     context.startActivity(intent)
                                     activity?.finish()
                                 }
+                                selectedOptionText = option
+                                expanded = false
                             }
                         )
                     }
                 }
 
-
-                Text("Top Sellers", color = text,
+                Text(
+                    "Top Sellers",
+                    color = text,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
-                    fontStyle = FontStyle.Italic,)
+                    fontStyle = FontStyle.Italic,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
 
-                LazyRow(
-                    modifier = Modifier
-                        .padding(top=20.dp, bottom = 20.dp)
-                        .fillMaxWidth()
-                        .background(Color.DarkGray,
-                            shape = RoundedCornerShape(16.dp)),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-//                    items(sellers) { seller ->
-//                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//
-//
-//                        }
-//                    }
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .wrapContentSize(Alignment.Center)
+                    )
+                } else {
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.DarkGray, RoundedCornerShape(16.dp))
+                            .padding(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(sellers) { seller ->
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.padding(4.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .background(Color.White, CircleShape)
+                                )
+                                Text(
+                                    "${seller.firstName} ${seller.lastName}",
+                                    color = Color.White,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(top = 4.dp)
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
     }
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DashboardActivityBuyPreview() {
-    DashboardActivityBuyBody()
 }
