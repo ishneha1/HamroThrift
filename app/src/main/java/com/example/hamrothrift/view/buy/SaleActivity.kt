@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.ProductRepoImpl
 import com.example.hamrothrift.view.components.CommonBottomBar
 import com.example.hamrothrift.view.components.CommonTopAppBar
@@ -52,10 +53,9 @@ fun SaleActivityBody(viewModel: ProductViewModel) {
     val context = LocalContext.current
     val activity = context as? Activity
 
-    val products by viewModel.products.collectAsState()
-    val hotSaleProducts by viewModel.hotSaleProducts.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState()
+    val products by viewModel.products.collectAsState(initial = emptyList<ProductModel>())
+
+    val isLoading by viewModel.isLoading.collectAsState(initial = false)
 
     Scaffold(
         topBar = { CommonTopAppBar() },
@@ -98,13 +98,13 @@ fun SaleActivityBody(viewModel: ProductViewModel) {
                                 CircularProgressIndicator()
                             }
                         }
-                        error != null -> {
-                            Text(
-                                text = error ?: "Unknown error occurred",
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
+//                        error != null -> {
+//                            Text(
+//                                text = error ?: "Unknown error occurred",
+//                                color = MaterialTheme.colorScheme.error,
+//                                modifier = Modifier.padding(16.dp)
+//                            )
+//                        }
                         else -> {
                             Text(
                                 "HOT SALE",
@@ -117,12 +117,12 @@ fun SaleActivityBody(viewModel: ProductViewModel) {
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 modifier = Modifier.padding(vertical = 8.dp)
                             ) {
-                                items(hotSaleProducts) { product ->
-                                    ProductCard(
-                                        product = product,
-                                        isSmall = true
-                                    )
-                                }
+//                                items(hotSaleProducts) { product ->
+//                                    ProductCard(
+//                                        product = product,
+//                                        isSmall = true
+//                                    )
+//                                }
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))
@@ -137,10 +137,12 @@ fun SaleActivityBody(viewModel: ProductViewModel) {
                             Spacer(modifier = Modifier.height(8.dp))
 
                             products.forEach { product ->
-                                ProductCard(
-                                    product = product,
-                                    isSmall = false
-                                )
+                                ProductCard(product = product,
+                                    isSmall = false,
+                                    onMessageClick = { /* Handle message click */ })
+                                    //product = product,
+                                    //isSmall = false
+
                                 Spacer(modifier = Modifier.height(8.dp))
                             }
                         }

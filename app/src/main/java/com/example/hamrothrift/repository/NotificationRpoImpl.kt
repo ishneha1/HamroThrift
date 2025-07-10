@@ -14,7 +14,7 @@ class NotificationRepoImpl : NotificationRepo {
         notification: NotificationModel,
         callback: (Boolean, String) -> Unit
     ) {
-        val notificationId = notificationsRef.push().key ?: return
+        var notificationId = notificationsRef.push().key ?: return
         notification.notificationId = notificationId
 
         notificationsRef.child(notificationId).setValue(notification)

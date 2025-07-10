@@ -70,7 +70,7 @@ class NotificationViewModel(
             val notification = NotificationModel(
                 title = title,
                 message = message,
-                time = System.currentTimeMillis().toString(),
+                timestamp =  System.currentTimeMillis().toString(),
                 userId = userId,
                 type = type
             )

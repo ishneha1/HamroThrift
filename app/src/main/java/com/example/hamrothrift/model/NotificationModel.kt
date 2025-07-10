@@ -3,7 +3,7 @@ package com.example.hamrothrift.model
 import com.google.firebase.Timestamp
 
 data class NotificationModel(
-    val notificationId: String = "",
+    var notificationId: String = "",
     val userId: String = "",
     val title: String = "",
     val message: String = "",

@@ -1,5 +1,6 @@
 package com.example.hamrothrift.view.buy
 
+import com.google.firebase.Timestamp
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -237,7 +238,7 @@ fun NotificationCard(
                     color = Color.DarkGray
                 )
                 Text(
-                    text = notification.time,
+                    text = formatFirebaseTimestamp(notification.timestamp),
                     fontSize = 15.sp,
                     color = Color.Gray
                 )
@@ -252,4 +253,10 @@ fun NotificationCard(
             }
         }
     }
+}
+
+// Update the helper function to handle Firebase Timestamp
+private fun formatFirebaseTimestamp(timestamp: com.google.firebase.Timestamp): String {
+    val formatter = java.text.SimpleDateFormat("MMM dd, yyyy HH:mm", java.util.Locale.getDefault())
+    return formatter.format(timestamp.toDate())
 }
