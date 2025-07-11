@@ -27,7 +27,7 @@ class NotificationViewModel(
             notificationRepo.getNotificationsByUserId(userId) { success, message, notifications ->
                 _loading.value = false
                 if (success) {
-                    _notifications.value = notifications.sortedByDescending { it.time }
+                    _notifications.value = notifications.sortedByDescending { it.timestamp }
                 } else {
                     _error.value = message
                 }
@@ -70,7 +70,7 @@ class NotificationViewModel(
             val notification = NotificationModel(
                 title = title,
                 message = message,
-                timestamp =  System.currentTimeMillis().toString(),
+                timestamp = com.google.firebase.Timestamp.now(),
                 userId = userId,
                 type = type
             )
