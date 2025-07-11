@@ -91,6 +91,8 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(bg)
+                .padding(horizontal = 16.dp, vertical = 10.dp)
+
         ) {
             ModeSelectorDropdown(
                 currentMode = "Buy Mode",
@@ -102,6 +104,8 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
                     }
                 }
             )
+            Spacer(modifier = Modifier.height(18.dp))
+
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
@@ -134,7 +138,7 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
             }
         }
 
-        // Message Dialog - Updated to match your MessageDialog component
+
         if (showMessageDialog && selectedProduct != null) {
             MessageDialog(
                 product = selectedProduct!!,
