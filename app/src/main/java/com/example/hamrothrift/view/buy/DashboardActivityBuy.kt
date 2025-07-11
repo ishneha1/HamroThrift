@@ -91,6 +91,7 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(bg)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             ModeSelectorDropdown(
                 currentMode = "Buy Mode",
@@ -102,7 +103,7 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
                     }
                 }
             )
-
+            Spacer(modifier = Modifier.height(16.dp))
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 state = gridState,
