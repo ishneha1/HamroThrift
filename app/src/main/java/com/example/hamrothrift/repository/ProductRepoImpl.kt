@@ -125,5 +125,15 @@ class ProductRepoImpl : ProductRepo {
                 }
             }
         awaitClose { snapshotListener.remove() }
+
+
+    }
+
+    override suspend fun updateProduct(productId: String, updates: Map<String, Any?>) {
+        try {
+            firestore.collection("products").document(productId).update(updates).await()
+        } catch (e: Exception) {
+            throw e
+        }
     }
 }
