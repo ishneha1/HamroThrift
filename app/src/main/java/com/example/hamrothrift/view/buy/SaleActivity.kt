@@ -65,7 +65,6 @@ fun SaleActivityBody(
 
     val allProducts by productViewModel.products.collectAsState(initial = emptyList<ProductModel>())
     val isLoading by productViewModel.isLoading.collectAsState(initial = false)
-    val error by productViewModel.error.collectAsState(initial = null)
 
     // Filter products to show only items on sale
     val saleProducts = remember(allProducts) {
@@ -76,16 +75,16 @@ fun SaleActivityBody(
         }
     }
 
-    // Hot sale products - top 5 sale items
+    // Hot sale products - top 5 sale items sorted by discount
     val hotSaleProducts = remember(saleProducts) {
-        saleProducts.sortedByDescending {
-                product -> product.discount ?: 0.0
+        saleProducts.sortedByDescending { product ->
+            product.discount ?: 0.0
         }.take(5)
     }
 
     // Fetch products when composable is first created
     LaunchedEffect(Unit) {
-        productViewModel.fetchProducts()
+        productViewModel.loadInitialProducts() // Correct method name
     }
 
     Scaffold(
@@ -128,13 +127,6 @@ fun SaleActivityBody(
                             ) {
                                 CircularProgressIndicator()
                             }
-                        }
-                        error != null -> {
-                            Text(
-                                text = error ?: "Unknown error occurred",
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.padding(16.dp)
-                            )
                         }
                         saleProducts.isEmpty() -> {
                             Box(
@@ -193,7 +185,7 @@ fun SaleActivityBody(
                 }
 
                 // Display all sale products
-                if (!isLoading && error == null && saleProducts.isNotEmpty()) {
+                if (!isLoading && saleProducts.isNotEmpty()) {
                     items(saleProducts) { product ->
                         ProductCard(
                             product = product,
