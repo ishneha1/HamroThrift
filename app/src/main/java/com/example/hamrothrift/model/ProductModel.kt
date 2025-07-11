@@ -8,6 +8,9 @@ class ProductModel(
     val imageUrl: String = "",
     val sellerId: String = "",
     val category: String = "",
-    val isHotSale: Boolean = false,
-    val timestamp: Long = System.currentTimeMillis()
+    val isOnSale: Boolean = false,
+    val timestamp: Long = System.currentTimeMillis(),
+    val originalPrice: Double? = null,
+    val discount: Double? = null
+
 )

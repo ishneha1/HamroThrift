@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.ProductRepoImpl
+import com.example.hamrothrift.repository.NotificationRepoImpl
 import com.example.hamrothrift.view.components.CommonBottomBar
 import com.example.hamrothrift.view.components.CommonTopAppBar
 import com.example.hamrothrift.view.components.ModeSelectorDropdown
@@ -31,31 +32,61 @@ import com.example.hamrothrift.view.sell.DashboardSellActivity
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.ProductViewModel
 import com.example.hamrothrift.viewmodel.ProductViewModelFactory
+import com.example.hamrothrift.viewmodel.NotificationViewModel
+import com.example.hamrothrift.viewmodel.NotificationViewModelFactory
 
 class SaleActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val repository = ProductRepoImpl()
-            val viewModel: ProductViewModel = viewModel(
-                factory = ProductViewModelFactory(repository)
+            val productRepository = ProductRepoImpl()
+            val notificationRepository = NotificationRepoImpl()
+            val productViewModel: ProductViewModel = viewModel(
+                factory = ProductViewModelFactory(productRepository)
             )
-            SaleActivityBody(viewModel)
+            val notificationViewModel: NotificationViewModel = viewModel(
+                factory = NotificationViewModelFactory(notificationRepository)
+            )
+            SaleActivityBody(productViewModel, notificationViewModel)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SaleActivityBody(viewModel: ProductViewModel) {
+fun SaleActivityBody(
+    productViewModel: ProductViewModel,
+    notificationViewModel: NotificationViewModel
+) {
     var selectedTab by remember { mutableIntStateOf(1) }
     val context = LocalContext.current
     val activity = context as? Activity
 
-    val products by viewModel.products.collectAsState(initial = emptyList<ProductModel>())
+    val allProducts by productViewModel.products.collectAsState(initial = emptyList<ProductModel>())
+    val isLoading by productViewModel.isLoading.collectAsState(initial = false)
+    val error by productViewModel.error.collectAsState(initial = null)
 
-    val isLoading by viewModel.isLoading.collectAsState(initial = false)
+    // Filter products to show only items on sale
+    val saleProducts = remember(allProducts) {
+        allProducts.filter { product ->
+            product.isOnSale == true ||
+                    (product.originalPrice != null && product.price < (product.originalPrice ?: 0.0)) ||
+                    (product.discount != null && product.discount!! > 0)
+        }
+    }
+
+    // Hot sale products - top 5 sale items
+    val hotSaleProducts = remember(saleProducts) {
+        saleProducts.sortedByDescending {
+                product -> product.discount ?: 0.0
+        }.take(5)
+    }
+
+    // Fetch products when composable is first created
+    LaunchedEffect(Unit) {
+        productViewModel.fetchProducts()
+    }
 
     Scaffold(
         topBar = { CommonTopAppBar() },
@@ -105,59 +136,105 @@ fun SaleActivityBody(viewModel: ProductViewModel) {
                                 modifier = Modifier.padding(16.dp)
                             )
                         }
-                        else -> {
-                            Text(
-                                "HOT SALE",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = text
-                            )
-
-                            LazyRow(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                modifier = Modifier.padding(vertical = 8.dp)
+                        saleProducts.isEmpty() -> {
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
                             ) {
-                                items(hotSaleProducts) { product ->
-                                    ProductCard(
-                                        product = product,
-                                        isSmall = true
-                                    )
+                                Text(
+                                    text = "No sale items available",
+                                    color = text,
+                                    fontSize = 16.sp
+                                )
+                            }
+                        }
+                        else -> {
+                            // Hot Sale Section
+                            if (hotSaleProducts.isNotEmpty()) {
+                                Text(
+                                    "HOT SALE",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = text
+                                )
+
+                                LazyRow(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    modifier = Modifier.padding(vertical = 8.dp)
+                                ) {
+                                    items(hotSaleProducts) { product ->
+                                        ProductCard(
+                                            product = product,
+                                            isSmall = true,
+                                            onMessageClick = {
+                                                handleMessageClick(
+                                                    product,
+                                                    notificationViewModel
+                                                )
+                                            }
+                                        )
+                                    }
                                 }
+
+                                Spacer(modifier = Modifier.height(16.dp))
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
-
+                            // All Sale Items Section
                             Text(
-                                "For You",
+                                "Sale Items",
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = text
                             )
 
                             Spacer(modifier = Modifier.height(8.dp))
-
-                            products.forEach { product ->
-                                ProductCard(product = product,
-                                    isSmall = false,
-                                    onMessageClick = { /* Handle message click */ })
-                                    product = product,
-                                    isSmall = false
-
-                                Spacer(modifier = Modifier.height(8.dp))
-                            }
                         }
+                    }
+                }
+
+                // Display all sale products
+                if (!isLoading && error == null && saleProducts.isNotEmpty()) {
+                    items(saleProducts) { product ->
+                        ProductCard(
+                            product = product,
+                            isSmall = false,
+                            onMessageClick = {
+                                handleMessageClick(
+                                    product,
+                                    notificationViewModel
+                                )
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
         }
     }
 }
+
+private fun handleMessageClick(
+    product: ProductModel,
+    notificationViewModel: NotificationViewModel
+) {
+    // Send notification to seller
+    notificationViewModel.addNotification(
+        title = "New Message",
+        message = "Someone is interested in your product: ${product.name}",
+        type = "message"
+    )
+}
+
 @Preview(showBackground = true)
 @Composable
 fun PreviewSaleActivity() {
-    val repository = ProductRepoImpl()
-    val viewModel: ProductViewModel = viewModel(
-        factory = ProductViewModelFactory(repository)
+    val productRepository = ProductRepoImpl()
+    val notificationRepository = NotificationRepoImpl()
+    val productViewModel: ProductViewModel = viewModel(
+        factory = ProductViewModelFactory(productRepository)
     )
-    SaleActivityBody(viewModel)
+    val notificationViewModel: NotificationViewModel = viewModel(
+        factory = NotificationViewModelFactory(notificationRepository)
+    )
+    SaleActivityBody(productViewModel, notificationViewModel)
 }
