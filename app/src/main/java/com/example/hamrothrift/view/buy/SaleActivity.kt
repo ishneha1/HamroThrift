@@ -98,13 +98,13 @@ fun SaleActivityBody(viewModel: ProductViewModel) {
                                 CircularProgressIndicator()
                             }
                         }
-//                        error != null -> {
-//                            Text(
-//                                text = error ?: "Unknown error occurred",
-//                                color = MaterialTheme.colorScheme.error,
-//                                modifier = Modifier.padding(16.dp)
-//                            )
-//                        }
+                        error != null -> {
+                            Text(
+                                text = error ?: "Unknown error occurred",
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
                         else -> {
                             Text(
                                 "HOT SALE",
@@ -117,12 +117,12 @@ fun SaleActivityBody(viewModel: ProductViewModel) {
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 modifier = Modifier.padding(vertical = 8.dp)
                             ) {
-//                                items(hotSaleProducts) { product ->
-//                                    ProductCard(
-//                                        product = product,
-//                                        isSmall = true
-//                                    )
-//                                }
+                                items(hotSaleProducts) { product ->
+                                    ProductCard(
+                                        product = product,
+                                        isSmall = true
+                                    )
+                                }
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))
@@ -140,8 +140,8 @@ fun SaleActivityBody(viewModel: ProductViewModel) {
                                 ProductCard(product = product,
                                     isSmall = false,
                                     onMessageClick = { /* Handle message click */ })
-                                    //product = product,
-                                    //isSmall = false
+                                    product = product,
+                                    isSmall = false
 
                                 Spacer(modifier = Modifier.height(8.dp))
                             }
