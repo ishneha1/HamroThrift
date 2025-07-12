@@ -27,13 +27,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hamrothrift.R
-import com.example.hamrothrift.model.Order
 import com.example.hamrothrift.repository.OrderRepositoryImpl
 import com.example.hamrothrift.view.ProfileActivity
 import com.example.hamrothrift.view.buy.DashboardActivityBuy
 import com.example.hamrothrift.view.buy.NotificationActivity
 import com.example.hamrothrift.view.buy.SaleActivity
 import com.example.hamrothrift.view.components.CommonBottomBar
+import com.example.hamrothrift.view.components.OrderCard
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.OrderViewModel
 import com.example.hamrothrift.viewmodel.OrderViewModelFactory
@@ -149,6 +149,7 @@ fun MyOrdersScreen(viewModel: OrderViewModel) {
                     CircularProgressIndicator(color = buttton)
                 }
             }
+
             error != null -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -161,6 +162,7 @@ fun MyOrdersScreen(viewModel: OrderViewModel) {
                     )
                 }
             }
+
             orders.isEmpty() -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -183,12 +185,16 @@ fun MyOrdersScreen(viewModel: OrderViewModel) {
                     }
                 }
             }
+
             else -> {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(orders) { order ->
-                        OrderCard(order = order)
+                        OrderCard(
+                            order = order,
+                            showBuyerInfo = false // Don't show buyer info in My Orders
+                        )
                     }
                 }
             }
@@ -196,76 +202,3 @@ fun MyOrdersScreen(viewModel: OrderViewModel) {
     }
 }
 
-@Composable
-fun OrderCard(order: Order) {
-    val font = FontFamily(Font(R.font.handmade))
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = card),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Order #${order.orderId.take(8)}",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = text,
-                    fontFamily = font
-                )
-                Text(
-                    text = order.status,
-                    fontSize = 14.sp,
-                    color = when (order.status.lowercase()) {
-                        "delivered" -> Color(0xFF4CAF50)
-                        "pending" -> Color(0xFFFF9800)
-                        "cancelled" -> Color(0xFFF44336)
-                        else -> text
-                    },
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Product: ${order.productName}",
-                fontSize = 14.sp,
-                color = text,
-                fontFamily = font
-            )
-
-            Text(
-                text = "Quantity: ${order.quantity}",
-                fontSize = 14.sp,
-                color = text,
-                fontFamily = font
-            )
-
-            Text(
-                text = "Total: Rs. ${String.format("%.2f", order.totalPrice)}",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = buttton,
-                fontFamily = font
-            )
-
-            if (order.orderDate.isNotEmpty()) {
-                Text(
-                    text = "Date: ${order.orderDate}",
-                    fontSize = 12.sp,
-                    color = text.copy(alpha = 0.7f),
-                    fontFamily = font
-                )
-            }
-        }
-    }
-}
