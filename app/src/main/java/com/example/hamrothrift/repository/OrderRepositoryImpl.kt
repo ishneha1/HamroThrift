@@ -63,4 +63,23 @@ class OrderRepositoryImpl : OrderRepository {
             false
         }
     }
+
+    override suspend fun getUserOrders(userId: String): Flow<List<Order>> = callbackFlow {
+        val snapshotListener = ordersCollection
+            .whereEqualTo("userId", userId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    val orders = snapshot.documents.mapNotNull { document ->
+                        document.toObject(Order::class.java)?.copy(orderId = document.id)
+                    }
+                    trySend(orders)
+                }
+            }
+        awaitClose { snapshotListener.remove() }
+    }
 }
