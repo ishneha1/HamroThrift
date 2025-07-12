@@ -1,75 +1,270 @@
-package com.example.hamrothrift.ui.screens
+package com.example.hamrothrift.view.screens
 
-import android.util.Log
+import android.content.Intent
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.hamrothrift.R
+import com.example.hamrothrift.model.Order
+import com.example.hamrothrift.repository.OrderRepositoryImpl
+import com.example.hamrothrift.view.ProfileActivity
+import com.example.hamrothrift.view.buy.DashboardActivityBuy
+import com.example.hamrothrift.view.buy.NotificationActivity
+import com.example.hamrothrift.view.buy.SaleActivity
+import com.example.hamrothrift.view.components.CommonBottomBar
+import com.example.hamrothrift.view.theme.ui.theme.*
+import com.example.hamrothrift.viewmodel.OrderViewModel
+import com.example.hamrothrift.viewmodel.OrderViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
+
+class MyOrdersActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            val orderRepository = OrderRepositoryImpl()
+            val viewModel: OrderViewModel = viewModel(
+                factory = OrderViewModelFactory(orderRepository)
+            )
+            MyOrdersActivityBody(viewModel)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MyOrdersActivityBody(viewModel: OrderViewModel) {
+    var selectedTab by remember { mutableStateOf(-1) }
+    val context = LocalContext.current
+    val gradientColors = listOf(White, deepBlue, Color.Black)
+    val font = FontFamily(Font(R.font.handmade))
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        "HamroThrift",
+                        style = TextStyle(
+                            brush = Brush.linearGradient(colors = gradientColors),
+                            fontSize = 25.sp,
+                            fontFamily = font,
+                            fontStyle = FontStyle.Italic
+                        )
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = appBar),
+                navigationIcon = {
+                    IconButton(onClick = { (context as ComponentActivity).finish() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = White
+                        )
+                    }
+                }
+            )
+        },
+        bottomBar = {
+            CommonBottomBar(
+                selectedTab = selectedTab,
+                onTabSelected = { index ->
+                    when (index) {
+                        0 -> context.startActivity(Intent(context, DashboardActivityBuy::class.java))
+                        1 -> context.startActivity(Intent(context, SaleActivity::class.java))
+                        2 -> context.startActivity(Intent(context, NotificationActivity::class.java))
+                        3 -> context.startActivity(Intent(context, ProfileActivity::class.java))
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(bg)
+        ) {
+            MyOrdersScreen(viewModel = viewModel)
+        }
+    }
+}
 
 @Composable
-fun MyOrdersScreen() {
-    val userId = FirebaseAuth.getInstance().currentUser?.uid
-    var orders by remember { mutableStateOf(listOf<Map<String, Any>>()) }
-    var loading by remember { mutableStateOf(true) }
+fun MyOrdersScreen(viewModel: OrderViewModel) {
+    val user = FirebaseAuth.getInstance().currentUser
+    val orders by viewModel.orders.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
+    val font = FontFamily(Font(R.font.handmade))
 
-    LaunchedEffect(userId) {
-        if (userId != null) {
-            try {
-                val snapshot = FirebaseFirestore.getInstance()
-                    .collection("orders")
-                    .whereEqualTo("userId", userId)
-                    .get()
-                    .await()
-                orders = snapshot.documents.map { it.data ?: emptyMap() }
-            } catch (e: Exception) {
-                Log.e("MyOrdersScreen", "Error fetching orders", e)
-            } finally {
-                loading = false
-            }
+    LaunchedEffect(user) {
+        user?.uid?.let { userId ->
+            viewModel.getUserOrders(userId)
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
+    ) {
         Text(
             text = "My Orders",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFFA4CCD9)
+            fontSize = 30.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = text,
+            fontFamily = font,
+            modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (loading) {
-            CircularProgressIndicator()
-        } else if (orders.isEmpty()) {
-            Text("No orders found.")
-        } else {
-            LazyColumn {
-                items(orders) { order ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE6F1F5))
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text("Order ID: ${order["orderId"]}", fontWeight = FontWeight.Bold)
-                            Text("Product: ${order["productName"]}")
-                            Text("Quantity: ${order["quantity"]}")
-                            Text("Total Price: Rs. ${order["totalPrice"]}")
-                        }
+        when {
+            isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = buttton)
+                }
+            }
+            error != null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Error: $error",
+                        color = Color.Red,
+                        fontSize = 16.sp
+                    )
+                }
+            }
+            orders.isEmpty() -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.Default.ShoppingCart,
+                            contentDescription = "No Orders",
+                            modifier = Modifier.size(64.dp),
+                            tint = text.copy(alpha = 0.5f)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "No orders found",
+                            fontSize = 18.sp,
+                            color = text.copy(alpha = 0.7f),
+                            fontFamily = font
+                        )
                     }
                 }
+            }
+            else -> {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(orders) { order ->
+                        OrderCard(order = order)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun OrderCard(order: Order) {
+    val font = FontFamily(Font(R.font.handmade))
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = card),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Order #${order.orderId.take(8)}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = text,
+                    fontFamily = font
+                )
+                Text(
+                    text = order.status,
+                    fontSize = 14.sp,
+                    color = when (order.status.lowercase()) {
+                        "delivered" -> Color(0xFF4CAF50)
+                        "pending" -> Color(0xFFFF9800)
+                        "cancelled" -> Color(0xFFF44336)
+                        else -> text
+                    },
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Product: ${order.productName}",
+                fontSize = 14.sp,
+                color = text,
+                fontFamily = font
+            )
+
+            Text(
+                text = "Quantity: ${order.quantity}",
+                fontSize = 14.sp,
+                color = text,
+                fontFamily = font
+            )
+
+            Text(
+                text = "Total: Rs. ${String.format("%.2f", order.totalPrice)}",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = buttton,
+                fontFamily = font
+            )
+
+            if (order.orderDate.isNotEmpty()) {
+                Text(
+                    text = "Date: ${order.orderDate}",
+                    fontSize = 12.sp,
+                    color = text.copy(alpha = 0.7f),
+                    fontFamily = font
+                )
             }
         }
     }

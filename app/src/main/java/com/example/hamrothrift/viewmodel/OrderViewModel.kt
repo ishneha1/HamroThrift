@@ -56,6 +56,22 @@ class OrderViewModel(private val repository: OrderRepository) : ViewModel() {
             repository.deleteOrder(orderId)
         }
     }
+
+    fun getUserOrders(userId: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+            repository.getUserOrders(userId)
+                .catch { e ->
+                    _error.value = e.message
+                    _isLoading.value = false
+                }
+                .collect { ordersList ->
+                    _orders.value = ordersList
+                    _isLoading.value = false
+                }
+        }
+    }
 }
 
 class OrderViewModelFactory(private val repository: OrderRepository) : ViewModelProvider.Factory {
