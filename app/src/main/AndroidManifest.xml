@@ -18,6 +18,17 @@
         tools:replace="android:fullBackupContent"
         tools:targetApi="31">
         <activity
+            android:name=".view.buy.DashboardActivityBuy"
+            android:exported="true"
+            android:label="@string/title_activity_dashboard_buy"
+            android:theme="@style/Theme.HamroThrift">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".view.components.CommonBottomBar"
             android:exported="true"
             android:label="@string/title_activity_common_bottom_bar"
@@ -85,17 +96,6 @@
         </activity>
         <activity
             android:name=".view.sell.DashboardSellActivity"
-            android:exported="true"
-            android:label="@string/title_activity_dashboard_sell"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.buy.DashboardActivityBuy"
             android:exported="true"
             android:label="@string/title_activity_dashboard_sell"
             android:theme="@style/Theme.HamroThrift">
