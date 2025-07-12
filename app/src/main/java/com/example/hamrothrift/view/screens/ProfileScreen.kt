@@ -114,7 +114,8 @@ fun ProfileScreen(viewModel: UserViewModel = viewModel()) {
             // TODO: Create BillingAddressActivity
         }
         ProfileOption("Change Password", Icons.Default.Lock) {
-            // TODO: Create ChangePasswordActivity
+            val intent = Intent(context, ChangePasswordActivity::class.java)
+            context.startActivity(intent)
         }
         ProfileOption("Logout", Icons.Default.ExitToApp) {
             viewModel.logout { success, message ->
