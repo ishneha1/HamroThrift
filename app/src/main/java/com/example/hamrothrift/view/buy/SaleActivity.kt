@@ -84,7 +84,7 @@ fun SaleActivityBody(
 
     // Fetch products when composable is first created
     LaunchedEffect(Unit) {
-        productViewModel.loadInitialProducts() // Correct method name
+        productViewModel.loadInitialProducts()
     }
 
     Scaffold(

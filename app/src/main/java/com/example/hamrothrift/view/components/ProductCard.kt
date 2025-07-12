@@ -17,18 +17,24 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import coil.compose.AsyncImage
+import com.example.hamrothrift.R
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.view.theme.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonTopAppBar() {
+    val font = FontFamily(
+        Font(R.font.handmade)
+    )
     TopAppBar(
         title = {
             Text(
@@ -36,7 +42,8 @@ fun CommonTopAppBar() {
                 style = TextStyle(
                     brush = Brush.linearGradient(colors = listOf(White, deepBlue, Black)),
                     fontSize = 25.sp,
-                    fontStyle = FontStyle.Italic
+                    fontStyle = FontStyle.Italic,
+                    fontFamily = font
                 )
             )
         },
