@@ -17,4 +17,5 @@
     <string name="title_activity_all_orders">AllOrdersActivity</string>
     <string name="title_activity_navigation_handler">NavigationHandler</string>
     <string name="title_activity_common_bottom_bar">CommonBottomBar</string>
+    <string name="title_activity_my_orders">MyOrders</string>
 </resources>

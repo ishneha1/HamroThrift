@@ -18,6 +18,17 @@
         tools:replace="android:fullBackupContent"
         tools:targetApi="31">
         <activity
+            android:name=".view.screens.MyOrders"
+            android:exported="true"
+            android:label="@string/title_activity_my_orders"
+            android:theme="@style/Theme.HamroThrift">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".view.buy.DashboardActivityBuy"
             android:exported="true"
             android:label="@string/title_activity_dashboard_buy"
