@@ -7,5 +7,8 @@ data class Order(
     val quantity: Int = 0,
     val totalPrice: Double = 0.0,
     val orderDate: String = "",
-    val status: String = "Pending"
+    val status: String = "Pending",
+    val buyerName: String,
+    val itemName: String,
+    val price: Double
 )
