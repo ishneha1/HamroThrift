@@ -20,7 +20,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
 import com.example.hamrothrift.R
 import com.example.hamrothrift.repository.UserRepoImpl
 import com.example.hamrothrift.view.components.CommonBottomBar
@@ -54,7 +53,6 @@ private fun ProfileActivityBody(viewModel: UserViewModel) {
     val context = LocalContext.current
     val gradientColors = listOf(White, deepBlue, Black)
     val font = FontFamily(Font(R.font.handmade))
-    val navController = rememberNavController()
 
     Scaffold(
         topBar = {
@@ -100,7 +98,7 @@ private fun ProfileActivityBody(viewModel: UserViewModel) {
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            ProfileScreen(navController = navController)
+            ProfileScreen(viewModel = viewModel)
         }
     }
 }
