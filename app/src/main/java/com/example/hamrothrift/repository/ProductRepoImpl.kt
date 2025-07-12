@@ -129,7 +129,7 @@ class ProductRepoImpl : ProductRepo {
 
     }
 
-    override suspend fun updateProduct(productId: String, updates: Map<String, Any?>) {
+    override suspend fun updateProductFields(productId: String, updates: Map<String, Any?>) {
         try {
             firestore.collection("products").document(productId).update(updates).await()
         } catch (e: Exception) {

@@ -100,7 +100,7 @@ class ProductViewModel(
                     "price" to calculatedPrice
                 )
 
-                repository.updateProduct(productId, updates)
+                repository.updateProductFields(productId, updates)
                 loadInitialProducts() // Refresh the list
 
             } catch (e: Exception) {
