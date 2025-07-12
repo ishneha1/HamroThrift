@@ -111,11 +111,10 @@ fun AllOrdersBody(viewModel: OrderViewModel) {
                 ) {
                     Text(
                         text = "All Orders",
-                        fontSize = 30.sp,
+                        fontSize = 25.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = text,
-                        fontFamily = font,
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom =20.dp)
                     )
 
                     if (orders.isEmpty()) {
