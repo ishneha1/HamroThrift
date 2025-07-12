@@ -103,7 +103,7 @@ fun ProfileScreen(viewModel: UserViewModel = viewModel()) {
         Divider(color = text.copy(alpha = 0.2f))
 
         ProfileOption("My Orders", Icons.Default.ShoppingCart) {
-            val intent = Intent(context, My::class.java)
+            val intent = Intent(context, MyOrdersActivity::class.java)
             context.startActivity(intent)
         }
         ProfileOption("All Orders", Icons.Default.List) {
