@@ -68,10 +68,8 @@ fun DashboardSellBody(viewModel: SalesOverviewViewModel) {
                 onTabSelected = { index ->
                     selectedTab = index
                     when (index) {
-                        0 -> {
-                            context.startActivity(Intent(context, DashboardActivityBuy::class.java))
-                            activity?.finish()
-                        }
+                        0 -> context.startActivity(Intent(context, DashboardSellActivity::class.java))
+                        1 -> context.startActivity(Intent(context, UploadActivity::class.java))
                         2 -> context.startActivity(Intent(context, NotificationActivity::class.java))
                         3 -> context.startActivity(Intent(context, ProfileActivity::class.java))
                     }
