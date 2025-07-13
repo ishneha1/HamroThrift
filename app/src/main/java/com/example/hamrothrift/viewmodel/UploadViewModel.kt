@@ -80,8 +80,3 @@ class UploadViewModel(private val repository: UploadRepository) : ViewModel() {
         }
     }
 }
-
-sealed class ValidationResult {
-    object Valid : ValidationResult()
-    data class Invalid(val errors: List<String>) : ValidationResult()
-}
