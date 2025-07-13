@@ -6,6 +6,7 @@
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="DashboardActivityBuy">
+<<<<<<< HEAD
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="SplashScreenActivity">
@@ -15,6 +16,8 @@
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="ProfileActivity">
+=======
+>>>>>>> 00d086fdc719a403498a79f4e4b976b83dcfa67d
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
