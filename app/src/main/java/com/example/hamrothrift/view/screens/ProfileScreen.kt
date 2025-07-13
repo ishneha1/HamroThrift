@@ -111,7 +111,8 @@ fun ProfileScreen(viewModel: UserViewModel = viewModel()) {
             context.startActivity(intent)
         }
         ProfileOption("Billing Address", Icons.Default.LocationOn) {
-            // TODO: Create BillingAddressActivity
+            val intent = Intent(context, BillingAddressActivity::class.java)
+            context.startActivity(intent)
         }
         ProfileOption("Change Password", Icons.Default.Lock) {
             val intent = Intent(context, ChangePasswordActivity::class.java)
