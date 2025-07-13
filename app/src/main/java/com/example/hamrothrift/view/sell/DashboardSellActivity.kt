@@ -31,7 +31,7 @@ import com.example.hamrothrift.repository.SalesRepositoryImpl
 import com.example.hamrothrift.view.ProfileActivity
 import com.example.hamrothrift.view.buy.DashboardActivityBuy
 import com.example.hamrothrift.view.buy.NotificationActivity
-import com.example.hamrothrift.view.components.CommonBottomBar
+import com.example.hamrothrift.view.components.CommonBottomBarSell
 import com.example.hamrothrift.view.components.CommonTopAppBar
 import com.example.hamrothrift.view.components.ModeSelectorDropdown
 import com.example.hamrothrift.view.theme.ui.theme.*
@@ -55,7 +55,7 @@ class DashboardSellActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardSellBody(viewModel: SalesOverviewViewModel) {
-    var selectedTab by remember { mutableStateOf(1) } // Sell tab selected
+    var selectedTab by remember { mutableStateOf(0) } // Home tab selected (Analytics/Dashboard)
     val context = LocalContext.current
     val activity = context as? Activity
     val font = FontFamily(Font(R.font.handmade))
@@ -63,15 +63,23 @@ fun DashboardSellBody(viewModel: SalesOverviewViewModel) {
     Scaffold(
         topBar = { CommonTopAppBar() },
         bottomBar = {
-            CommonBottomBar(
+            CommonBottomBarSell(
                 selectedTab = selectedTab,
                 onTabSelected = { index ->
                     selectedTab = index
                     when (index) {
-                        0 -> context.startActivity(Intent(context, DashboardSellActivity::class.java))
-                        1 -> context.startActivity(Intent(context, UploadActivity::class.java))
-                        2 -> context.startActivity(Intent(context, NotificationActivity::class.java))
-                        3 -> context.startActivity(Intent(context, ProfileActivity::class.java))
+                        0 -> { /* Already on Home/Analytics - do nothing */ }
+                        1 -> {
+                             context.startActivity(Intent(context, UploadActivity::class.java))
+                        }
+                        2 -> {
+                            // Navigate to Notifications
+                            context.startActivity(Intent(context, NotificationActivity::class.java))
+                        }
+                        3 -> {
+                            // Navigate to Profile
+                            context.startActivity(Intent(context, ProfileActivity::class.java))
+                        }
                     }
                 }
             )
@@ -359,20 +367,17 @@ fun SummaryCard(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = text,
-                fontFamily = font
             )
             Text(
                 text = title,
                 fontSize = 10.sp,
                 color = text.copy(alpha = 0.7f),
-                fontFamily = font
             )
             Text(
                 text = subtitle,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium,
                 color = buttton,
-                fontFamily = font
             )
         }
     }
@@ -402,7 +407,6 @@ fun DailyDataItem(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = text,
-                    fontFamily = font
                 )
                 Text(
                     text = if (mode == "Sell") "${data.sellCount} transactions" else "${data.buyCount} transactions",
@@ -417,7 +421,6 @@ fun DailyDataItem(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = buttton,
-                fontFamily = font
             )
         }
     }
