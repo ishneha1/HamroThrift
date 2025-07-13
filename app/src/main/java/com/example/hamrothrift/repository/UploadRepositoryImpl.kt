@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
+import kotlin.text.category
+import kotlin.toString
 
 class UploadRepositoryImpl : UploadRepository {
 
@@ -35,6 +37,7 @@ class UploadRepositoryImpl : UploadRepository {
                 category = uploadRequest.category,
                 price = uploadRequest.price.toDoubleOrNull() ?: 0.0,
                 description = uploadRequest.description,
+                condition = uploadRequest.condition, // Add this line
                 imageUrl = imageUrl,
                 sellerId = getCurrentUserId()
             )

@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.hamrothrift.R
+import com.example.hamrothrift.view.sell.DashboardSellActivity
 import com.example.hamrothrift.model.ProductUploadRequest
 import com.example.hamrothrift.repository.UploadRepositoryImpl
 import com.example.hamrothrift.repository.UploadResult
@@ -151,11 +152,12 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
 
     // Handle upload state changes
     LaunchedEffect(uploadState) {
-        when (uploadState) {
+        val currentState = uploadState
+        when (currentState) {
             is UploadResult.Success -> {
                 Toast.makeText(
                     context,
-                    "Product '${uploadState.product.name}' uploaded successfully!",
+                    "Product '${currentState.product.name}' uploaded successfully!",
                     Toast.LENGTH_SHORT
                 ).show()
                 // Reset form
@@ -170,7 +172,7 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
             is UploadResult.Error -> {
                 Toast.makeText(
                     context,
-                    "Upload failed: ${uploadState.message}",
+                    "Upload failed: ${currentState.message}",
                     Toast.LENGTH_LONG
                 ).show()
                 viewModel.clearUploadState()
@@ -178,6 +180,7 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
             else -> { /* Do nothing for Loading or null states */ }
         }
     }
+
 
     Column(
         modifier = Modifier
@@ -252,7 +255,8 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                 unfocusedLabelColor = text.copy(alpha = 0.7f),
                 focusedTextColor = text,
                 unfocusedTextColor = text,
-                containerColor = card
+                unfocusedContainerColor = card,
+                focusedContainerColor = card
             )
         )
 
@@ -283,7 +287,8 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                     unfocusedLabelColor = text.copy(alpha = 0.7f),
                     focusedTextColor = text,
                     unfocusedTextColor = text,
-                    containerColor = card
+                    unfocusedContainerColor = card,
+                    focusedContainerColor = card
                 )
             )
             ExposedDropdownMenu(
@@ -326,7 +331,8 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                 unfocusedLabelColor = text.copy(alpha = 0.7f),
                 focusedTextColor = text,
                 unfocusedTextColor = text,
-                containerColor = card
+                unfocusedContainerColor = card,
+                focusedContainerColor = card
             )
         )
 
@@ -357,7 +363,8 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                     unfocusedLabelColor = text.copy(alpha = 0.7f),
                     focusedTextColor = text,
                     unfocusedTextColor = text,
-                    containerColor = card
+                    unfocusedContainerColor = card,
+                    focusedContainerColor = card
                 )
             )
             ExposedDropdownMenu(
@@ -402,7 +409,8 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                 unfocusedLabelColor = text.copy(alpha = 0.7f),
                 focusedTextColor = text,
                 unfocusedTextColor = text,
-                containerColor = card
+                unfocusedContainerColor = card,
+                focusedContainerColor = card
             )
         )
 
