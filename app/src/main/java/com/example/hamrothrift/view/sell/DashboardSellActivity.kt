@@ -8,7 +8,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -32,7 +31,6 @@ import com.example.hamrothrift.repository.SalesRepositoryImpl
 import com.example.hamrothrift.view.ProfileActivity
 import com.example.hamrothrift.view.buy.DashboardActivityBuy
 import com.example.hamrothrift.view.buy.NotificationActivity
-import com.example.hamrothrift.view.buy.SaleActivity
 import com.example.hamrothrift.view.components.CommonBottomBar
 import com.example.hamrothrift.view.components.CommonTopAppBar
 import com.example.hamrothrift.view.components.ModeSelectorDropdown
@@ -134,7 +132,6 @@ fun SalesOverviewScreen(viewModel: SalesOverviewViewModel) {
             fontSize = 24.sp,
             fontWeight = FontWeight.SemiBold,
             color = text,
-            fontFamily = font,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -152,7 +149,6 @@ fun SalesOverviewScreen(viewModel: SalesOverviewViewModel) {
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = text,
-                    fontFamily = font,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
@@ -207,7 +203,6 @@ fun SalesOverviewScreen(viewModel: SalesOverviewViewModel) {
                             label = {
                                 Text(
                                     text = range,
-                                    fontFamily = font,
                                     fontSize = 12.sp
                                 )
                             },
