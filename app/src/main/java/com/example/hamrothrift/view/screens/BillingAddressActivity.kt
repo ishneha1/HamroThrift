@@ -140,16 +140,15 @@ fun BillingAddressScreen(viewModel: BillingAddressViewModel) {
 
     // Update form fields when billing address is loaded
     LaunchedEffect(billingAddress) {
-        billingAddress?.let { address ->
-            name = address.name
-            phone = address.phone
-            this@LaunchedEffect.address = address.address
-            city = address.city
-            state = address.state
-            zipCode = address.zipCode
+        billingAddress?.let { billingData ->
+            name = billingData.name
+            phone = billingData.phone
+            address = billingData.address
+            city = billingData.city
+            state = billingData.state
+            zipCode = billingData.zipCode
         }
     }
-
     // Reset success state after showing message
     LaunchedEffect(isSuccess) {
         if (isSuccess) {
