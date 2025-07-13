@@ -20,4 +20,5 @@
     <string name="title_activity_my_orders">MyOrders</string>
     <string name="title_activity_change_password">ChangePasswordActivity</string>
     <string name="title_activity_billing_address">BillingAddressActivity</string>
+    <string name="title_activity_upload">UploadActivity</string>
 </resources>
