@@ -17,6 +17,8 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.auth.FacebookAuthProvider
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import java.io.InputStream
 import java.util.concurrent.Executors
 
@@ -34,6 +36,7 @@ class UserRepoImpl : UserRepo {
             "api_secret" to "C7WUm7KiQWZl7XaR9guDFTW3wU0"
         )
     )
+    private val db = Firebase.firestore
 
     override fun login(
         email: String,
@@ -188,6 +191,7 @@ class UserRepoImpl : UserRepo {
             }
 
     }
+
     override fun uploadImage(context: Context, imageUri: Uri, callback: (String?) -> Unit) {
         val executor = Executors.newSingleThreadExecutor()
         executor.execute {
@@ -236,4 +240,56 @@ class UserRepoImpl : UserRepo {
         }
         return fileName
     }
+    override fun updateUserProfile(
+        userId: String,
+        userModel: UserModel,
+        onResult: (Boolean, String) -> Unit
+    ) {
+        val userData = hashMapOf(
+            "firstName" to userModel.firstName,
+            "lastName" to userModel.lastName,
+            "gender" to userModel.gender,
+            "updatedAt" to System.currentTimeMillis()
+        )
+
+        db.collection("users")
+            .document(userId)
+            .update(userData as Map<String, Any>)
+            .addOnSuccessListener {
+                onResult(true, "Profile updated successfully!")
+            }
+            .addOnFailureListener { e ->
+                onResult(false, "Failed to update profile: ${e.message}")
+            }
+    }
+
+    override fun getCurrentUserProfile(
+        userId: String,
+        onResult: (UserModel?, String) -> Unit
+    ) {
+        db.collection("users")
+            .document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val user = UserModel(
+                        userId = userId,
+                        firstName = document.getString("firstName") ?: "",
+                        lastName = document.getString("lastName") ?: "",
+                        gender = document.getString("gender") ?: "",
+                        email = document.getString("email") ?: "",
+                        password = "", // Don't expose password
+                    )
+                    onResult(user, "Profile loaded successfully")
+                } else {
+                    onResult(null, "User profile not found")
+                }
+            }
+            .addOnFailureListener { e ->
+                onResult(null, "Failed to load profile: ${e.message}")
+            }
+    }
+
+
+
 }

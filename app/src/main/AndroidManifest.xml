@@ -18,6 +18,17 @@
         tools:replace="android:fullBackupContent"
         tools:targetApi="31">
         <activity
+            android:name=".view.sell.EditProfileActivity"
+            android:exported="true"
+            android:label="@string/title_activity_edit_profile"
+            android:theme="@style/Theme.HamroThrift">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".view.sell.UploadActivity"
             android:exported="true"
             android:label="@string/title_activity_upload"

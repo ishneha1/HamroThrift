@@ -9,6 +9,7 @@ import com.example.hamrothrift.model.UserModel
 import com.example.hamrothrift.repository.UserRepo
 import com.google.firebase.auth.FirebaseUser
 
+
 class UserViewModel(val repo : UserRepo): ViewModel() {
     fun login(
         email: String,
@@ -79,6 +80,30 @@ class UserViewModel(val repo : UserRepo): ViewModel() {
     }
     fun uploadImage(context: Context,imageUri: Uri, callback: (String?) -> Unit){
         repo.uploadImage(context,imageUri,callback)
+    }
+
+    fun updateUserProfile(
+        userId: String,
+        userModel: UserModel,
+        onResult: (Boolean, String) -> Unit
+    ) {
+        repo.updateUserProfile(userId, userModel, onResult)
+    }
+
+    fun getCurrentUserProfile(
+        userId: String,
+        onResult: (UserModel?, String) -> Unit
+    ) {
+        repo.getCurrentUserProfile(userId, onResult)
+    }
+
+    fun validateProfileData(
+        firstName: String,
+        lastName: String,
+        phone: String
+    ): Boolean {
+        return firstName.isNotBlank() &&
+                lastName.isNotBlank()
     }
 
 }
