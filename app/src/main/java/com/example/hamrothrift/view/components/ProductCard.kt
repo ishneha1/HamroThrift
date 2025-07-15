@@ -1,6 +1,7 @@
 package com.example.hamrothrift.view.components
 
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -27,7 +29,12 @@ import androidx.compose.ui.unit.toSize
 import coil.compose.AsyncImage
 import com.example.hamrothrift.R
 import com.example.hamrothrift.model.ProductModel
+import com.example.hamrothrift.repository.CartRepository
 import com.example.hamrothrift.view.theme.ui.theme.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
