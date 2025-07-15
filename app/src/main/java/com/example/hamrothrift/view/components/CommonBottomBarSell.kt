@@ -27,9 +27,8 @@ fun CommonBottomBarSell(
 
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        shape = RoundedCornerShape(20.dp),
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = card),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
