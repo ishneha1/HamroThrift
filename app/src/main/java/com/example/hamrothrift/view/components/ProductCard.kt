@@ -1,6 +1,8 @@
 package com.example.hamrothrift.view.components
 
 
+import android.app.Activity
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,6 +32,9 @@ import coil.compose.AsyncImage
 import com.example.hamrothrift.R
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.CartRepository
+import com.example.hamrothrift.view.HomepageActivity
+import com.example.hamrothrift.view.buy.CartActivity
+import com.example.hamrothrift.view.buy.SearchActivity
 import com.example.hamrothrift.view.theme.ui.theme.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +47,8 @@ fun CommonTopAppBar() {
     val font = FontFamily(
         Font(R.font.handmade)
     )
+    val context = LocalContext.current
+
     TopAppBar(
         title = {
             Text(
@@ -56,10 +63,18 @@ fun CommonTopAppBar() {
         },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = appBar),
         actions = {
-            IconButton(onClick = {}) {
+            IconButton(onClick = {
+                val intent =
+                    Intent(context, CartActivity::class.java)
+                context.startActivity(intent)
+            }) {
                 Icon(Icons.Default.ShoppingCart, contentDescription = "Cart", tint = White)
             }
-            IconButton(onClick = {}) {
+            IconButton(onClick = {
+                val intent =
+                Intent(context, SearchActivity::class.java)
+                context.startActivity(intent)
+            }) {
                 Icon(Icons.Default.Search, contentDescription = "Search", tint = White)
             }
         }
