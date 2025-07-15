@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.example.hamrothrift.navigation.NavigationHandler
 import com.example.hamrothrift.view.theme.ui.theme.appBar
+import com.example.hamrothrift.view.theme.ui.theme.card
 import com.example.hamrothrift.viewmodel.NavigationViewModel
 
 @Composable
@@ -19,7 +20,7 @@ fun CommonBottomBar(
     val context = LocalContext.current
     val activity = context as? Activity
 
-    NavigationBar(containerColor = appBar) {
+    NavigationBar(containerColor = card) {
         navigationViewModel.navigationItems.forEach { item ->
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = item.label) },

@@ -111,7 +111,7 @@ fun NotificationScreen(viewModel: NotificationViewModel) {
             )
         },
         bottomBar = {
-            NavigationBar(containerColor = appBar) {
+            NavigationBar(containerColor = card) {
                 val items = listOf(
                     NavigationItem(label = "Home", icon = Icons.Default.Home, index = 0),
                     NavigationItem(label = "Sale", icon = Icons.Default.Star, index = 1),

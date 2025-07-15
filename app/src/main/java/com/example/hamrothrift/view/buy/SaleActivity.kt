@@ -15,18 +15,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.hamrothrift.R
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.ProductRepoImpl
 import com.example.hamrothrift.repository.NotificationRepoImpl
 import com.example.hamrothrift.view.components.CommonBottomBar
 import com.example.hamrothrift.view.components.CommonTopAppBar
-import com.example.hamrothrift.view.components.ModeSelectorDropdown
 import com.example.hamrothrift.view.components.ProductCard
 import com.example.hamrothrift.view.sell.DashboardSellActivity
 import com.example.hamrothrift.view.theme.ui.theme.*
@@ -62,6 +65,10 @@ fun SaleActivityBody(
     var selectedTab by remember { mutableIntStateOf(1) }
     val context = LocalContext.current
     val activity = context as? Activity
+    val font = FontFamily(Font(R.font.handmade))
+
+    val modes = listOf("Sell", "Buy")
+    var selectedMode by remember { mutableStateOf("Buy") }
 
     val allProducts by productViewModel.products.collectAsState(initial = emptyList<ProductModel>())
     val isLoading by productViewModel.isLoading.collectAsState(initial = false)
@@ -80,6 +87,15 @@ fun SaleActivityBody(
         saleProducts.sortedByDescending { product ->
             product.discount ?: 0.0
         }.take(5)
+    }
+
+    // Function to handle message click
+    fun handleMessageClick(product: ProductModel) {
+        notificationViewModel.addNotification(
+            title = "New Message",
+            message = "Someone is interested in your product: ${product.name}",
+            type = "message"
+        )
     }
 
     // Fetch products when composable is first created
@@ -106,16 +122,67 @@ fun SaleActivityBody(
                 modifier = Modifier.padding(16.dp)
             ) {
                 item {
-                    ModeSelectorDropdown(
-                        currentMode = "Buy Mode",
-                        onModeSelected = { mode ->
-                            if (mode == "Sell Mode") {
-                                val intent = Intent(context, DashboardSellActivity::class.java)
-                                context.startActivity(intent)
-                                activity?.finish()
+                    Text(
+                        text = "Sale Products",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = text,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    // Mode Selector
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
+                        colors = CardDefaults.cardColors(containerColor = card),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = "View Mode",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = text,
+                                fontFamily = font,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+
+                            LazyRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(modes) { mode ->
+                                    FilterChip(
+                                        onClick = {
+                                            selectedMode = mode
+                                            when (mode) {
+                                                "Buy" -> {
+                                                    // Already on Buy dashboard - do nothing
+                                                }
+                                                "Sell" -> {
+                                                    val intent = Intent(context, DashboardSellActivity::class.java)
+                                                    context.startActivity(intent)
+                                                    activity?.finish()
+                                                }
+                                            }
+                                        },
+                                        label = {
+                                            Text(
+                                                text = mode,
+                                                fontFamily = font,
+                                                fontSize = 12.sp
+                                            )
+                                        },
+                                        selected = selectedMode == mode,
+                                        colors = FilterChipDefaults.filterChipColors(
+                                            selectedContainerColor = buttton,
+                                            selectedLabelColor = Color.White
+                                        )
+                                    )
+                                }
                             }
                         }
-                    )
+                    }
 
                     Spacer(modifier = Modifier.height(20.dp))
 
@@ -125,7 +192,7 @@ fun SaleActivityBody(
                                 modifier = Modifier.fillMaxWidth(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator()
+                                CircularProgressIndicator(color = buttton)
                             }
                         }
                         saleProducts.isEmpty() -> {
@@ -144,43 +211,45 @@ fun SaleActivityBody(
                             // Hot Sale Section
                             if (hotSaleProducts.isNotEmpty()) {
                                 Text(
-                                    "HOT SALE",
+                                    text = "HOT SALE",
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = text
+                                    color = text,
+                                    fontFamily = font
                                 )
 
-                                LazyRow(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    modifier = Modifier.padding(vertical = 8.dp)
-                                ) {
-                                    items(hotSaleProducts) { product ->
-                                        ProductCard(
-                                            product = product,
-                                            isSmall = true,
-                                            onMessageClick = {
-                                                handleMessageClick(
-                                                    product,
-                                                    notificationViewModel
-                                                )
-                                            }
-                                        )
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
                             }
-
-                            // All Sale Items Section
-                            Text(
-                                "Sale Items",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = text
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
                         }
+                    }
+                }
+
+                // Hot Sale Items Row
+                if (!isLoading && hotSaleProducts.isNotEmpty()) {
+                    item {
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        ) {
+                            items(hotSaleProducts) { product ->
+                                ProductCard(
+                                    product = product,
+                                    isSmall = true,
+                                    onMessageClick = { handleMessageClick(product) }
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = "All Sale Items",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = text,
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
 
@@ -190,12 +259,7 @@ fun SaleActivityBody(
                         ProductCard(
                             product = product,
                             isSmall = false,
-                            onMessageClick = {
-                                handleMessageClick(
-                                    product,
-                                    notificationViewModel
-                                )
-                            }
+                            onMessageClick = { handleMessageClick(product) }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
@@ -205,28 +269,20 @@ fun SaleActivityBody(
     }
 }
 
-private fun handleMessageClick(
-    product: ProductModel,
-    notificationViewModel: NotificationViewModel
-) {
-    // Send notification to seller
-    notificationViewModel.addNotification(
-        title = "New Message",
-        message = "Someone is interested in your product: ${product.name}",
-        type = "message"
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
 fun PreviewSaleActivity() {
-    val productRepository = ProductRepoImpl()
-    val notificationRepository = NotificationRepoImpl()
-    val productViewModel: ProductViewModel = viewModel(
-        factory = ProductViewModelFactory(productRepository)
-    )
-    val notificationViewModel: NotificationViewModel = viewModel(
-        factory = NotificationViewModelFactory(notificationRepository)
-    )
-    SaleActivityBody(productViewModel, notificationViewModel)
+    // Preview composable - simplified for preview
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(bg),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Sale Activity Preview",
+            fontSize = 20.sp,
+            color = text
+        )
+    }
 }
