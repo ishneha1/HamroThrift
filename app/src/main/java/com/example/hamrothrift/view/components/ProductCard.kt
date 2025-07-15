@@ -1,6 +1,9 @@
 package com.example.hamrothrift.view.components
 
 
+import android.app.Activity
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -27,7 +31,15 @@ import androidx.compose.ui.unit.toSize
 import coil.compose.AsyncImage
 import com.example.hamrothrift.R
 import com.example.hamrothrift.model.ProductModel
+import com.example.hamrothrift.repository.CartRepository
+import com.example.hamrothrift.view.HomepageActivity
+import com.example.hamrothrift.view.buy.CartActivity
+import com.example.hamrothrift.view.buy.SearchActivity
 import com.example.hamrothrift.view.theme.ui.theme.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,6 +47,8 @@ fun CommonTopAppBar() {
     val font = FontFamily(
         Font(R.font.handmade)
     )
+    val context = LocalContext.current
+
     TopAppBar(
         title = {
             Text(
@@ -49,10 +63,18 @@ fun CommonTopAppBar() {
         },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = appBar),
         actions = {
-            IconButton(onClick = {}) {
+            IconButton(onClick = {
+                val intent =
+                    Intent(context, CartActivity::class.java)
+                context.startActivity(intent)
+            }) {
                 Icon(Icons.Default.ShoppingCart, contentDescription = "Cart", tint = White)
             }
-            IconButton(onClick = {}) {
+            IconButton(onClick = {
+                val intent =
+                Intent(context, SearchActivity::class.java)
+                context.startActivity(intent)
+            }) {
                 Icon(Icons.Default.Search, contentDescription = "Search", tint = White)
             }
         }
@@ -199,6 +221,57 @@ fun ProductCard(
                     }
                 }
             }
+        }
+    }
+}
+
+// In your product card or detail screen
+@Composable
+fun AddToCartButton(
+    product: ProductModel,
+    cartRepository: CartRepository
+) {
+    val context = LocalContext.current
+    var isAdding by remember { mutableStateOf(false) }
+
+    Button(
+        onClick = {
+            if (!isAdding) {
+                isAdding = true
+                // Add to cart logic
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        cartRepository.addToCart(product, 1).collect { success ->
+                            withContext(Dispatchers.Main) {
+                                if (success) {
+                                    Toast.makeText(context, "Added to cart!", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(context, "Failed to add to cart", Toast.LENGTH_SHORT).show()
+                                }
+                                isAdding = false
+                            }
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                            isAdding = false
+                        }
+                    }
+                }
+            }
+        },
+        enabled = !isAdding,
+        colors = ButtonDefaults.buttonColors(containerColor = buttton)
+    ) {
+        if (isAdding) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(16.dp),
+                color = White
+            )
+        } else {
+            Icon(Icons.Default.ShoppingCart, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Add to Cart")
         }
     }
 }
