@@ -14,10 +14,10 @@
       <SelectionState runConfigName="SplashScreenActivity (1)">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="DashboardActivity">
+      <SelectionState runConfigName="DashboardSellActivity">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="DashboardSellActivity">
+      <SelectionState runConfigName="DashboardActivityBuy">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

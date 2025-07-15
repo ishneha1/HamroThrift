@@ -8,24 +8,37 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.hamrothrift.R
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.ProductRepoImpl
 import com.example.hamrothrift.view.ProfileActivity
 import com.example.hamrothrift.view.components.*
 import com.example.hamrothrift.view.sell.DashboardSellActivity
 import com.example.hamrothrift.view.theme.ui.theme.bg
+import com.example.hamrothrift.view.theme.ui.theme.buttton
+import com.example.hamrothrift.view.theme.ui.theme.card
+import com.example.hamrothrift.view.theme.ui.theme.text
 import com.example.hamrothrift.viewmodel.ProductViewModel
 import com.example.hamrothrift.viewmodel.ProductViewModelFactory
 
@@ -52,9 +65,13 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
     val gridState = rememberLazyGridState()
     val products by viewModel.products.collectAsState(initial = emptyList())
     val isLoading by viewModel.isLoading.collectAsState()
+    val font = FontFamily(Font(R.font.handmade))
 
     var showMessageDialog by remember { mutableStateOf(false) }
     var selectedProduct by remember { mutableStateOf<ProductModel?>(null) }
+
+    val modes = listOf("Sell", "Buy")
+    var selectedMode by remember { mutableStateOf("Buy") }
 
     LaunchedEffect(Unit) {
         viewModel.loadInitialProducts()
@@ -79,8 +96,9 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
                     selectedTab = index
                     when (index) {
                         1 -> context.startActivity(Intent(context, SaleActivity::class.java))
-                        2 -> context.startActivity(Intent(context, NotificationActivity::class.java))
-                        3 -> context.startActivity(Intent(context, ProfileActivity::class.java))
+                        2 -> context.startActivity(Intent(context, CartActivity::class.java))
+                        3 -> context.startActivity(Intent(context, NotificationActivity::class.java))
+                        4 -> context.startActivity(Intent(context, ProfileActivity::class.java))
                     }
                 }
             )
@@ -92,52 +110,109 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
                 .padding(innerPadding)
                 .background(bg)
                 .padding(horizontal = 16.dp, vertical = 10.dp)
-
         ) {
-            ModeSelectorDropdown(
-                currentMode = "Buy Mode",
-                onModeSelected = { mode ->
-                    if (mode == "Sell Mode") {
-                        val intent = Intent(context, DashboardSellActivity::class.java)
-                        context.startActivity(intent)
-                        activity?.finish()
-                    }
-                }
-            )
-            Spacer(modifier = Modifier.height(18.dp))
-
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                state = gridState,
-                contentPadding = PaddingValues(8.dp),
-                modifier = Modifier.weight(1f)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
             ) {
-                items(products) { product ->
-                    ProductCard(
-                        product = product,
-                        isSmall = false,
-                        onMessageClick = {
-                            selectedProduct = it
-                            showMessageDialog = true
-                        }
-                    )
-                }
-            }
+                Text(
+                    text = "Buy Products",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = text,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
 
-            if (isLoading) {
-                Box(
+                // Mode Selector
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(bottom = 12.dp),
+                    colors = CardDefaults.cardColors(containerColor = card),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "View Mode",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = text,
+                            fontFamily = font,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(modes) { mode ->
+                                FilterChip(
+                                    onClick = {
+                                        selectedMode = mode
+                                        when (mode) {
+                                            "Buy" -> {
+                                                // Already on Buy dashboard - do nothing
+                                            }
+                                            "Sell" -> {
+                                                val intent = Intent(context, DashboardSellActivity::class.java)
+                                                context.startActivity(intent)
+                                                activity?.finish()
+                                            }
+                                        }
+                                    },
+                                    label = {
+                                        Text(
+                                            text = mode,
+                                            fontFamily = font,
+                                            fontSize = 12.sp
+                                        )
+                                    },
+                                    selected = selectedMode == mode,
+                                    colors = FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = buttton,
+                                        selectedLabelColor = Color.White
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                // Products Grid
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    state = gridState,
+                    contentPadding = PaddingValues(8.dp),
+                    modifier = Modifier.height(600.dp) // Fixed height for scrollable content
+                ) {
+                    items(products) { product ->
+                        ProductCard(
+                            product = product,
+                            isSmall = false,
+                            onMessageClick = {
+                                selectedProduct = it
+                                showMessageDialog = true
+                            }
+                        )
+                    }
+                }
+
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = buttton
+                        )
+                    }
                 }
             }
         }
-
 
         if (showMessageDialog && selectedProduct != null) {
             MessageDialog(
