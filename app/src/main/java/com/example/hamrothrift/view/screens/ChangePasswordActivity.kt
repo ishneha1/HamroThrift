@@ -86,19 +86,6 @@ private fun ChangePasswordActivityBody(viewModel: PasswordChangeViewModel) {
                     }
                 }
             )
-        },
-        bottomBar = {
-            CommonBottomBar(
-                selectedTab = selectedTab,
-                onTabSelected = { index ->
-                    when (index) {
-                        0 -> context.startActivity(Intent(context, DashboardActivityBuy::class.java))
-                        1 -> context.startActivity(Intent(context, SaleActivity::class.java))
-                        2 -> context.startActivity(Intent(context, NotificationActivity::class.java))
-                        3 -> context.startActivity(Intent(context, ProfileActivity::class.java))
-                    }
-                }
-            )
         }
     ) { innerPadding ->
         Box(
