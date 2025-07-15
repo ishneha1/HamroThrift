@@ -202,3 +202,54 @@ fun ProductCard(
         }
     }
 }
+
+// In your product card or detail screen
+@Composable
+fun AddToCartButton(
+    product: ProductModel,
+    cartRepository: CartRepository
+) {
+    val context = LocalContext.current
+    var isAdding by remember { mutableStateOf(false) }
+
+    Button(
+        onClick = {
+            if (!isAdding) {
+                isAdding = true
+                // Add to cart logic
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        cartRepository.addToCart(product, 1).collect { success ->
+                            withContext(Dispatchers.Main) {
+                                if (success) {
+                                    Toast.makeText(context, "Added to cart!", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(context, "Failed to add to cart", Toast.LENGTH_SHORT).show()
+                                }
+                                isAdding = false
+                            }
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                            isAdding = false
+                        }
+                    }
+                }
+            }
+        },
+        enabled = !isAdding,
+        colors = ButtonDefaults.buttonColors(containerColor = buttton)
+    ) {
+        if (isAdding) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(16.dp),
+                color = White
+            )
+        } else {
+            Icon(Icons.Default.ShoppingCart, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Add to Cart")
+        }
+    }
+}
