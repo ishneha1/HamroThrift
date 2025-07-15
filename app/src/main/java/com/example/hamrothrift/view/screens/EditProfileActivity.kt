@@ -24,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,9 +33,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -46,9 +46,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.hamrothrift.R
 import com.example.hamrothrift.model.UserModel
 import com.example.hamrothrift.repository.UserRepoImpl
-import com.example.hamrothrift.view.buy.DashboardActivityBuy
 import com.example.hamrothrift.view.buy.NotificationActivity
-import com.example.hamrothrift.view.sell.DashboardSellActivity
 import com.example.hamrothrift.view.components.CommonBottomBarSell
 import com.example.hamrothrift.view.components.CommonTopAppBar
 import com.example.hamrothrift.view.sell.UploadActivity
@@ -76,9 +74,11 @@ fun EditProfileScreen() {
     val activity = context as? Activity
     val auth = FirebaseAuth.getInstance()
     val currentUser = auth.currentUser
-    var selectedTab by remember { mutableStateOf(1) }
 
     val font = FontFamily(Font(R.font.handmade))
+
+    val gradientColors = listOf(White, deepBlue, Color.Black)
+
     val repo = remember { UserRepoImpl() }
     val userViewModel = remember { UserViewModel(repo) }
 
@@ -140,29 +140,32 @@ fun EditProfileScreen() {
     }
 
     Scaffold(
-        topBar = { CommonTopAppBar() },
-        bottomBar = {
-            CommonBottomBarSell(
-                selectedTab = selectedTab,
-                onTabSelected = { index ->
-                    selectedTab = index
-                    when (index) {
-                        0 -> { /* Already on Home/Analytics - do nothing */ }
-                        1 -> {
-                            context.startActivity(Intent(context, UploadActivity::class.java))
-                        }
-                        2 -> {
-                            // Navigate to Notifications
-                            context.startActivity(Intent(context, NotificationActivity::class.java))
-                        }
-                        3 -> {
-                            // Navigate to Profile
-                            context.startActivity(Intent(context, ProfileActivity::class.java))
-                        }
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        "HamroThrift",
+                        style = TextStyle(
+                            brush = Brush.linearGradient(colors = gradientColors),
+                            fontSize = 25.sp,
+                            fontFamily = font,
+                            fontStyle = FontStyle.Italic
+                        )
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = appBar),
+                navigationIcon = {
+                    IconButton(onClick = { (context as ComponentActivity).finish() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = White
+                        )
                     }
                 }
             )
         }
+
     ) { innerPadding ->
         if (isLoading) {
             Box(
