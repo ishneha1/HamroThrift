@@ -104,7 +104,6 @@ private fun BottomNavItem(
                 fontSize = 10.sp,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                 color = if (isSelected) buttton else text.copy(alpha = 0.6f),
-                fontFamily = font
             )
         }
     }

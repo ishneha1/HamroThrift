@@ -92,18 +92,6 @@ fun DashboardSellBody(viewModel: SalesOverviewViewModel) {
                 .background(bg)
                 .padding(horizontal = 16.dp, vertical = 10.dp)
         ) {
-            ModeSelectorDropdown(
-                currentMode = "Sell Mode",
-                onModeSelected = { mode ->
-                    if (mode == "Buy Mode") {
-                        val intent = Intent(context, DashboardActivityBuy::class.java)
-                        context.startActivity(intent)
-                        activity?.finish()
-                    }
-                }
-            )
-
-            Spacer(modifier = Modifier.height(18.dp))
 
             SalesOverviewScreen(viewModel = viewModel)
         }
@@ -122,6 +110,9 @@ fun SalesOverviewScreen(viewModel: SalesOverviewViewModel) {
     val errorMessage by viewModel.errorMessage.collectAsState()
     val selectedTimeRange by viewModel.selectedTimeRange.collectAsState()
     val selectedMode by viewModel.selectedMode.collectAsState()
+
+    val context = LocalContext.current
+    val activity = context as? Activity
 
     // Load initial data
     LaunchedEffect(Unit) {
@@ -163,7 +154,21 @@ fun SalesOverviewScreen(viewModel: SalesOverviewViewModel) {
                 ) {
                     items(modes) { mode ->
                         FilterChip(
-                            onClick = { viewModel.setSelectedMode(mode) },
+                            onClick = {
+                                viewModel.setSelectedMode(mode)
+                                // Add navigation logic here
+                                when (mode) {
+                                    "Buy" -> {
+                                        val intent = Intent(context, DashboardActivityBuy::class.java)
+                                        context.startActivity(intent)
+                                        activity?.finish() // Close current activity
+                                    }
+                                    "Sell" -> {
+                                        // Already on Sell dashboard - just update the mode
+                                        // Or navigate to a specific Sell activity if needed
+                                    }
+                                }
+                            },
                             label = {
                                 Text(
                                     text = mode,
@@ -181,7 +186,6 @@ fun SalesOverviewScreen(viewModel: SalesOverviewViewModel) {
                 }
             }
         }
-
         // Time Range Selector
         Card(
             modifier = Modifier
