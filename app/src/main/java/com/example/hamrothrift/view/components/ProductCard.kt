@@ -90,7 +90,7 @@ fun CommonBottomBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
         Triple("Profile", Icons.Default.Person, 3)
     )
 
-    NavigationBar(containerColor = appBar) {
+    NavigationBar(containerColor = card) {
         items.forEach { (label, icon, index) ->
             NavigationBarItem(
                 icon = { Icon(icon, contentDescription = label) },
