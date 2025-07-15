@@ -24,3 +24,10 @@ data class ProductUploadRequest(
     val description: String,
     val imageUri: android.net.Uri
 )
+
+data class CartItem(
+    val id: String = "",
+    val product: ProductModel = ProductModel(),
+    val quantity: Int = 1,
+    val addedAt: Long = System.currentTimeMillis()
+)
