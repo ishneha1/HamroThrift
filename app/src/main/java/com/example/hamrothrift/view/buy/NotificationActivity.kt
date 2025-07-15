@@ -94,10 +94,17 @@ fun NotificationScreen(viewModel: NotificationViewModel) {
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = appBar),
                 actions = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {
+                        val intent =
+                        Intent(context, CartActivity::class.java)
+                        context.startActivity(intent)}) {
                         Icon(Icons.Default.ShoppingCart, "Cart", tint = Color.White)
                     }
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {
+                        val intent =
+                            Intent(context, CartActivity::class.java)
+                        context.startActivity(intent)
+                    }) {
                         Icon(Icons.Default.Search, "Search", tint = Color.White)
                     }
                 }
