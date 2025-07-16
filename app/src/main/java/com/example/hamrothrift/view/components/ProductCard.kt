@@ -81,27 +81,6 @@ fun CommonTopAppBar() {
     )
 }
 
-@Composable
-fun CommonBottomBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
-    val items = listOf(
-        Triple("Home", Icons.Default.Home, 0),
-        Triple("Sale", Icons.Default.Star, 1),
-        Triple("Notification", Icons.Default.Notifications, 2),
-        Triple("Profile", Icons.Default.Person, 3)
-    )
-
-    NavigationBar(containerColor = card) {
-        items.forEach { (label, icon, index) ->
-            NavigationBarItem(
-                icon = { Icon(icon, contentDescription = label) },
-                label = { Text(label) },
-                selected = selectedTab == index,
-                onClick = { onTabSelected(index) }
-            )
-        }
-    }
-}
-
 
 @Composable
 fun ProductCard(
