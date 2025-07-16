@@ -95,10 +95,10 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
                 onTabSelected = { index ->
                     selectedTab = index
                     when (index) {
+                        0 -> context.startActivity(Intent(context, DashboardActivityBuy::class.java))
                         1 -> context.startActivity(Intent(context, SaleActivity::class.java))
-                        2 -> context.startActivity(Intent(context, CartActivity::class.java))
-                        3 -> context.startActivity(Intent(context, NotificationActivity::class.java))
-                        4 -> context.startActivity(Intent(context, ProfileActivity::class.java))
+                        2 -> context.startActivity(Intent(context, NotificationActivity::class.java))
+                        3 -> context.startActivity(Intent(context, ProfileActivity::class.java))
                     }
                 }
             )
@@ -138,7 +138,6 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = text,
-                            fontFamily = font,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
@@ -163,7 +162,6 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
                                     label = {
                                         Text(
                                             text = mode,
-                                            fontFamily = font,
                                             fontSize = 12.sp
                                         )
                                     },
