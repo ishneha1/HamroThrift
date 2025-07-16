@@ -1,6 +1,6 @@
 package com.example.hamrothrift.view.components
 
-import android.content.Intent
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -23,10 +23,6 @@ import com.example.hamrothrift.R
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.ChatRepoImpl
 import com.example.hamrothrift.repository.NotificationRepoImpl
-import com.example.hamrothrift.view.ProfileActivity
-import com.example.hamrothrift.view.buy.DashboardActivityBuy
-import com.example.hamrothrift.view.NotificationActivity
-import com.example.hamrothrift.view.buy.SaleActivity
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.ChatViewModel
 import com.example.hamrothrift.viewmodel.ChatViewModelFactory
@@ -63,21 +59,6 @@ fun MessageDialog(
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = buttton)
-                )
-            },
-            bottomBar = {
-                CommonBottomBar(
-                    selectedTab = selectedTab,
-                    onTabSelected = { index: Int ->
-                        selectedTab = index
-                        onDismiss()
-                        when (index) {
-                            0 -> context.startActivity(Intent(context, DashboardActivityBuy::class.java))
-                            1 -> context.startActivity(Intent(context, SaleActivity::class.java))
-                            2 -> context.startActivity(Intent(context, NotificationActivity::class.java))
-                            3 -> context.startActivity(Intent(context, ProfileActivity::class.java))
-                        }
-                    }
                 )
             },
             containerColor = bg

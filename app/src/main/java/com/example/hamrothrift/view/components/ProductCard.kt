@@ -81,78 +81,7 @@ fun CommonTopAppBar() {
     )
 }
 
-@Composable
-fun CommonBottomBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
-    val items = listOf(
-        Triple("Home", Icons.Default.Home, 0),
-        Triple("Sale", Icons.Default.Star, 1),
-        Triple("Notification", Icons.Default.Notifications, 2),
-        Triple("Profile", Icons.Default.Person, 3)
-    )
 
-    NavigationBar(containerColor = card) {
-        items.forEach { (label, icon, index) ->
-            NavigationBarItem(
-                icon = { Icon(icon, contentDescription = label) },
-                label = { Text(label) },
-                selected = selectedTab == index,
-                onClick = { onTabSelected(index) }
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ModeSelectorDropdown(
-    currentMode: String,
-    onModeSelected: (String) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-    var textFieldSize by remember { mutableStateOf(Size.Zero) }
-    val options = listOf("Buy Mode", "Sell Mode")
-
-    Box(modifier = Modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = currentMode,
-            onValueChange = {},
-            modifier = Modifier
-                .fillMaxWidth()
-                .onGloballyPositioned { coordinates ->
-                    textFieldSize = coordinates.size.toSize()
-                }
-                .clickable { expanded = true }
-                .clip(RoundedCornerShape(10.dp)),
-            colors = TextFieldDefaults.colors(
-                disabledContainerColor = buttton,
-                disabledIndicatorColor = Black,
-                disabledTextColor = Black
-            ),
-            enabled = false,
-            trailingIcon = {
-                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-            }
-        )
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.width(with(LocalDensity.current) { textFieldSize.width.toDp() })
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        expanded = false
-                        onModeSelected(option)
-                    }
-                )
-            }
-        }
-    }
-}
-
-// Update ProductCard.kt
 @Composable
 fun ProductCard(
     product: ProductModel,

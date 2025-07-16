@@ -7,6 +7,7 @@
       </SelectionState>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       <SelectionState runConfigName="DashboardActivityBuy">
 <<<<<<< HEAD
         <option name="selectionMode" value="DROPDOWN" />
@@ -34,6 +35,12 @@
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="DashboardActivity (1)">
+=======
+      <SelectionState runConfigName="ProfileActivity">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="DashboardActivityBuy">
+>>>>>>> a538386aa7bd8c0153cab066bbfa507ef50f9df4
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

@@ -33,6 +33,7 @@ import com.example.hamrothrift.view.components.CommonTopAppBar
 import com.example.hamrothrift.view.components.ProductCard
 import com.example.hamrothrift.view.sell.DashboardSellActivity
 import com.example.hamrothrift.view.theme.ui.theme.*
+import com.example.hamrothrift.viewmodel.NavigationViewModel
 import com.example.hamrothrift.viewmodel.ProductViewModel
 import com.example.hamrothrift.viewmodel.ProductViewModelFactory
 import com.example.hamrothrift.viewmodel.NotificationViewModel
@@ -51,7 +52,8 @@ class SaleActivity : ComponentActivity() {
             val notificationViewModel: NotificationViewModel = viewModel(
                 factory = NotificationViewModelFactory(notificationRepository)
             )
-            SaleActivityBody(productViewModel, notificationViewModel)
+            val navigationViewModel: NavigationViewModel = viewModel()
+            SaleActivityBody(productViewModel, notificationViewModel, navigationViewModel )
         }
     }
 }
@@ -60,7 +62,8 @@ class SaleActivity : ComponentActivity() {
 @Composable
 fun SaleActivityBody(
     productViewModel: ProductViewModel,
-    notificationViewModel: NotificationViewModel
+    notificationViewModel: NotificationViewModel,
+    navigationViewModel:NavigationViewModel
 ) {
     var selectedTab by remember { mutableIntStateOf(1) }
     val context = LocalContext.current
@@ -107,8 +110,8 @@ fun SaleActivityBody(
         topBar = { CommonTopAppBar() },
         bottomBar = {
             CommonBottomBar(
-                selectedTab = selectedTab,
-                onTabSelected = { selectedTab = it }
+                navigationViewModel = navigationViewModel,
+                selectedTab = selectedTab
             )
         }
     ) { paddingValues ->

@@ -32,14 +32,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hamrothrift.R
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.ProductRepoImpl
-import com.example.hamrothrift.view.NotificationActivity
-import com.example.hamrothrift.view.ProfileActivity
 import com.example.hamrothrift.view.components.*
 import com.example.hamrothrift.view.sell.DashboardSellActivity
 import com.example.hamrothrift.view.theme.ui.theme.bg
 import com.example.hamrothrift.view.theme.ui.theme.buttton
 import com.example.hamrothrift.view.theme.ui.theme.card
 import com.example.hamrothrift.view.theme.ui.theme.text
+import com.example.hamrothrift.viewmodel.NavigationViewModel
 import com.example.hamrothrift.viewmodel.ProductViewModel
 import com.example.hamrothrift.viewmodel.ProductViewModelFactory
 
@@ -52,14 +51,16 @@ class DashboardActivityBuy : ComponentActivity() {
             val viewModel: ProductViewModel = viewModel(
                 factory = ProductViewModelFactory(productRepository)
             )
-            DashboardBuyBody(viewModel)
+            val navigationViewModel: NavigationViewModel = viewModel()
+            DashboardBuyBody(viewModel, navigationViewModel )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardBuyBody(viewModel: ProductViewModel) {
+fun DashboardBuyBody(viewModel: ProductViewModel,
+                     navigationViewModel: NavigationViewModel) {
     var selectedTab by remember { mutableStateOf(0) }
     val context = LocalContext.current
     val activity = context as? Activity
@@ -91,18 +92,8 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
     Scaffold(
         topBar = { CommonTopAppBar() },
         bottomBar = {
-            CommonBottomBar(
-                selectedTab = selectedTab,
-                onTabSelected = { index ->
-                    selectedTab = index
-                    when (index) {
-                        0 -> context.startActivity(Intent(context, DashboardActivityBuy::class.java))
-                        1 -> context.startActivity(Intent(context, SaleActivity::class.java))
-                        2 -> context.startActivity(Intent(context, NotificationActivity::class.java))
-                        3 -> context.startActivity(Intent(context, ProfileActivity::class.java))
-                    }
-                }
-            )
+            CommonBottomBar(navigationViewModel = navigationViewModel,
+                selectedTab=selectedTab)
         }
     ) { innerPadding ->
         Column(

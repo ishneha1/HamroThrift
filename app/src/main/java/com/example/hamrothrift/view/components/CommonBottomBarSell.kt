@@ -23,7 +23,6 @@ fun CommonBottomBarSell(
     selectedTab: Int,
     onTabSelected: (Int) -> Unit
 ) {
-    val font = FontFamily(Font(R.font.handmade))
 
     Card(
         modifier = Modifier
@@ -44,8 +43,7 @@ fun CommonBottomBarSell(
                 icon = Icons.Default.Analytics,
                 label = "Home",
                 isSelected = selectedTab == 0,
-                onClick = { onTabSelected(0) },
-                font = font
+                onClick = { onTabSelected(0) }
             )
 
             // Upload Tab
@@ -53,8 +51,7 @@ fun CommonBottomBarSell(
                 icon = Icons.Default.Add,
                 label = "Upload",
                 isSelected = selectedTab == 1,
-                onClick = { onTabSelected(1) },
-                font = font
+                onClick = { onTabSelected(1) }
             )
 
 
@@ -64,7 +61,6 @@ fun CommonBottomBarSell(
                 label = "Notifications",
                 isSelected = selectedTab == 2,
                 onClick = { onTabSelected(2) },
-                font = font
             )
 
             // Profile Tab
@@ -73,7 +69,6 @@ fun CommonBottomBarSell(
                 label = "Profile",
                 isSelected = selectedTab == 3,
                 onClick = { onTabSelected(3) },
-                font = font
             )
         }
     }
@@ -84,8 +79,7 @@ private fun BottomNavItem(
     icon: ImageVector,
     label: String,
     isSelected: Boolean,
-    onClick: () -> Unit,
-    font: FontFamily
+    onClick: () -> Unit
 ) {
     IconButton(onClick = onClick) {
         Column(

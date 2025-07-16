@@ -36,7 +36,10 @@ import com.example.hamrothrift.repository.NotificationRepoImpl
 import com.example.hamrothrift.view.buy.CartActivity
 import com.example.hamrothrift.view.buy.DashboardActivityBuy
 import com.example.hamrothrift.view.buy.SaleActivity
+import com.example.hamrothrift.view.buy.SearchActivity
+import com.example.hamrothrift.view.components.CommonBottomBar
 import com.example.hamrothrift.view.theme.ui.theme.*
+import com.example.hamrothrift.viewmodel.NavigationViewModel
 import com.example.hamrothrift.viewmodel.NotificationViewModel
 import com.example.hamrothrift.viewmodel.NotificationViewModelFactory
 import java.text.SimpleDateFormat
@@ -51,14 +54,16 @@ class NotificationActivity : ComponentActivity() {
             val viewModel: NotificationViewModel = viewModel(
                 factory = NotificationViewModelFactory(notificationRepo)
             )
-            NotificationScreen(viewModel)
+            val navigationViewModel: NavigationViewModel = viewModel()
+            NotificationScreen(viewModel, navigationViewModel )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationScreen(viewModel: NotificationViewModel) {
+fun NotificationScreen(viewModel: NotificationViewModel,
+                       navigationViewModel: NavigationViewModel) {
     val context = LocalContext.current
     val gradientColors = listOf(White, deepBlue, Color.Black)
     var selectedTab by remember { mutableStateOf(2) }
@@ -106,7 +111,7 @@ fun NotificationScreen(viewModel: NotificationViewModel) {
                     }
                     IconButton(onClick = {
                         val intent =
-                            Intent(context, CartActivity::class.java)
+                            Intent(context, SearchActivity::class.java)
                         context.startActivity(intent)
                     }) {
                         Icon(Icons.Default.Search, "Search", tint = Color.White)
@@ -115,30 +120,10 @@ fun NotificationScreen(viewModel: NotificationViewModel) {
             )
         },
         bottomBar = {
-            NavigationBar(containerColor = card) {
-                val items = listOf(
-                    NavigationItem(label = "Home", icon = Icons.Default.Home, index = 0),
-                    NavigationItem(label = "Sale", icon = Icons.Default.Star, index = 1),
-                    NavigationItem(label = "Notification", icon = Icons.Default.Notifications, index = 2),
-                    NavigationItem(label = "Profile", icon = Icons.Default.Person, index = 3)
-                )
-
-                items.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) },
-                        selected = selectedTab == index,
-                        onClick = {
-                            selectedTab = index
-                            when (index) {
-                                0 -> context.startActivity(Intent(context, DashboardActivityBuy::class.java))
-                                1 -> context.startActivity(Intent(context, SaleActivity::class.java))
-                                3 -> context.startActivity(Intent(context, ProfileActivity::class.java))
-                            }
-                        }
-                    )
-                }
-            }
+            CommonBottomBar(
+                navigationViewModel = navigationViewModel,
+                selectedTab=selectedTab
+            )
         }
     ) { innerPadding ->
         Box(
