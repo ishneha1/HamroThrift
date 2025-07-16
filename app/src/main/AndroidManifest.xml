@@ -205,7 +205,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".view.buy.NotificationActivity"
+            android:name=".view.NotificationActivity"
             android:exported="true"
             android:label="@string/title_activity_notification"
             android:theme="@style/Theme.HamroThrift">

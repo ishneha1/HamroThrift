@@ -1,13 +1,11 @@
 package com.example.hamrothrift.view.screens
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -29,11 +27,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hamrothrift.R
 import com.example.hamrothrift.repository.PasswordRepositoryImpl
-import com.example.hamrothrift.view.ProfileActivity
-import com.example.hamrothrift.view.buy.DashboardActivityBuy
-import com.example.hamrothrift.view.buy.NotificationActivity
-import com.example.hamrothrift.view.buy.SaleActivity
-import com.example.hamrothrift.view.components.CommonBottomBar
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.PasswordChangeViewModel
 import com.example.hamrothrift.viewmodel.PasswordChangeViewModelFactory

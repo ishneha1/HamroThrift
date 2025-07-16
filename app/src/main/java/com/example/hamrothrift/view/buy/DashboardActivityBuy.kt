@@ -32,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hamrothrift.R
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.ProductRepoImpl
+import com.example.hamrothrift.view.NotificationActivity
 import com.example.hamrothrift.view.ProfileActivity
 import com.example.hamrothrift.view.components.*
 import com.example.hamrothrift.view.sell.DashboardSellActivity
@@ -95,10 +96,10 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
                 onTabSelected = { index ->
                     selectedTab = index
                     when (index) {
+                        0 -> context.startActivity(Intent(context, DashboardActivityBuy::class.java))
                         1 -> context.startActivity(Intent(context, SaleActivity::class.java))
-                        2 -> context.startActivity(Intent(context, CartActivity::class.java))
-                        3 -> context.startActivity(Intent(context, NotificationActivity::class.java))
-                        4 -> context.startActivity(Intent(context, ProfileActivity::class.java))
+                        2 -> context.startActivity(Intent(context, NotificationActivity::class.java))
+                        3 -> context.startActivity(Intent(context, ProfileActivity::class.java))
                     }
                 }
             )
@@ -138,7 +139,6 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = text,
-                            fontFamily = font,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
@@ -163,7 +163,6 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
                                     label = {
                                         Text(
                                             text = mode,
-                                            fontFamily = font,
                                             fontSize = 12.sp
                                         )
                                     },

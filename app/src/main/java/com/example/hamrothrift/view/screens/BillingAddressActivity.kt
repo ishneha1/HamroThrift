@@ -33,7 +33,7 @@ import com.example.hamrothrift.model.BillingAddress
 import com.example.hamrothrift.repository.BillingAddressRepositoryImpl
 import com.example.hamrothrift.view.ProfileActivity
 import com.example.hamrothrift.view.buy.DashboardActivityBuy
-import com.example.hamrothrift.view.buy.NotificationActivity
+import com.example.hamrothrift.view.NotificationActivity
 import com.example.hamrothrift.view.buy.SaleActivity
 import com.example.hamrothrift.view.components.CommonBottomBar
 import com.example.hamrothrift.view.theme.ui.theme.*

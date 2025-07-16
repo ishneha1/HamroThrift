@@ -6,6 +6,7 @@
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
 <<<<<<< HEAD
+<<<<<<< HEAD
       <SelectionState runConfigName="DashboardActivityBuy">
 <<<<<<< HEAD
         <option name="selectionMode" value="DROPDOWN" />
@@ -18,15 +19,21 @@
       <SelectionState runConfigName="ProfileActivity">
 =======
 >>>>>>> 00d086fdc719a403498a79f4e4b976b83dcfa67d
+=======
+      <SelectionState runConfigName="UploadActivity">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="SplashScreenActivity (1)">
+      <SelectionState runConfigName="DashboardSellActivity (1)">
+>>>>>>> a17c7a975105fa40d433b14a6bec03feae0f03d3
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="DashboardSellActivity">
+      <SelectionState runConfigName="SaleActivity">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="DashboardActivityBuy">
+      <SelectionState runConfigName="DashboardActivity">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="DashboardActivity (1)">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
