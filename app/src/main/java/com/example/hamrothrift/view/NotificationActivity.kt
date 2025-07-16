@@ -36,6 +36,7 @@ import com.example.hamrothrift.repository.NotificationRepoImpl
 import com.example.hamrothrift.view.buy.CartActivity
 import com.example.hamrothrift.view.buy.DashboardActivityBuy
 import com.example.hamrothrift.view.buy.SaleActivity
+import com.example.hamrothrift.view.buy.SearchActivity
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.NotificationViewModel
 import com.example.hamrothrift.viewmodel.NotificationViewModelFactory
@@ -106,7 +107,7 @@ fun NotificationScreen(viewModel: NotificationViewModel) {
                     }
                     IconButton(onClick = {
                         val intent =
-                            Intent(context, CartActivity::class.java)
+                            Intent(context, SearchActivity::class.java)
                         context.startActivity(intent)
                     }) {
                         Icon(Icons.Default.Search, "Search", tint = Color.White)
