@@ -144,7 +144,6 @@ fun SaleActivityBody(
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = text,
-                                fontFamily = font,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
 
@@ -169,7 +168,6 @@ fun SaleActivityBody(
                                         label = {
                                             Text(
                                                 text = mode,
-                                                fontFamily = font,
                                                 fontSize = 12.sp
                                             )
                                         },
