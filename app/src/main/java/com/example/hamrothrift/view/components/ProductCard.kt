@@ -102,57 +102,7 @@ fun CommonBottomBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ModeSelectorDropdown(
-    currentMode: String,
-    onModeSelected: (String) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-    var textFieldSize by remember { mutableStateOf(Size.Zero) }
-    val options = listOf("Buy Mode", "Sell Mode")
 
-    Box(modifier = Modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = currentMode,
-            onValueChange = {},
-            modifier = Modifier
-                .fillMaxWidth()
-                .onGloballyPositioned { coordinates ->
-                    textFieldSize = coordinates.size.toSize()
-                }
-                .clickable { expanded = true }
-                .clip(RoundedCornerShape(10.dp)),
-            colors = TextFieldDefaults.colors(
-                disabledContainerColor = buttton,
-                disabledIndicatorColor = Black,
-                disabledTextColor = Black
-            ),
-            enabled = false,
-            trailingIcon = {
-                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-            }
-        )
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.width(with(LocalDensity.current) { textFieldSize.width.toDp() })
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        expanded = false
-                        onModeSelected(option)
-                    }
-                )
-            }
-        }
-    }
-}
-
-// Update ProductCard.kt
 @Composable
 fun ProductCard(
     product: ProductModel,
