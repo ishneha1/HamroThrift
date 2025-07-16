@@ -29,9 +29,8 @@ import com.example.hamrothrift.viewmodel.UserViewModel
 import android.content.Intent
 import androidx.compose.ui.graphics.Color
 import com.example.hamrothrift.view.buy.CartActivity
-import com.example.hamrothrift.view.buy.DashboardActivityBuy
-import com.example.hamrothrift.view.buy.SaleActivity
 import com.example.hamrothrift.view.buy.SearchActivity
+import com.example.hamrothrift.viewmodel.NavigationViewModel
 import com.example.hamrothrift.viewmodel.UserViewModelFactory
 
 class ProfileActivity : ComponentActivity() {
@@ -43,14 +42,16 @@ class ProfileActivity : ComponentActivity() {
             val viewModel: UserViewModel = viewModel(
                 factory = UserViewModelFactory(userRepository)
             )
-            ProfileActivityBody(viewModel)
+            val navigationViewModel: NavigationViewModel = viewModel()
+            ProfileActivityBody(viewModel, navigationViewModel )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProfileActivityBody(viewModel: UserViewModel) {
+private fun ProfileActivityBody(viewModel: UserViewModel,
+                                navigationViewModel:NavigationViewModel) {
     var selectedTab by remember { mutableStateOf(3) }
     val context = LocalContext.current
     val gradientColors = listOf(White, deepBlue, Black)
@@ -90,15 +91,8 @@ private fun ProfileActivityBody(viewModel: UserViewModel) {
         },
         bottomBar = {
             CommonBottomBar(
-                selectedTab = selectedTab,
-                onTabSelected = { index ->
-                    selectedTab = index
-                    when (index) {
-                        0 -> context.startActivity(Intent(context, DashboardActivityBuy::class.java))
-                        1 -> context.startActivity(Intent(context, SaleActivity::class.java))
-                        2 -> context.startActivity(Intent(context, NotificationActivity::class.java))
-                    }
-                }
+                navigationViewModel = navigationViewModel,
+                selectedTab=selectedTab
             )
         }
     ) { innerPadding ->
