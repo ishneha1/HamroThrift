@@ -1,4 +1,4 @@
-package com.example.hamrothrift.view.buy
+package com.example.hamrothrift.view
 
 import com.google.firebase.Timestamp
 import android.content.Intent
@@ -33,10 +33,14 @@ import com.example.hamrothrift.R
 import com.example.hamrothrift.model.NavigationItem
 import com.example.hamrothrift.model.NotificationModel
 import com.example.hamrothrift.repository.NotificationRepoImpl
-import com.example.hamrothrift.view.ProfileActivity
+import com.example.hamrothrift.view.buy.CartActivity
+import com.example.hamrothrift.view.buy.DashboardActivityBuy
+import com.example.hamrothrift.view.buy.SaleActivity
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.NotificationViewModel
 import com.example.hamrothrift.viewmodel.NotificationViewModelFactory
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class NotificationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -263,7 +267,7 @@ fun NotificationCard(
 }
 
 // Update the helper function to handle Firebase Timestamp
-private fun formatFirebaseTimestamp(timestamp: com.google.firebase.Timestamp): String {
-    val formatter = java.text.SimpleDateFormat("MMM dd, yyyy HH:mm", java.util.Locale.getDefault())
+private fun formatFirebaseTimestamp(timestamp: Timestamp): String {
+    val formatter = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
     return formatter.format(timestamp.toDate())
 }

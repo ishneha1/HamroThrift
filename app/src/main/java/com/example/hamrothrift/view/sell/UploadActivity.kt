@@ -38,16 +38,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.hamrothrift.R
-import com.example.hamrothrift.view.sell.DashboardSellActivity
-import com.example.hamrothrift.model.ProductUploadRequest
 import com.example.hamrothrift.repository.UploadRepositoryImpl
 import com.example.hamrothrift.repository.UploadResult
 import com.example.hamrothrift.view.ProfileActivity
 import com.example.hamrothrift.view.buy.DashboardActivityBuy
-import com.example.hamrothrift.view.buy.NotificationActivity
+import com.example.hamrothrift.view.NotificationActivity
 import com.example.hamrothrift.view.components.CommonBottomBarSell
 import com.example.hamrothrift.view.components.CommonTopAppBar
-import com.example.hamrothrift.view.components.ModeSelectorDropdown
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.UploadViewModel
 import com.example.hamrothrift.viewmodel.UploadViewModelFactory

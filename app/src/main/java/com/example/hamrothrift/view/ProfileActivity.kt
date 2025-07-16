@@ -28,7 +28,6 @@ import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.UserViewModel
 import android.content.Intent
 import com.example.hamrothrift.view.buy.DashboardActivityBuy
-import com.example.hamrothrift.view.buy.NotificationActivity
 import com.example.hamrothrift.view.buy.SaleActivity
 import com.example.hamrothrift.viewmodel.UserViewModelFactory
 

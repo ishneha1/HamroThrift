@@ -30,7 +30,7 @@ import com.example.hamrothrift.R
 import com.example.hamrothrift.repository.SalesRepositoryImpl
 import com.example.hamrothrift.view.ProfileActivity
 import com.example.hamrothrift.view.buy.DashboardActivityBuy
-import com.example.hamrothrift.view.buy.NotificationActivity
+import com.example.hamrothrift.view.NotificationActivity
 import com.example.hamrothrift.view.components.CommonBottomBarSell
 import com.example.hamrothrift.view.components.CommonTopAppBar
 import com.example.hamrothrift.view.theme.ui.theme.*

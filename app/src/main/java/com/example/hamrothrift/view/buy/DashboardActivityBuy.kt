@@ -32,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hamrothrift.R
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.ProductRepoImpl
+import com.example.hamrothrift.view.NotificationActivity
 import com.example.hamrothrift.view.ProfileActivity
 import com.example.hamrothrift.view.components.*
 import com.example.hamrothrift.view.sell.DashboardSellActivity
