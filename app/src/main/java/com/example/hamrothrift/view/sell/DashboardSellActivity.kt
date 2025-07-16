@@ -171,7 +171,6 @@ fun SalesOverviewScreen(viewModel: SalesOverviewViewModel) {
                             label = {
                                 Text(
                                     text = mode,
-                                    fontFamily = font,
                                     fontSize = 12.sp
                                 )
                             },
@@ -199,7 +198,6 @@ fun SalesOverviewScreen(viewModel: SalesOverviewViewModel) {
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = text,
-                    fontFamily = font,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
@@ -258,7 +256,6 @@ fun SalesOverviewScreen(viewModel: SalesOverviewViewModel) {
                     Text(
                         text = error,
                         color = Color(0xFFC62828),
-                        fontFamily = font,
                         fontSize = 14.sp
                     )
                 }
@@ -278,8 +275,8 @@ fun SalesOverviewScreen(viewModel: SalesOverviewViewModel) {
                         value = "${overview.totalSells}",
                         subtitle = "Rs. ${String.format("%.0f", overview.totalSellAmount)}",
                         icon = Icons.Default.TrendingUp,
-                        modifier = Modifier.weight(1f),
-                        font = font
+                        modifier = Modifier.weight(1f)
+
                     )
                 } else {
                     SummaryCard(
@@ -287,7 +284,6 @@ fun SalesOverviewScreen(viewModel: SalesOverviewViewModel) {
                         value = "${overview.totalBuys}",
                         subtitle = "Rs. ${String.format("%.0f", overview.totalBuyAmount)}",
                         modifier = Modifier.weight(1f),
-                        font = font
                     )
                 }
 
@@ -300,7 +296,7 @@ fun SalesOverviewScreen(viewModel: SalesOverviewViewModel) {
                     },
                     subtitle = "Per Transaction",
                     modifier = Modifier.weight(1f),
-                    font = font
+
                 )
             }
 
@@ -319,7 +315,6 @@ fun SalesOverviewScreen(viewModel: SalesOverviewViewModel) {
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = text,
-                            fontFamily = font,
                             modifier = Modifier.padding(bottom = 12.dp)
                         )
 
@@ -327,7 +322,6 @@ fun SalesOverviewScreen(viewModel: SalesOverviewViewModel) {
                             DailyDataItem(
                                 data = dayData,
                                 mode = selectedMode,
-                                font = font
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
@@ -345,7 +339,6 @@ fun SummaryCard(
     subtitle: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
     modifier: Modifier = Modifier,
-    font: FontFamily
 ) {
     Card(
         modifier = modifier,
@@ -390,7 +383,6 @@ fun SummaryCard(
 fun DailyDataItem(
     data: com.example.hamrothrift.model.SalesData,
     mode: String,
-    font: FontFamily
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -415,7 +407,6 @@ fun DailyDataItem(
                     text = if (mode == "Sell") "${data.sellCount} transactions" else "${data.buyCount} transactions",
                     fontSize = 12.sp,
                     color = text.copy(alpha = 0.7f),
-                    fontFamily = font
                 )
             }
 
