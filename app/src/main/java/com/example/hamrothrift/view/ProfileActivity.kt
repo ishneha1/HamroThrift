@@ -27,8 +27,11 @@ import com.example.hamrothrift.view.screens.ProfileScreen
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.UserViewModel
 import android.content.Intent
+import androidx.compose.ui.graphics.Color
+import com.example.hamrothrift.view.buy.CartActivity
 import com.example.hamrothrift.view.buy.DashboardActivityBuy
 import com.example.hamrothrift.view.buy.SaleActivity
+import com.example.hamrothrift.view.buy.SearchActivity
 import com.example.hamrothrift.viewmodel.UserViewModelFactory
 
 class ProfileActivity : ComponentActivity() {
@@ -69,11 +72,18 @@ private fun ProfileActivityBody(viewModel: UserViewModel) {
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = appBar),
                 actions = {
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Default.ShoppingCart, "Cart", tint = White)
+                    IconButton(onClick = {
+                        val intent =
+                            Intent(context, CartActivity::class.java)
+                        context.startActivity(intent)}) {
+                        Icon(Icons.Default.ShoppingCart, "Cart", tint = Color.White)
                     }
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Default.Search, "Search", tint = White)
+                    IconButton(onClick = {
+                        val intent =
+                            Intent(context, SearchActivity::class.java)
+                        context.startActivity(intent)
+                    }) {
+                        Icon(Icons.Default.Search, "Search", tint = Color.White)
                     }
                 }
             )
