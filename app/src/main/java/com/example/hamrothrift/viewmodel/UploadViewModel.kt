@@ -21,6 +21,10 @@ class UploadViewModel(private val repository: UploadRepository) : ViewModel() {
     private val _uploadedProduct = MutableStateFlow<ProductModel?>(null)
     val uploadedProduct: StateFlow<ProductModel?> = _uploadedProduct.asStateFlow()
 
+    private val _selectedMode = MutableStateFlow("Sell")
+    val selectedMode: StateFlow<String> = _selectedMode.asStateFlow()
+
+
     fun uploadProduct(
         context: Context,
         imageUri: Uri,
@@ -53,6 +57,10 @@ class UploadViewModel(private val repository: UploadRepository) : ViewModel() {
         _uploadState.value = null
         _uploadedProduct.value = null
     }
+    fun setSelectedMode(mode: String) {
+        _selectedMode.value = mode
+    }
+
 
     fun validateProductData(
         name: String,

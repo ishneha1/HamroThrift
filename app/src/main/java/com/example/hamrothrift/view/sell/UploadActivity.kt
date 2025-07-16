@@ -13,6 +13,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -72,6 +74,8 @@ fun UploadSellBody(viewModel: UploadViewModel) {
     val context = LocalContext.current
     val activity = context as? Activity
     val font = FontFamily(Font(R.font.handmade))
+    val modes = listOf("Sell", "Buy")
+    val selectedMode by viewModel.selectedMode.collectAsState()
 
     Scaffold(
         topBar = { CommonTopAppBar() },
@@ -107,16 +111,59 @@ fun UploadSellBody(viewModel: UploadViewModel) {
                 .background(bg)
                 .padding(horizontal = 16.dp, vertical = 10.dp)
         ) {
-            ModeSelectorDropdown(
-                currentMode = "Sell Mode",
-                onModeSelected = { mode ->
-                    if (mode == "Buy Mode") {
-                        val intent = Intent(context, DashboardActivityBuy::class.java)
-                        context.startActivity(intent)
-                        activity?.finish()
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+                colors = CardDefaults.cardColors(containerColor = card),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "View Mode",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = text,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(modes) { mode ->
+                            FilterChip(
+                                onClick = {
+                                    viewModel.setSelectedMode(mode)
+                                    // Add navigation logic here
+                                    when (mode) {
+                                        "Buy" -> {
+                                            val intent = Intent(context, DashboardActivityBuy::class.java)
+                                            context.startActivity(intent)
+                                            activity?.finish() // Close current activity
+                                        }
+                                        "Sell" -> {
+                                            // Already on Sell dashboard - just update the mode
+                                            // Or navigate to a specific Sell activity if needed
+                                        }
+                                    }
+                                },
+                                label = {
+                                    Text(
+                                        text = mode,
+                                        //fontFamily = font,
+                                        fontSize = 12.sp
+                                    )
+                                },
+                                selected = selectedMode == mode,
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = buttton,
+                                    selectedLabelColor = Color.White
+                                )
+                            )
+                        }
                     }
                 }
-            )
+            }
 
             Spacer(modifier = Modifier.height(18.dp))
 
@@ -192,7 +239,6 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
             fontSize = 24.sp,
             fontWeight = FontWeight.SemiBold,
             color = text,
-            fontFamily = font,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -203,7 +249,7 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                 .height(200.dp)
                 .clickable { imagePickerLauncher.launch("image/*") },
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = card),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Box(
@@ -230,7 +276,6 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Tap to add photo",
-                            fontFamily = font,
                             fontSize = 16.sp,
                             color = text.copy(alpha = 0.7f)
                         )
@@ -245,7 +290,7 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
         OutlinedTextField(
             value = name.value,
             onValueChange = { name.value = it },
-            label = { Text("Product Name", fontFamily = font, color = text) },
+            label = { Text("Product Name", color = text) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
@@ -255,9 +300,8 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                 unfocusedLabelColor = text.copy(alpha = 0.7f),
                 focusedTextColor = text,
                 unfocusedTextColor = text,
-                unfocusedContainerColor = card,
-                focusedContainerColor = card
-            )
+                unfocusedContainerColor = Color.White,
+                focusedContainerColor = Color.White            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -274,7 +318,7 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                 value = category.value,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Category", fontFamily = font, color = text) },
+                label = { Text("Category", color = text) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -287,21 +331,20 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                     unfocusedLabelColor = text.copy(alpha = 0.7f),
                     focusedTextColor = text,
                     unfocusedTextColor = text,
-                    unfocusedContainerColor = card,
-                    focusedContainerColor = card
+                    unfocusedContainerColor = Color.White,
+                    focusedContainerColor = Color.White
                 )
             )
             ExposedDropdownMenu(
                 expanded = expandedCategory,
                 onDismissRequest = { expandedCategory = false },
-                modifier = Modifier.background(card)
+                modifier = Modifier.background(Color.White)
             ) {
                 categories.forEach { cat ->
                     DropdownMenuItem(
                         text = {
                             Text(
                                 cat,
-                                fontFamily = font,
                                 color = text
                             )
                         },
@@ -320,7 +363,7 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
         OutlinedTextField(
             value = price.value,
             onValueChange = { price.value = it },
-            label = { Text("Price (Rs.)", fontFamily = font, color = text) },
+            label = { Text("Price (Rs.)", color = text) },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             shape = RoundedCornerShape(12.dp),
@@ -331,8 +374,8 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                 unfocusedLabelColor = text.copy(alpha = 0.7f),
                 focusedTextColor = text,
                 unfocusedTextColor = text,
-                unfocusedContainerColor = card,
-                focusedContainerColor = card
+                unfocusedContainerColor = Color.White,
+                focusedContainerColor = Color.White
             )
         )
 
@@ -350,7 +393,7 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                 value = condition.value,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Condition", fontFamily = font, color = text) },
+                label = { Text("Condition",  color = text) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCondition) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -363,14 +406,14 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                     unfocusedLabelColor = text.copy(alpha = 0.7f),
                     focusedTextColor = text,
                     unfocusedTextColor = text,
-                    unfocusedContainerColor = card,
-                    focusedContainerColor = card
+                    unfocusedContainerColor = Color.White,
+                    focusedContainerColor = Color.White
                 )
             )
             ExposedDropdownMenu(
                 expanded = expandedCondition,
                 onDismissRequest = { expandedCondition = false },
-                modifier = Modifier.background(card)
+                modifier = Modifier.background(Color.White)
             ) {
                 conditions.forEach { cond ->
                     DropdownMenuItem(
@@ -396,7 +439,7 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
         OutlinedTextField(
             value = description.value,
             onValueChange = { description.value = it },
-            label = { Text("Description", fontFamily = font, color = text) },
+            label = { Text("Description",  color = text) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(120.dp),
@@ -409,8 +452,8 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                 unfocusedLabelColor = text.copy(alpha = 0.7f),
                 focusedTextColor = text,
                 unfocusedTextColor = text,
-                unfocusedContainerColor = card,
-                focusedContainerColor = card
+                unfocusedContainerColor = Color.White,
+                focusedContainerColor = Color.White
             )
         )
 
@@ -480,7 +523,6 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = "List Item for Sale",
-                    fontFamily = font,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
