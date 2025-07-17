@@ -32,13 +32,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hamrothrift.R
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.ProductRepoImpl
+import com.example.hamrothrift.view.NotificationActivity
+import com.example.hamrothrift.view.ProfileActivity
 import com.example.hamrothrift.view.components.*
 import com.example.hamrothrift.view.sell.DashboardSellActivity
 import com.example.hamrothrift.view.theme.ui.theme.bg
 import com.example.hamrothrift.view.theme.ui.theme.buttton
 import com.example.hamrothrift.view.theme.ui.theme.card
 import com.example.hamrothrift.view.theme.ui.theme.text
-import com.example.hamrothrift.viewmodel.NavigationViewModel
 import com.example.hamrothrift.viewmodel.ProductViewModel
 import com.example.hamrothrift.viewmodel.ProductViewModelFactory
 
@@ -51,16 +52,14 @@ class DashboardActivityBuy : ComponentActivity() {
             val viewModel: ProductViewModel = viewModel(
                 factory = ProductViewModelFactory(productRepository)
             )
-            val navigationViewModel: NavigationViewModel = viewModel()
-            DashboardBuyBody(viewModel, navigationViewModel )
+            DashboardBuyBody(viewModel)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardBuyBody(viewModel: ProductViewModel,
-                     navigationViewModel: NavigationViewModel) {
+fun DashboardBuyBody(viewModel: ProductViewModel) {
     var selectedTab by remember { mutableStateOf(0) }
     val context = LocalContext.current
     val activity = context as? Activity
@@ -79,7 +78,6 @@ fun DashboardBuyBody(viewModel: ProductViewModel,
         viewModel.loadInitialProducts()
     }
 
-    // Implement infinite scrolling
     LaunchedEffect(gridState) {
         snapshotFlow { gridState.firstVisibleItemIndex }
             .collect { firstVisibleItem ->
@@ -92,8 +90,30 @@ fun DashboardBuyBody(viewModel: ProductViewModel,
     Scaffold(
         topBar = { CommonTopAppBar() },
         bottomBar = {
-            CommonBottomBar(navigationViewModel = navigationViewModel,
-                selectedTab=selectedTab)
+            CommonBottomBar(
+                selectedTab = selectedTab,
+                onTabSelected = { index ->
+                    selectedTab = index
+                    when (index) {
+                        0 -> {
+                            context.startActivity(Intent(context, DashboardSellActivity::class.java))
+                            activity?.finish()
+                        }
+                        1 -> {
+                            context.startActivity(Intent(context, SaleActivity::class.java))
+                            activity?.finish()
+                        }
+                        2 -> {
+                            context.startActivity(Intent(context, NotificationActivity::class.java))
+                            activity?.finish()
+                        }
+                        3 -> {
+                            context.startActivity(Intent(context, ProfileActivity::class.java))
+                            activity?.finish()
+                        }
+                    }
+                }
+            )
         }
     ) { innerPadding ->
         Column(
@@ -115,8 +135,6 @@ fun DashboardBuyBody(viewModel: ProductViewModel,
                     color = text,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
-
-                // Mode Selector
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -168,14 +186,14 @@ fun DashboardBuyBody(viewModel: ProductViewModel,
                     }
                 }
 
+
                 Spacer(modifier = Modifier.height(18.dp))
 
-                // Products Grid
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     state = gridState,
                     contentPadding = PaddingValues(8.dp),
-                    modifier = Modifier.height(600.dp) // Fixed height for scrollable content
+                    modifier = Modifier.height(600.dp)
                 ) {
                     items(products) { product ->
                         ProductCard(
