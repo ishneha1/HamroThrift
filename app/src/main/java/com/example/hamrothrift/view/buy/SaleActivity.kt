@@ -28,6 +28,8 @@ import com.example.hamrothrift.R
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.ProductRepoImpl
 import com.example.hamrothrift.repository.NotificationRepoImpl
+import com.example.hamrothrift.view.NotificationActivity
+import com.example.hamrothrift.view.ProfileActivity
 import com.example.hamrothrift.view.components.CommonBottomBar
 import com.example.hamrothrift.view.components.CommonTopAppBar
 import com.example.hamrothrift.view.components.ProductCard
@@ -110,8 +112,28 @@ fun SaleActivityBody(
         topBar = { CommonTopAppBar() },
         bottomBar = {
             CommonBottomBar(
-                navigationViewModel = navigationViewModel,
-                selectedTab = selectedTab
+                selectedTab = selectedTab,
+                onTabSelected = { index ->
+                    selectedTab = index
+                    when (index) {
+                        0 -> {
+                            context.startActivity(Intent(context, DashboardActivityBuy::class.java))
+                            activity?.finish()
+                        }
+                        1 -> {
+                            context.startActivity(Intent(context, SaleActivity::class.java))
+                            activity?.finish()
+                        }
+                        2 -> {
+                            context.startActivity(Intent(context, NotificationActivity::class.java))
+                            activity?.finish()
+                        }
+                        3 -> {
+                            context.startActivity(Intent(context, ProfileActivity::class.java))
+                            activity?.finish()
+                        }
+                    }
+                }
             )
         }
     ) { paddingValues ->
