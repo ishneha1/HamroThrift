@@ -1,5 +1,6 @@
 package com.example.hamrothrift.view
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -29,6 +30,8 @@ import com.example.hamrothrift.viewmodel.UserViewModel
 import android.content.Intent
 import androidx.compose.ui.graphics.Color
 import com.example.hamrothrift.view.buy.CartActivity
+import com.example.hamrothrift.view.buy.DashboardActivityBuy
+import com.example.hamrothrift.view.buy.SaleActivity
 import com.example.hamrothrift.view.buy.SearchActivity
 import com.example.hamrothrift.viewmodel.NavigationViewModel
 import com.example.hamrothrift.viewmodel.UserViewModelFactory
@@ -42,20 +45,19 @@ class ProfileActivity : ComponentActivity() {
             val viewModel: UserViewModel = viewModel(
                 factory = UserViewModelFactory(userRepository)
             )
-            val navigationViewModel: NavigationViewModel = viewModel()
-            ProfileActivityBody(viewModel, navigationViewModel )
+            ProfileActivityBody(viewModel )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProfileActivityBody(viewModel: UserViewModel,
-                                navigationViewModel:NavigationViewModel) {
+private fun ProfileActivityBody(viewModel: UserViewModel) {
     var selectedTab by remember { mutableStateOf(3) }
     val context = LocalContext.current
     val gradientColors = listOf(White, deepBlue, Black)
     val font = FontFamily(Font(R.font.handmade))
+    val activity = context as? Activity
 
     Scaffold(
         topBar = {
@@ -91,8 +93,31 @@ private fun ProfileActivityBody(viewModel: UserViewModel,
         },
         bottomBar = {
             CommonBottomBar(
-                navigationViewModel = navigationViewModel,
-                selectedTab=selectedTab
+                selectedTab = selectedTab,
+                onTabSelected = { index ->
+                    selectedTab = index
+                    when (index) {
+                        0 -> {
+                            context.startActivity(Intent(context, DashboardActivityBuy::class.java))
+                            activity?.finish()
+                        }
+
+                        1 -> {
+                            context.startActivity(Intent(context, SaleActivity::class.java))
+                            activity?.finish()
+                        }
+
+                        2 -> {
+                            context.startActivity(Intent(context, NotificationActivity::class.java))
+                            activity?.finish()
+                        }
+
+                        3 -> {
+                            context.startActivity(Intent(context, ProfileActivity::class.java))
+                            activity?.finish()
+                        }
+                    }
+                }
             )
         }
     ) { innerPadding ->
