@@ -1,5 +1,6 @@
 package com.example.hamrothrift.view
 
+import android.app.Activity
 import com.google.firebase.Timestamp
 import android.content.Intent
 import android.os.Bundle
@@ -54,17 +55,16 @@ class NotificationActivity : ComponentActivity() {
             val viewModel: NotificationViewModel = viewModel(
                 factory = NotificationViewModelFactory(notificationRepo)
             )
-            val navigationViewModel: NavigationViewModel = viewModel()
-            NotificationScreen(viewModel, navigationViewModel )
+            NotificationScreen(viewModel )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationScreen(viewModel: NotificationViewModel,
-                       navigationViewModel: NavigationViewModel) {
+fun NotificationScreen(viewModel: NotificationViewModel) {
     val context = LocalContext.current
+    val activity = context as? Activity
     val gradientColors = listOf(White, deepBlue, Color.Black)
     var selectedTab by remember { mutableStateOf(2) }
     val font = FontFamily(Font(R.font.handmade))
@@ -121,8 +121,31 @@ fun NotificationScreen(viewModel: NotificationViewModel,
         },
         bottomBar = {
             CommonBottomBar(
-                navigationViewModel = navigationViewModel,
-                selectedTab=selectedTab
+                selectedTab = selectedTab,
+                onTabSelected = { index ->
+                    selectedTab = index
+                    when (index) {
+                        0 -> {
+                            context.startActivity(Intent(context, DashboardActivityBuy::class.java))
+                            activity?.finish()
+                        }
+
+                        1 -> {
+                            context.startActivity(Intent(context, SaleActivity::class.java))
+                            activity?.finish()
+                        }
+
+                        2 -> {
+                            context.startActivity(Intent(context, NotificationActivity::class.java))
+                            activity?.finish()
+                        }
+
+                        3 -> {
+                            context.startActivity(Intent(context, ProfileActivity::class.java))
+                            activity?.finish()
+                        }
+                    }
+                }
             )
         }
     ) { innerPadding ->
