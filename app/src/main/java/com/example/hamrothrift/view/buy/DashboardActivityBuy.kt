@@ -96,7 +96,7 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
                     selectedTab = index
                     when (index) {
                         0 -> {
-                            context.startActivity(Intent(context, DashboardSellActivity::class.java))
+                            context.startActivity(Intent(context, DashboardActivityBuy::class.java))
                             activity?.finish()
                         }
                         1 -> {
