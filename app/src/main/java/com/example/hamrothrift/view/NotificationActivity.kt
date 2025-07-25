@@ -3,6 +3,7 @@ package com.example.hamrothrift.view
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -44,6 +45,7 @@ import com.example.hamrothrift.view.components.CommonBottomBarSell
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.NotificationViewModel
 import com.example.hamrothrift.viewmodel.NotificationViewModelFactory
+import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -51,6 +53,13 @@ import java.util.Locale
 class NotificationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val auth = FirebaseAuth.getInstance()
+        if (auth.currentUser == null) {
+            startActivity(Intent(this, WelcomeAndOnboardingActivity::class.java))
+            finish()
+            return
+        }
+
         enableEdgeToEdge()
         setContent {
             val notificationRepo = NotificationRepoImpl()
@@ -248,6 +257,7 @@ fun NotificationCard(
     onDelete: () -> Unit
 ) {
     val context = LocalContext.current
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
     val icon = when (notification.type) {
         "ORDER" -> Icons.Default.CheckCircle
         "MESSAGE" -> Icons.Default.Email
@@ -256,13 +266,28 @@ fun NotificationCard(
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth()
-            .clickable{
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
                 if (notification.type == "MESSAGE") {
-                    val intent = Intent(context, ChatActivity::class.java)
-                    intent.putExtra("productId", notification.productId)
-                    intent.putExtra("otherUserId", notification.senderId) // senderId = buyer
-                    context.startActivity(intent)
+                    try {
+                        // Determine the correct otherUserId
+                        val otherUserId = if (currentUserId == notification.userId) {
+                            notification.senderId
+                        } else {
+                            notification.userId
+                        }
+
+                        val intent = Intent(context, ChatDialogActivity::class.java).apply {
+                            putExtra("productId", notification.productId)
+                            putExtra("otherUserId", otherUserId)
+                            putExtra("message", notification.message)
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        }
+                        context.startActivity(intent)
+                    } catch (e: Exception) {
+                        Log.e("NotificationCard", "Error launching ChatDialog", e)
+                    }
                 }
             },
         shape = RoundedCornerShape(12.dp),

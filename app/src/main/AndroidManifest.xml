@@ -18,6 +18,11 @@
         tools:replace="android:fullBackupContent"
         tools:targetApi="31">
         <activity
+            android:name=".view.ChatDialogActivity"
+            android:exported="false"
+            android:label="@string/title_activity_chat_dialog"
+            android:theme="@style/Theme.HamroThrift" />
+        <activity
             android:name=".view.components.ChatScreen"
             android:exported="false"
             android:label="@string/title_activity_chat_screen"
