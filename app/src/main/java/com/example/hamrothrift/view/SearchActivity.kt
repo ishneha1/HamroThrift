@@ -1,6 +1,6 @@
 package com.example.hamrothrift.view.buy
 
-import android.content.Intent
+
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -33,9 +33,6 @@ import coil.compose.AsyncImage
 import com.example.hamrothrift.R
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.SearchRepositoryImpl
-import com.example.hamrothrift.view.ProfileActivity
-import com.example.hamrothrift.view.components.CommonBottomBar
-import com.example.hamrothrift.view.components.CommonTopAppBar
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.SearchViewModel
 import com.example.hamrothrift.viewmodel.SearchViewModelFactory

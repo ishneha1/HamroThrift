@@ -70,7 +70,7 @@ class NotificationViewModel(
             val notification = NotificationModel(
                 title = title,
                 message = message,
-                timestamp = com.google.firebase.Timestamp.now(),
+                timestamp = System.currentTimeMillis(), // Changed from Firestore Timestamp to Long
                 userId = userId,
                 type = type
             )

@@ -1,6 +1,5 @@
 package com.example.hamrothrift.view.screens
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,11 +30,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hamrothrift.R
 import com.example.hamrothrift.model.BillingAddress
 import com.example.hamrothrift.repository.BillingAddressRepositoryImpl
-import com.example.hamrothrift.view.ProfileActivity
-import com.example.hamrothrift.view.buy.DashboardActivityBuy
-import com.example.hamrothrift.view.NotificationActivity
-import com.example.hamrothrift.view.buy.SaleActivity
-import com.example.hamrothrift.view.components.CommonBottomBar
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.BillingAddressViewModel
 import com.example.hamrothrift.viewmodel.BillingAddressViewModelFactory

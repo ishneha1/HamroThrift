@@ -25,7 +25,6 @@ import com.example.hamrothrift.view.EditProfileActivity
 import com.example.hamrothrift.view.HomepageActivity
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.UserViewModel
-import com.example.hamrothrift.view.screens.AllOrdersActivity
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -43,7 +42,7 @@ fun ProfileScreen(viewModel: UserViewModel = viewModel()) {
 
     viewModel.users.observeAsState().value?.let { userModel ->
         userName = "${userModel.firstName} ${userModel.lastName}"
-        profileImageUrl = userModel.userImage
+        profileImageUrl = userModel.profileImageUrl
     }
 
     Column(

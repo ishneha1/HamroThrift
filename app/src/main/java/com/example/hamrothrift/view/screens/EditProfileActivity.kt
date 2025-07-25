@@ -48,7 +48,7 @@ import com.example.hamrothrift.repository.UserRepoImpl
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 
@@ -176,7 +176,7 @@ fun EditProfileScreen() {
                     .padding(innerPadding)
                     .background(bg)
                     .verticalScroll(rememberScrollState())
-                    .padding(10.dp,top=40.dp,end=10.dp),
+                    .padding(10.dp, top = 40.dp, end = 10.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Card(
@@ -245,7 +245,11 @@ fun EditProfileScreen() {
                                 onValueChange = { firstName = it },
                                 label = { Text("First Name", color = text) },
                                 leadingIcon = {
-                                    Icon(Icons.Default.Person, contentDescription = "Name", tint = buttton)
+                                    Icon(
+                                        Icons.Default.Person,
+                                        contentDescription = "Name",
+                                        tint = buttton
+                                    )
                                 },
                                 modifier = Modifier.weight(1f),
                                 singleLine = true,
@@ -267,7 +271,11 @@ fun EditProfileScreen() {
                                 onValueChange = { lastName = it },
                                 label = { Text("Last Name", color = text) },
                                 leadingIcon = {
-                                    Icon(Icons.Default.Person, contentDescription = "Name", tint = buttton)
+                                    Icon(
+                                        Icons.Default.Person,
+                                        contentDescription = "Name",
+                                        tint = buttton
+                                    )
                                 },
                                 modifier = Modifier.weight(1f),
                                 singleLine = true,
@@ -322,7 +330,11 @@ fun EditProfileScreen() {
                             onValueChange = { email = it },
                             label = { Text("Email", color = text) },
                             leadingIcon = {
-                                Icon(Icons.Default.Email, contentDescription = "Email", tint = buttton)
+                                Icon(
+                                    Icons.Default.Email,
+                                    contentDescription = "Email",
+                                    tint = buttton
+                                )
                             },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
@@ -347,7 +359,12 @@ fun EditProfileScreen() {
 
                         Button(
                             onClick = {
-                                if (userViewModel.validateProfileData(firstName, lastName, selectedGender)) {
+                                if (userViewModel.validateProfileData(
+                                        firstName,
+                                        lastName,
+                                        selectedGender
+                                    )
+                                ) {
                                     isUpdating = true
                                     val updatedUser = UserModel(
                                         userId = currentUser?.uid ?: "",
@@ -358,12 +375,19 @@ fun EditProfileScreen() {
                                         password = ""
                                     )
 
-                                    userViewModel.updateUserProfile(currentUser?.uid ?: "", updatedUser) { success, message ->
+                                    userViewModel.updateUserProfile(
+                                        currentUser?.uid ?: "",
+                                        updatedUser
+                                    ) { success, message ->
                                         isUpdating = false
                                         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                                     }
                                 } else {
-                                    Toast.makeText(context, "Please fill all fields correctly", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(
+                                        context,
+                                        "Please fill all fields correctly",
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                 }
                             },
                             modifier = Modifier
@@ -404,6 +428,7 @@ fun EditProfileScreen() {
     }
 }
 
+// Update the uploadProfileImage function
 private fun uploadProfileImage(
     userId: String,
     imageUri: Uri,
@@ -415,18 +440,21 @@ private fun uploadProfileImage(
     profileImagesRef.putFile(imageUri)
         .addOnSuccessListener {
             profileImagesRef.downloadUrl.addOnSuccessListener { uri ->
-                Firebase.firestore.collection("users")
-                    .document(userId)
-                    .update("profileImageUrl", uri.toString())
+                // Use Realtime Database instead of Firestore
+                Firebase.database.reference
+                    .child("users")
+                    .child(userId)
+                    .child("profileImageUrl")
+                    .setValue(uri.toString())
                     .addOnSuccessListener {
                         onResult(true, "Profile image updated successfully!", uri.toString())
                     }
-                    .addOnFailureListener { e ->
-                        onResult(false, "Failed to save image URL: ${e.message}", null)
+                    .addOnFailureListener { exception ->
+                        onResult(false, "Failed to save image URL: ${exception.message}", null)
                     }
             }
         }
-        .addOnFailureListener { e ->
-            onResult(false, "Failed to upload image: ${e.message}", null)
+        .addOnFailureListener { exception ->
+            onResult(false, "Failed to upload image: ${exception.message}", null)
         }
 }

@@ -33,12 +33,10 @@ import coil.compose.AsyncImage
 import com.example.hamrothrift.R
 import com.example.hamrothrift.model.CartItem
 import com.example.hamrothrift.repository.CartRepositoryImpl
-import com.example.hamrothrift.view.components.CommonTopAppBar
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.CartViewModel
 import com.example.hamrothrift.viewmodel.CartViewModelFactory
-import java.text.NumberFormat
-import java.util.*
+
 
 class CartActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

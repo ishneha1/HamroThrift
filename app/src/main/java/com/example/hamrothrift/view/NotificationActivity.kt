@@ -1,7 +1,6 @@
 package com.example.hamrothrift.view
 
 import android.app.Activity
-import com.google.firebase.Timestamp
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -45,6 +44,7 @@ import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.NotificationViewModel
 import com.example.hamrothrift.viewmodel.NotificationViewModelFactory
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class NotificationActivity : ComponentActivity() {
@@ -56,7 +56,7 @@ class NotificationActivity : ComponentActivity() {
             val viewModel: NotificationViewModel = viewModel(
                 factory = NotificationViewModelFactory(notificationRepo)
             )
-            val mode = intent.getStringExtra("mode") ?: "buy" // Default to buy mode
+            val mode = intent.getStringExtra("mode") ?: "buy"
             NotificationScreen(viewModel, mode)
         }
     }
@@ -71,20 +71,16 @@ fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
     var selectedTab by remember { mutableStateOf(2) }
     val font = FontFamily(Font(R.font.handmade))
 
-    // Observe ViewModel states
     val notifications by viewModel.notifications.observeAsState(initial = emptyList<NotificationModel>())
     val isLoading by viewModel.loading.observeAsState(initial = false)
     val error by viewModel.error.observeAsState(initial = null)
 
-    // Load notifications when screen is created
     LaunchedEffect(Unit) {
         viewModel.loadNotifications()
     }
 
-    // Show error if any
     error?.let { errorMessage ->
         LaunchedEffect(errorMessage) {
-            // Handle error (e.g., show a toast)
             viewModel.clearError()
         }
     }
@@ -106,14 +102,13 @@ fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = appBar),
                 actions = {
                     IconButton(onClick = {
-                        val intent =
-                        Intent(context, CartActivity::class.java)
-                        context.startActivity(intent)}) {
+                        val intent = Intent(context, CartActivity::class.java)
+                        context.startActivity(intent)
+                    }) {
                         Icon(Icons.Default.ShoppingCart, "Cart", tint = Color.White)
                     }
                     IconButton(onClick = {
-                        val intent =
-                            Intent(context, SearchActivity::class.java)
+                        val intent = Intent(context, SearchActivity::class.java)
                         context.startActivity(intent)
                     }) {
                         Icon(Icons.Default.Search, "Search", tint = Color.White)
@@ -291,7 +286,7 @@ fun NotificationCard(
                     color = Color.DarkGray
                 )
                 Text(
-                    text = formatFirebaseTimestamp(notification.timestamp),
+                    text = formatTimestamp(notification.timestamp),
                     fontSize = 15.sp,
                     color = Color.Gray
                 )
@@ -308,8 +303,8 @@ fun NotificationCard(
     }
 }
 
-// Update the helper function to handle Firebase Timestamp
-private fun formatFirebaseTimestamp(timestamp: Timestamp): String {
+// Updated helper function to handle Long timestamp (Realtime Database)
+private fun formatTimestamp(timestamp: Long): String {
     val formatter = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
-    return formatter.format(timestamp.toDate())
+    return formatter.format(Date(timestamp))
 }
