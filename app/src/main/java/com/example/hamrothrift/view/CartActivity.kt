@@ -37,7 +37,6 @@ import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.CartViewModel
 import com.example.hamrothrift.viewmodel.CartViewModelFactory
 
-
 class CartActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -142,7 +141,7 @@ fun CartScreen(viewModel: CartViewModel) {
             EmptyCartView(
                 modifier = Modifier.fillMaxSize(),
                 onContinueShopping = {
-                    val intent = Intent(context, SearchActivity::class.java)
+                    val intent = Intent(context, DashboardActivityBuy::class.java)
                     context.startActivity(intent)
                 }
             )

@@ -17,8 +17,16 @@
         android:theme="@style/Theme.HamroThrift"
         tools:replace="android:fullBackupContent"
         tools:targetApi="31">
-
-        <!-- Set SplashScreenActivity as the single launcher activity -->
+        <activity
+            android:name=".view.components.ChatScreen"
+            android:exported="false"
+            android:label="@string/title_activity_chat_screen"
+            android:theme="@style/Theme.HamroThrift" />
+        <activity
+            android:name=".view.ChatActivity"
+            android:exported="false"
+            android:label="@string/title_activity_chat"
+            android:theme="@style/Theme.HamroThrift" /> <!-- Set SplashScreenActivity as the single launcher activity -->
         <activity
             android:name=".view.SplashScreenActivity"
             android:exported="true"
@@ -26,11 +34,10 @@
             android:theme="@style/Theme.HamroThrift">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Other activities -->
+        </activity> <!-- Other activities -->
         <activity
             android:name=".view.buy.CartActivity"
             android:exported="true"

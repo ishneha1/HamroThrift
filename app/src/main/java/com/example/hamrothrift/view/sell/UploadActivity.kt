@@ -326,7 +326,7 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
 
         // Category Dropdown
         var expandedCategory by remember { mutableStateOf(false) }
-        val categories = listOf("Electronics", "Clothing", "Books", "Home & Garden", "Sports", "Others")
+        val categories = listOf("Electronics", "Clothing", "Books", "Home & Garden", "Shoes","Sports", "Others")
 
         ExposedDropdownMenuBox(
             expanded = expandedCategory,

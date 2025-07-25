@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -246,6 +247,7 @@ fun NotificationCard(
     notification: NotificationModel,
     onDelete: () -> Unit
 ) {
+    val context = LocalContext.current
     val icon = when (notification.type) {
         "ORDER" -> Icons.Default.CheckCircle
         "MESSAGE" -> Icons.Default.Email
@@ -254,7 +256,15 @@ fun NotificationCard(
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth()
+            .clickable{
+                if (notification.type == "MESSAGE") {
+                    val intent = Intent(context, ChatActivity::class.java)
+                    intent.putExtra("productId", notification.productId)
+                    intent.putExtra("otherUserId", notification.senderId) // senderId = buyer
+                    context.startActivity(intent)
+                }
+            },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Teal)
     ) {

@@ -65,14 +65,19 @@ class NotificationViewModel(
         }
     }
 
-    fun addNotification(title: String, message: String, type: String) {
+    fun addNotification(title: String, message: String, type: String,
+                        senderId : String ="",
+                        productId : String = "") {
         currentUserId?.let { userId ->
             val notification = NotificationModel(
                 title = title,
                 message = message,
-                timestamp = System.currentTimeMillis(), // Changed from Firestore Timestamp to Long
+                timestamp = System.currentTimeMillis(),
                 userId = userId,
-                type = type
+                type = type,
+                senderId = senderId,
+                productId = productId,
+                relatedId = productId
             )
 
             notificationRepo.addNotification(notification) { success, message ->

@@ -26,12 +26,14 @@ class ChatRepoImpl : ChatRepo {
             val notificationRef = notificationsRef.push()
             val notification = NotificationModel(
                 notificationId = notificationRef.key ?: "",
-                userId = message.receiverId,
+                userId = message.receiverId ?: "",
                 title = "New Message",
                 message = "You have a new message about a product",
                 type = "CHAT",
                 timestamp = System.currentTimeMillis(),
-                relatedId = message.productId
+                relatedId = message.productId ?: "",
+                senderId = message.senderId ?: "",
+                productId = message.productId ?: ""
             )
             notificationRef.setValue(notification).await()
             true
@@ -47,9 +49,8 @@ class ChatRepoImpl : ChatRepo {
                 for (childSnapshot in snapshot.children) {
                     val message = childSnapshot.getValue(ChatMessage::class.java)
                     message?.let {
-                        // Filter messages for the user (either sender or receiver)
                         if (it.senderId == userId || it.receiverId == userId) {
-                            messages.add(0, it) // Add to beginning for DESC order
+                            messages.add(0, it)
                         }
                     }
                 }

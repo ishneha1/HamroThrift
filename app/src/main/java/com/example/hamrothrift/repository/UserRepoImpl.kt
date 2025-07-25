@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.provider.OpenableColumns
+import com.example.hamrothrift.R
 import com.cloudinary.Cloudinary
 import com.cloudinary.utils.ObjectUtils
 import com.example.hamrothrift.model.UserModel
@@ -137,7 +138,16 @@ class UserRepoImpl : UserRepo {
         model: UserModel,
         callback: (Boolean, String) -> Unit
     ) {
-        ref.child(userId).setValue(model)
+        // Set default profile image if none provided
+        val userWithDefaultImage = if (model.profileImageUrl.isEmpty()) {
+            model.copy(
+                profileImageUrl = "android.resource://com.example.hamrothrift/${R.drawable.profilephoto}"
+            )
+        } else {
+            model
+        }
+
+        ref.child(userId).setValue(userWithDefaultImage)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     callback(true, "user added")
@@ -146,7 +156,6 @@ class UserRepoImpl : UserRepo {
                 }
             }
     }
-
     override fun deleteAccount(
         userId: String,
         callback: (Boolean, String) -> Unit

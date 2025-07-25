@@ -1,6 +1,5 @@
 package com.example.hamrothrift.view.buy
 
-
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -36,6 +35,7 @@ import com.example.hamrothrift.repository.SearchRepositoryImpl
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.SearchViewModel
 import com.example.hamrothrift.viewmodel.SearchViewModelFactory
+import kotlin.text.category
 
 class SearchActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -292,6 +292,9 @@ fun SearchHistorySection(
 fun SearchResultsSection(
     results: List<ProductModel>,
 ) {
+    var showDetailsDialog by remember { mutableStateOf(false) }
+    var selectedProduct by remember { mutableStateOf<ProductModel?>(null) }
+
     Column {
         Text(
             "${results.size} products found",
@@ -302,21 +305,72 @@ fun SearchResultsSection(
 
         LazyColumn {
             items(results) { product ->
-                ProductSearchCard(product = product)
+                ProductSearchCard(
+                    product = product,
+                    onProductClick = {
+                        selectedProduct = it
+                        showDetailsDialog = true
+                    }
+                )
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
+    }
+
+    if (showDetailsDialog && selectedProduct != null) {
+        // Use the same dialog as in ProductCard
+        AlertDialog(
+            onDismissRequest = {
+                showDetailsDialog = false
+                selectedProduct = null
+            },
+            title = { Text(selectedProduct!!.name) },
+            text = {
+                Column {
+                    AsyncImage(
+                        model = selectedProduct!!.imageUrl,
+                        contentDescription = selectedProduct!!.name,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Price: Rs.${selectedProduct!!.price}", fontWeight = FontWeight.Bold)
+                    Text("Category: ${selectedProduct!!.category}")
+                    Text("Condition: ${selectedProduct!!.condition}")
+                    Text("Description: ${selectedProduct!!.description}")
+                    if (selectedProduct!!.isOnSale) {
+                        Text("On Sale!", color = Color.Red)
+                        selectedProduct!!.originalPrice?.let {
+                            Text("Original Price: Rs.$it")
+                        }
+                        selectedProduct!!.discount?.let {
+                            Text("Discount: $it%")
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDetailsDialog = false
+                    selectedProduct = null
+                }) {
+                    Text("Close")
+                }
+            }
+        )
     }
 }
 
 @Composable
 fun ProductSearchCard(
-    product: ProductModel
+    product: ProductModel,
+    onProductClick: (ProductModel) -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { /* Navigate to product detail */ },
+            .clickable { onProductClick(product) },
         colors = CardDefaults.cardColors(containerColor = card),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {

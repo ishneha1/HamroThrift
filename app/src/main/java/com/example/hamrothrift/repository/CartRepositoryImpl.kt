@@ -1,6 +1,7 @@
 package com.example.hamrothrift.repository
 
 import android.content.Context
+import android.widget.Toast
 import com.example.hamrothrift.model.CartItem
 import com.example.hamrothrift.model.ProductModel
 import com.google.firebase.auth.FirebaseAuth
@@ -43,6 +44,7 @@ class CartRepositoryImpl(private val context: Context) : CartRepository {
 
             trySend(true)
         } catch (e: Exception) {
+            Toast.makeText(context, "Add to cart error: ${e.message}", Toast.LENGTH_LONG).show()
             trySend(false)
         }
         awaitClose()

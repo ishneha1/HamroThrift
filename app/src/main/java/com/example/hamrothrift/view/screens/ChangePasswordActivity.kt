@@ -1,5 +1,6 @@
 package com.example.hamrothrift.view.screens
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,10 +28,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hamrothrift.R
 import com.example.hamrothrift.repository.PasswordRepositoryImpl
+import com.example.hamrothrift.view.HomepageActivity
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.PasswordChangeViewModel
 import com.example.hamrothrift.viewmodel.PasswordChangeViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.delay
 
 class ChangePasswordActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,6 +112,19 @@ fun ChangePasswordScreen(viewModel: PasswordChangeViewModel) {
     val message by viewModel.message.collectAsState()
     val isSuccess by viewModel.isSuccess.collectAsState()
     val emailSent by viewModel.emailSent.collectAsState()
+
+    val context = LocalContext.current
+
+    // Logout and navigate to homepage after reset email sent
+    LaunchedEffect(emailSent) {
+        if (emailSent) {
+            delay(2000) // Show message for 2 seconds
+            FirebaseAuth.getInstance().signOut()
+            val intent = Intent(context, HomepageActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            context.startActivity(intent)
+        }
+    }
 
     LaunchedEffect(isSuccess) {
         if (isSuccess) {
@@ -323,21 +339,21 @@ fun ChangePasswordScreen(viewModel: PasswordChangeViewModel) {
                         Icon(
                             imageVector = Icons.Default.Email,
                             contentDescription = "Email",
-                            tint = text
+                            tint = Green
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Email Sent!",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = text
+                            color = Green
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Check your email (${user?.email}) for password reset instructions.",
                         fontSize = 14.sp,
-                        color = text
+                        color = Green
                     )
                 }
             }
@@ -349,7 +365,7 @@ fun ChangePasswordScreen(viewModel: PasswordChangeViewModel) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (isSuccess) Color(0xFFE8F5E8) else Color(0xFFFFEBEE)
+                    containerColor = if (emailSent || isSuccess) Color(0xFFE8F5E8) else Color(0xFFFFEBEE)
                 ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
@@ -358,14 +374,14 @@ fun ChangePasswordScreen(viewModel: PasswordChangeViewModel) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = if (isSuccess) Icons.Default.CheckCircle else Icons.Default.Error,
+                        imageVector = if (emailSent || isSuccess) Icons.Default.CheckCircle else Icons.Default.Error,
                         contentDescription = null,
-                        tint = if (isSuccess) Green else Red
+                        tint = if (emailSent || isSuccess) Green else Red
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = msg,
-                        color = if (isSuccess) Green else Red,
+                        color = if (emailSent || isSuccess) Green else Red,
                     )
                 }
             }

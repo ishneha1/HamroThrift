@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -48,9 +49,6 @@ import com.example.hamrothrift.repository.UserRepoImpl
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
 
 class EditProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,13 +69,11 @@ fun EditProfileScreen() {
     val currentUser = auth.currentUser
 
     val font = FontFamily(Font(R.font.handmade))
-
     val gradientColors = listOf(White, deepBlue, Color.Black)
 
     val repo = remember { UserRepoImpl() }
     val userViewModel = remember { UserViewModel(repo) }
 
-    // State variables
     var isLoading by remember { mutableStateOf(true) }
     var isUpdating by remember { mutableStateOf(false) }
     var firstName by remember { mutableStateOf("") }
@@ -89,20 +85,28 @@ fun EditProfileScreen() {
 
     val genderOptions = listOf("Male", "Female", "Others")
 
-    // Image picker launcher
+    // Image picker launcher using Cloudinary upload
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
             currentUser?.uid?.let { userId ->
-                uploadProfileImage(userId, it) { success, message, imageUrl ->
-                    if (success) {
-                        profileImageUrl = imageUrl ?: ""
-                        Toast.makeText(context, "Profile image updated!", Toast.LENGTH_SHORT).show()
+                isImageUploading = true
+                userViewModel.uploadImage(context, it) { imageUrl ->
+                    if (imageUrl != null) {
+                        userViewModel.updateProfileImage(userId, imageUrl) { success, message ->
+                            isImageUploading = false
+                            if (success) {
+                                profileImageUrl = imageUrl
+                                Toast.makeText(context, "Profile image updated!", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                            }
+                        }
                     } else {
-                        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                        isImageUploading = false
+                        Toast.makeText(context, "Failed to upload image", Toast.LENGTH_LONG).show()
                     }
-                    isImageUploading = false
                 }
             }
         }
@@ -117,7 +121,6 @@ fun EditProfileScreen() {
                     firstName = user.firstName
                     lastName = user.lastName
                     selectedGender = user.gender
-                    // Use the profileImageUrl from UserModel directly
                     profileImageUrl = user.profileImageUrl ?: ""
                     isLoading = false
                 } else {
@@ -157,7 +160,6 @@ fun EditProfileScreen() {
                 }
             )
         }
-
     ) { innerPadding ->
         if (isLoading) {
             Box(
@@ -209,7 +211,10 @@ fun EditProfileScreen() {
                                 CircularProgressIndicator(color = buttton)
                             } else {
                                 val painter = rememberAsyncImagePainter(
-                                    model = profileImageUrl.ifEmpty { R.drawable.profilephoto }
+                                    model = if (profileImageUrl.isNotEmpty() && !profileImageUrl.contains("android.resource"))
+                                        profileImageUrl
+                                    else
+                                        R.drawable.profilephoto
                                 )
 
                                 Image(
@@ -220,7 +225,6 @@ fun EditProfileScreen() {
                                         .clip(CircleShape)
                                         .border(3.dp, buttton, CircleShape)
                                         .clickable {
-                                            isImageUploading = true
                                             imagePickerLauncher.launch("image/*")
                                         },
                                     contentScale = ContentScale.Crop
@@ -305,7 +309,9 @@ fun EditProfileScreen() {
                         ) {
                             genderOptions.forEach { gender ->
                                 Row(
-                                    modifier = Modifier.fillMaxWidth().weight(1f),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     RadioButton(
@@ -319,7 +325,6 @@ fun EditProfileScreen() {
                                     Text(
                                         text = gender,
                                         color = text,
-                                        //modifier = Modifier.padding(start = 2.dp)
                                     )
                                 }
                             }
@@ -355,8 +360,6 @@ fun EditProfileScreen() {
                             enabled = false
                         )
 
-
-
                         Button(
                             onClick = {
                                 if (userViewModel.validateProfileData(
@@ -372,7 +375,8 @@ fun EditProfileScreen() {
                                         lastName = lastName,
                                         gender = selectedGender,
                                         email = email,
-                                        password = ""
+                                        password = "",
+                                        profileImageUrl = profileImageUrl
                                     )
 
                                     userViewModel.updateUserProfile(
@@ -426,35 +430,4 @@ fun EditProfileScreen() {
             }
         }
     }
-}
-
-// Update the uploadProfileImage function
-private fun uploadProfileImage(
-    userId: String,
-    imageUri: Uri,
-    onResult: (Boolean, String, String?) -> Unit
-) {
-    val storageRef = Firebase.storage.reference
-    val profileImagesRef = storageRef.child("profile_images/$userId.jpg")
-
-    profileImagesRef.putFile(imageUri)
-        .addOnSuccessListener {
-            profileImagesRef.downloadUrl.addOnSuccessListener { uri ->
-                // Use Realtime Database instead of Firestore
-                Firebase.database.reference
-                    .child("users")
-                    .child(userId)
-                    .child("profileImageUrl")
-                    .setValue(uri.toString())
-                    .addOnSuccessListener {
-                        onResult(true, "Profile image updated successfully!", uri.toString())
-                    }
-                    .addOnFailureListener { exception ->
-                        onResult(false, "Failed to save image URL: ${exception.message}", null)
-                    }
-            }
-        }
-        .addOnFailureListener { exception ->
-            onResult(false, "Failed to upload image: ${exception.message}", null)
-        }
 }

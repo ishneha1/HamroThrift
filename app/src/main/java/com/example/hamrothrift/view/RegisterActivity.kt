@@ -146,9 +146,9 @@ fun RegisterActivityBody(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(120.dp)
+                            .size(150.dp)
                             .clip(CircleShape)
-                            .border(2.dp, Color.Black, CircleShape)
+                            .border(3.dp, Color.Black, CircleShape)
                             .clickable(
                                 indication = null,
                                 interactionSource = remember { MutableInteractionSource() }
@@ -162,12 +162,14 @@ fun RegisterActivityBody(
                                 contentScale = ContentScale.Crop
                             )
                         } else {
+                            // Show default profile photo
                             Image(
-                                painter = painterResource(R.drawable.baseline_add_a_photo_24),
-                                contentDescription = "Add Profile Picture",
+                                painter = painterResource(R.drawable.profilephoto),
+                                contentDescription = "Default Profile Picture",
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(30.dp)
+                                    .padding(10.dp),
+                                contentScale = ContentScale.Crop
                             )
                         }
                     }
@@ -344,7 +346,9 @@ fun RegisterActivityBody(
                                         }
                                     }
                                 } else {
-                                    // No image selected, create user without image
+                                    // No image selected, use default profile photo
+                                    val defaultImageUrl = "android.resource://com.example.hamrothrift/${R.drawable.profilephoto}"
+
                                     val model = UserModel(
                                         userId,
                                         firstName,
@@ -352,7 +356,7 @@ fun RegisterActivityBody(
                                         selectedOption,
                                         email,
                                         password,
-                                        ""
+                                        defaultImageUrl
                                     )
                                     userViewModel.addUserToDatabase(userId, model) { dbSuccess, dbMessage ->
                                         isUploading = false
