@@ -49,7 +49,7 @@ fun CommonBottomBar(
             // Upload Tab
             BottomNavItem(
                 icon = Icons.Default.Star,
-                label = "Upload",
+                label = "Sale",
                 isSelected = selectedTab == 1,
                 onClick = { onTabSelected(1) }
             )

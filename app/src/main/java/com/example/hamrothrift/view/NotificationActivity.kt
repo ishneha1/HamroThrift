@@ -31,16 +31,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hamrothrift.R
-import com.example.hamrothrift.model.NavigationItem
 import com.example.hamrothrift.model.NotificationModel
 import com.example.hamrothrift.repository.NotificationRepoImpl
 import com.example.hamrothrift.view.buy.CartActivity
 import com.example.hamrothrift.view.buy.DashboardActivityBuy
 import com.example.hamrothrift.view.buy.SaleActivity
 import com.example.hamrothrift.view.buy.SearchActivity
+import com.example.hamrothrift.view.sell.DashboardSellActivity
+import com.example.hamrothrift.view.sell.UploadActivity
 import com.example.hamrothrift.view.components.CommonBottomBar
+import com.example.hamrothrift.view.components.CommonBottomBarSell
 import com.example.hamrothrift.view.theme.ui.theme.*
-import com.example.hamrothrift.viewmodel.NavigationViewModel
 import com.example.hamrothrift.viewmodel.NotificationViewModel
 import com.example.hamrothrift.viewmodel.NotificationViewModelFactory
 import java.text.SimpleDateFormat
@@ -55,14 +56,15 @@ class NotificationActivity : ComponentActivity() {
             val viewModel: NotificationViewModel = viewModel(
                 factory = NotificationViewModelFactory(notificationRepo)
             )
-            NotificationScreen(viewModel )
+            val mode = intent.getStringExtra("mode") ?: "buy" // Default to buy mode
+            NotificationScreen(viewModel, mode)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationScreen(viewModel: NotificationViewModel) {
+fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
     val context = LocalContext.current
     val activity = context as? Activity
     val gradientColors = listOf(White, deepBlue, Color.Black)
@@ -120,33 +122,65 @@ fun NotificationScreen(viewModel: NotificationViewModel) {
             )
         },
         bottomBar = {
-            CommonBottomBar(
-                selectedTab = selectedTab,
-                onTabSelected = { index ->
-                    selectedTab = index
-                    when (index) {
-                        0 -> {
-                            context.startActivity(Intent(context, DashboardActivityBuy::class.java))
-                            activity?.finish()
-                        }
-
-                        1 -> {
-                            context.startActivity(Intent(context, SaleActivity::class.java))
-                            activity?.finish()
-                        }
-
-                        2 -> {
-                            context.startActivity(Intent(context, NotificationActivity::class.java))
-                            activity?.finish()
-                        }
-
-                        3 -> {
-                            context.startActivity(Intent(context, ProfileActivity::class.java))
-                            activity?.finish()
+            if (mode == "sell") {
+                CommonBottomBarSell(
+                    selectedTab = selectedTab,
+                    onTabSelected = { index ->
+                        selectedTab = index
+                        when (index) {
+                            0 -> {
+                                context.startActivity(Intent(context, DashboardSellActivity::class.java))
+                                activity?.finish()
+                            }
+                            1 -> {
+                                context.startActivity(Intent(context, UploadActivity::class.java))
+                                activity?.finish()
+                            }
+                            2 -> {
+                                val intent = Intent(context, NotificationActivity::class.java)
+                                intent.putExtra("mode", mode)
+                                context.startActivity(intent)
+                                activity?.finish()
+                            }
+                            3 -> {
+                                val intent = Intent(context, ProfileActivity::class.java)
+                                intent.putExtra("mode", mode)
+                                context.startActivity(intent)
+                                activity?.finish()
+                            }
                         }
                     }
-                }
-            )
+                )
+            } else {
+                CommonBottomBar(
+                    selectedTab = selectedTab,
+                    onTabSelected = { index ->
+                        selectedTab = index
+                        when (index) {
+                            0 -> {
+                                context.startActivity(Intent(context, DashboardActivityBuy::class.java))
+                                activity?.finish()
+                            }
+                            1 -> {
+                                context.startActivity(Intent(context, SaleActivity::class.java))
+                                activity?.finish()
+                            }
+                            2 -> {
+                                val intent = Intent(context, NotificationActivity::class.java)
+                                intent.putExtra("mode", mode)
+                                context.startActivity(intent)
+                                activity?.finish()
+                            }
+                            3 -> {
+                                val intent = Intent(context, ProfileActivity::class.java)
+                                intent.putExtra("mode", mode)
+                                context.startActivity(intent)
+                                activity?.finish()
+                            }
+                        }
+                    }
+                )
+            }
         }
     ) { innerPadding ->
         Box(

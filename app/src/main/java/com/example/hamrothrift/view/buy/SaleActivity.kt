@@ -35,7 +35,6 @@ import com.example.hamrothrift.view.components.CommonTopAppBar
 import com.example.hamrothrift.view.components.ProductCard
 import com.example.hamrothrift.view.sell.DashboardSellActivity
 import com.example.hamrothrift.view.theme.ui.theme.*
-import com.example.hamrothrift.viewmodel.NavigationViewModel
 import com.example.hamrothrift.viewmodel.ProductViewModel
 import com.example.hamrothrift.viewmodel.ProductViewModelFactory
 import com.example.hamrothrift.viewmodel.NotificationViewModel
@@ -54,8 +53,8 @@ class SaleActivity : ComponentActivity() {
             val notificationViewModel: NotificationViewModel = viewModel(
                 factory = NotificationViewModelFactory(notificationRepository)
             )
-            val navigationViewModel: NavigationViewModel = viewModel()
-            SaleActivityBody(productViewModel, notificationViewModel, navigationViewModel )
+            SaleActivityBody(productViewModel, notificationViewModel)
+
         }
     }
 }
@@ -64,8 +63,7 @@ class SaleActivity : ComponentActivity() {
 @Composable
 fun SaleActivityBody(
     productViewModel: ProductViewModel,
-    notificationViewModel: NotificationViewModel,
-    navigationViewModel:NavigationViewModel
+    notificationViewModel: NotificationViewModel
 ) {
     var selectedTab by remember { mutableIntStateOf(1) }
     val context = LocalContext.current
@@ -121,8 +119,7 @@ fun SaleActivityBody(
                             activity?.finish()
                         }
                         1 -> {
-                            context.startActivity(Intent(context, SaleActivity::class.java))
-                            activity?.finish()
+                            // Just stay on current screen
                         }
                         2 -> {
                             context.startActivity(Intent(context, NotificationActivity::class.java))

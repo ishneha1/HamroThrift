@@ -4,44 +4,41 @@ import android.content.Context
 import com.example.hamrothrift.model.CartItem
 import com.example.hamrothrift.model.ProductModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class CartRepositoryImpl(private val context: Context) : CartRepository {
-    private val firestore = FirebaseFirestore.getInstance()
+    private val database = FirebaseDatabase.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
     override suspend fun addToCart(product: ProductModel, quantity: Int): Flow<Boolean> = callbackFlow {
         try {
             val userId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
+            val cartRef = database.reference.child("carts").child(userId).child("items")
 
             // Check if product already exists in cart
-            val existingItems = firestore.collection("carts")
-                .document(userId)
-                .collection("items")
-                .whereEqualTo("product.id", product.id)
-                .get()
-                .await()
+            val existingSnapshot = cartRef.orderByChild("product/id").equalTo(product.id).get().await()
 
-            if (existingItems.isEmpty) {
+            if (existingSnapshot.children.count() == 0) {
                 // Add new item
                 val cartItem = CartItem(
                     product = product,
-                    quantity = quantity
+                    quantity = quantity,
+                    addedAt = System.currentTimeMillis()
                 )
-                firestore.collection("carts")
-                    .document(userId)
-                    .collection("items")
-                    .add(cartItem)
-                    .await()
+                val newItemRef = cartRef.push()
+                newItemRef.setValue(cartItem).await()
             } else {
                 // Update existing item quantity
-                val document = existingItems.documents[0]
-                val currentQuantity = document.getLong("quantity")?.toInt() ?: 0
-                document.reference.update("quantity", currentQuantity + quantity).await()
+                val existingItem = existingSnapshot.children.first()
+                val currentQuantity = existingItem.child("quantity").getValue(Int::class.java) ?: 0
+                existingItem.ref.child("quantity").setValue(currentQuantity + quantity).await()
             }
 
             trySend(true)
@@ -59,41 +56,32 @@ class CartRepositoryImpl(private val context: Context) : CartRepository {
             return@callbackFlow
         }
 
-        val listener = firestore.collection("carts")
-            .document(userId)
-            .collection("items")
-            .orderBy("addedAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
-                }
-
-                val items = snapshot?.documents?.mapNotNull { document ->
-                    try {
-                        document.toObject(CartItem::class.java)?.copy(id = document.id)
-                    } catch (e: Exception) {
-                        null
+        val cartRef = database.reference.child("carts").child(userId).child("items")
+        val listener = cartRef.orderByChild("addedAt").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val items = mutableListOf<CartItem>()
+                for (childSnapshot in snapshot.children) {
+                    val cartItem = childSnapshot.getValue(CartItem::class.java)
+                    cartItem?.let {
+                        items.add(0, it.copy(id = childSnapshot.key ?: ""))
                     }
-                } ?: emptyList()
-
+                }
                 trySend(items)
             }
 
-        awaitClose { listener.remove() }
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
+        })
+
+        awaitClose { cartRef.removeEventListener(listener) }
     }
 
     override suspend fun updateQuantity(itemId: String, newQuantity: Int): Flow<Boolean> = callbackFlow {
         try {
             val userId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
-
-            firestore.collection("carts")
-                .document(userId)
-                .collection("items")
-                .document(itemId)
-                .update("quantity", newQuantity)
-                .await()
-
+            database.reference.child("carts").child(userId).child("items")
+                .child(itemId).child("quantity").setValue(newQuantity).await()
             trySend(true)
         } catch (e: Exception) {
             trySend(false)
@@ -104,14 +92,8 @@ class CartRepositoryImpl(private val context: Context) : CartRepository {
     override suspend fun removeItem(itemId: String): Flow<Boolean> = callbackFlow {
         try {
             val userId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
-
-            firestore.collection("carts")
-                .document(userId)
-                .collection("items")
-                .document(itemId)
-                .delete()
-                .await()
-
+            database.reference.child("carts").child(userId).child("items")
+                .child(itemId).removeValue().await()
             trySend(true)
         } catch (e: Exception) {
             trySend(false)
@@ -122,17 +104,7 @@ class CartRepositoryImpl(private val context: Context) : CartRepository {
     override suspend fun clearCart(): Flow<Boolean> = callbackFlow {
         try {
             val userId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
-
-            val batch = firestore.batch()
-            val items = firestore.collection("carts")
-                .document(userId)
-                .collection("items")
-                .get()
-                .await()
-
-            items.forEach { batch.delete(it.reference) }
-            batch.commit().await()
-
+            database.reference.child("carts").child(userId).child("items").removeValue().await()
             trySend(true)
         } catch (e: Exception) {
             trySend(false)
@@ -148,22 +120,22 @@ class CartRepositoryImpl(private val context: Context) : CartRepository {
             return@callbackFlow
         }
 
-        val listener = firestore.collection("carts")
-            .document(userId)
-            .collection("items")
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    trySend(0)
-                    return@addSnapshotListener
+        val cartRef = database.reference.child("carts").child(userId).child("items")
+        val listener = cartRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var totalCount = 0
+                for (childSnapshot in snapshot.children) {
+                    val quantity = childSnapshot.child("quantity").getValue(Int::class.java) ?: 0
+                    totalCount += quantity
                 }
-
-                val count = snapshot?.documents?.sumOf {
-                    it.getLong("quantity")?.toInt() ?: 0
-                } ?: 0
-
-                trySend(count)
+                trySend(totalCount)
             }
 
-        awaitClose { listener.remove() }
+            override fun onCancelled(error: DatabaseError) {
+                trySend(0)
+            }
+        })
+
+        awaitClose { cartRef.removeEventListener(listener) }
     }
 }

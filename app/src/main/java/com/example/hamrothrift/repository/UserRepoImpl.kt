@@ -16,9 +16,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.auth.FacebookAuthProvider
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.io.InputStream
 import java.util.concurrent.Executors
 
@@ -36,7 +33,7 @@ class UserRepoImpl : UserRepo {
             "api_secret" to "C7WUm7KiQWZl7XaR9guDFTW3wU0"
         )
     )
-    private val db = Firebase.firestore
+
 
     override fun login(
         email: String,
@@ -58,12 +55,65 @@ class UserRepoImpl : UserRepo {
         password: String,
         callback: (Boolean, String, String) -> Unit
     ) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    callback(true, "Account Created", "${auth.currentUser?.uid}")
+        // First check if email exists (can receive emails)
+        checkIfEmailExists(email) { emailExists ->
+            if (emailExists) {
+                // Email exists, now check if it's already registered in our app
+                auth.fetchSignInMethodsForEmail(email)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val signInMethods = task.result?.signInMethods ?: emptyList()
+                            if (signInMethods.isNotEmpty()) {
+                                // Email already registered in our app
+                                callback(false, "This email is already registered. Please try logging in instead.", "")
+                            } else {
+                                // Email exists but not registered, proceed with registration
+                                auth.createUserWithEmailAndPassword(email, password)
+                                    .addOnCompleteListener { registerTask ->
+                                        if (registerTask.isSuccessful) {
+                                            callback(true, "Account Created Successfully", "${auth.currentUser?.uid}")
+                                        } else {
+                                            callback(false, "Registration failed: ${registerTask.exception?.message}", "")
+                                        }
+                                    }
+                            }
+                        } else {
+                            callback(false, "Failed to verify email: ${task.exception?.message}", "")
+                        }
+                    }
+            } else {
+                // Email doesn't exist
+                callback(false, "This email address does not exist. Please use a valid email address.", "")
+            }
+        }
+    }
+
+    private fun checkIfEmailExists(email: String, callback: (Boolean) -> Unit) {
+        // Create a temporary Firebase Auth instance for testing
+        val tempAuth = FirebaseAuth.getInstance()
+
+        // Try to send password reset email - if email exists, it will succeed
+        tempAuth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // Email exists and can receive emails
+                    callback(true)
                 } else {
-                    callback(false, "${it.exception?.message}", "")
+                    // Check the specific error
+                    val errorMessage = task.exception?.message?.lowercase() ?: ""
+                    when {
+                        errorMessage.contains("user-not-found") ||
+                                errorMessage.contains("invalid-email") ||
+                                errorMessage.contains("user not found") ||
+                                errorMessage.contains("no user record") -> {
+                            // Email doesn't exist
+                            callback(false)
+                        }
+                        else -> {
+                            // Other errors (network, etc.) - assume email exists
+                            callback(true)
+                        }
+                    }
                 }
             }
     }
@@ -174,7 +224,7 @@ class UserRepoImpl : UserRepo {
                             userId = it.uid,
                             email = it.email ?: "",
                             firstName = it.displayName ?: "",
-                            userImage = it.photoUrl?.toString() ?: ""
+                            profileImageUrl = it.photoUrl?.toString() ?: ""
                         )
                         database.getReference("users").child(it.uid).setValue(userModel)
                             .addOnCompleteListener { dbTask ->
@@ -240,6 +290,8 @@ class UserRepoImpl : UserRepo {
         }
         return fileName
     }
+
+    // Fixed: Use Realtime Database instead of Firestore
     override fun updateUserProfile(
         userId: String,
         userModel: UserModel,
@@ -249,12 +301,11 @@ class UserRepoImpl : UserRepo {
             "firstName" to userModel.firstName,
             "lastName" to userModel.lastName,
             "gender" to userModel.gender,
+            "userImage" to userModel.profileImageUrl,
             "updatedAt" to System.currentTimeMillis()
         )
 
-        db.collection("users")
-            .document(userId)
-            .update(userData as Map<String, Any>)
+        ref.child(userId).updateChildren(userData as Map<String, Any>)
             .addOnSuccessListener {
                 onResult(true, "Profile updated successfully!")
             }
@@ -263,33 +314,36 @@ class UserRepoImpl : UserRepo {
             }
     }
 
+    // Fixed: Use Realtime Database instead of Firestore
     override fun getCurrentUserProfile(
         userId: String,
         onResult: (UserModel?, String) -> Unit
     ) {
-        db.collection("users")
-            .document(userId)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val user = UserModel(
-                        userId = userId,
-                        firstName = document.getString("firstName") ?: "",
-                        lastName = document.getString("lastName") ?: "",
-                        gender = document.getString("gender") ?: "",
-                        email = document.getString("email") ?: "",
-                        password = "", // Don't expose password
-                    )
+        ref.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val user = snapshot.getValue(UserModel::class.java)
                     onResult(user, "Profile loaded successfully")
                 } else {
                     onResult(null, "User profile not found")
                 }
             }
+
+            override fun onCancelled(error: DatabaseError) {
+                onResult(null, "Failed to load profile: ${error.message}")
+            }
+        })
+    }
+    // In UserRepoImpl.kt, add this method:
+    override fun updateProfileImage(userId: String, imageUrl: String, callback: (Boolean, String) -> Unit) {
+        ref.child(userId).child("profileImageUrl").setValue(imageUrl)
+            .addOnSuccessListener {
+                callback(true, "Profile image updated successfully!")
+            }
             .addOnFailureListener { e ->
-                onResult(null, "Failed to load profile: ${e.message}")
+                callback(false, "Failed to update profile image: ${e.message}")
             }
     }
-
 
 
 }

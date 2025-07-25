@@ -21,6 +21,18 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    packaging {
+        resources {
+            excludes += setOf(
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt",
+                "META-INF/ASL2.0"
+            )
+        }
+    }
 
     buildTypes {
         release {
@@ -87,8 +99,10 @@ dependencies {
     implementation("com.squareup.picasso:picasso:2.8")
 
     // Cloudinary
-    implementation("com.cloudinary:cloudinary-android:2.1.0")
-
+    implementation("com.cloudinary:cloudinary-android:2.5.0")
+    implementation("com.cloudinary:cloudinary-core:1.36.0")
+    implementation("com.cloudinary:cloudinary-http44:1.36.0")
+    implementation ("androidx.activity:activity-compose:1.8.0")
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 

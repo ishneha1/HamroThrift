@@ -117,16 +117,13 @@ fun EditProfileScreen() {
                     firstName = user.firstName
                     lastName = user.lastName
                     selectedGender = user.gender
-                    // Load profile image URL from Firestore
-                    Firebase.firestore.collection("users").document(userId)
-                        .get()
-                        .addOnSuccessListener { document ->
-                            profileImageUrl = document.getString("profileImageUrl") ?: ""
-                        }
+                    // Use the profileImageUrl from UserModel directly
+                    profileImageUrl = user.profileImageUrl ?: ""
+                    isLoading = false
                 } else {
                     Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                    isLoading = false
                 }
-                isLoading = false
             }
         } ?: run {
             Toast.makeText(context, "User not authenticated", Toast.LENGTH_LONG).show()
@@ -179,7 +176,7 @@ fun EditProfileScreen() {
                     .padding(innerPadding)
                     .background(bg)
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
+                    .padding(10.dp,top=40.dp,end=10.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Card(
@@ -198,7 +195,6 @@ fun EditProfileScreen() {
                             text = "Edit Your Profile",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
-                            fontFamily = font,
                             color = text,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
@@ -235,7 +231,6 @@ fun EditProfileScreen() {
                         Text(
                             text = "Tap image to change",
                             fontSize = 12.sp,
-                            fontFamily = font,
                             color = text.copy(alpha = 0.7f),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
@@ -294,32 +289,29 @@ fun EditProfileScreen() {
                             text = "Gender",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
-                            fontFamily = font,
                             color = text
                         )
 
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             genderOptions.forEach { gender ->
                                 Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.fillMaxWidth().weight(1f),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     RadioButton(
                                         selected = (gender == selectedGender),
                                         onClick = { selectedGender = gender },
                                         colors = RadioButtonDefaults.colors(
                                             selectedColor = buttton,
-                                            unselectedColor = text.copy(alpha = 0.6f)
+                                            unselectedColor = text.copy(alpha = 0.2f)
                                         )
                                     )
                                     Text(
                                         text = gender,
                                         color = text,
-                                        fontFamily = font,
-                                        modifier = Modifier.padding(start = 4.dp)
+                                        //modifier = Modifier.padding(start = 2.dp)
                                     )
                                 }
                             }
@@ -392,7 +384,6 @@ fun EditProfileScreen() {
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(
                                     text = "Updating...",
-                                    fontFamily = font,
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White
@@ -400,7 +391,6 @@ fun EditProfileScreen() {
                             } else {
                                 Text(
                                     text = "Save Changes",
-                                    fontFamily = font,
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White

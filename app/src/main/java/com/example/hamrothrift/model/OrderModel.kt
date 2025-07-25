@@ -6,7 +6,7 @@ data class Order(
     val productName: String = "",
     val quantity: Int = 0,
     val totalPrice: Double = 0.0,
-    val orderDate: String = "",
+    val orderDate: Long = 0L,
     val status: String = "Pending",
     val buyerName: String ="",
     val itemName: String ="",

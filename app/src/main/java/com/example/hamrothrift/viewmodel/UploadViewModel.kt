@@ -24,38 +24,48 @@ class UploadViewModel(private val repository: UploadRepository) : ViewModel() {
     private val _selectedMode = MutableStateFlow("Sell")
     val selectedMode: StateFlow<String> = _selectedMode.asStateFlow()
 
-
     fun uploadProduct(
         context: Context,
-        imageUri: Uri,
+        imageUri: Uri?,
         name: String,
         category: String,
         price: String,
         condition: String,
-        description: String
+        description: String,
+        isOnSale: Boolean,
+        originalPrice: Double?,
+        discount: Double?
     ) {
-        val uploadRequest = ProductUploadRequest(
-            name = name,
-            category = category,
-            price = price,
-            condition = condition,
-            description = description,
-            imageUri = imageUri
-        )
-
         viewModelScope.launch {
-            repository.uploadProduct(context, uploadRequest).collect { result ->
-                _uploadState.value = result
-                if (result is UploadResult.Success) {
-                    _uploadedProduct.value = result.product
+            try {
+                // Set loading state immediately
+                _uploadState.value = UploadResult.Loading
+
+                val uploadRequest = ProductUploadRequest(
+                    name = name,
+                    category = category,
+                    price = price,
+                    condition = condition,
+                    description = description,
+                    imageUri = imageUri,
+                    isOnSale = isOnSale,
+                    originalPrice = originalPrice,
+                    discount = discount
+                )
+
+                // Collect the Flow properly
+                repository.uploadProduct(context, uploadRequest).collect { result ->
+                    _uploadState.value = result
                 }
+            } catch (e: Exception) {
+                _uploadState.value = UploadResult.Error(e.message ?: "Upload failed")
             }
         }
     }
 
+
     fun clearUploadState() {
         _uploadState.value = null
-        _uploadedProduct.value = null
     }
     fun setSelectedMode(mode: String) {
         _selectedMode.value = mode

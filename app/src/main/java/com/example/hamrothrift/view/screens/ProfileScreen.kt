@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
+import com.example.hamrothrift.view.EditProfileActivity
 import com.example.hamrothrift.view.HomepageActivity
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.UserViewModel
@@ -89,8 +90,8 @@ fun ProfileScreen(viewModel: UserViewModel = viewModel()) {
 
         Button(
             onClick = {
-                // TODO: Create EditProfileActivity and navigate
-                // context.startActivity(Intent(context, EditProfileActivity::class.java))
+
+                 context.startActivity(Intent(context, EditProfileActivity::class.java))
             },
             colors = ButtonDefaults.buttonColors(containerColor = buttton),
             modifier = Modifier.fillMaxWidth(0.8f)

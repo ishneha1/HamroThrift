@@ -104,7 +104,7 @@ fun CartActivityBody(viewModel: CartViewModel) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(brush = Brush.verticalGradient(colors = gradientColors))
+                .background(bg)
                 .padding(innerPadding)
         ) {
             // Cart Header
@@ -113,19 +113,18 @@ fun CartActivityBody(viewModel: CartViewModel) {
                 style = TextStyle(
                     fontSize = 28.sp,
                     fontStyle = FontStyle.Italic,
-                    fontFamily = font,
                     fontWeight = FontWeight.Bold
                 ),
                 modifier = Modifier.padding(16.dp)
             )
 
-            CartScreen(viewModel, font)
+            CartScreen(viewModel)
         }
     }
 }
 
 @Composable
-fun CartScreen(viewModel: CartViewModel, font: FontFamily) {
+fun CartScreen(viewModel: CartViewModel) {
     val context = LocalContext.current
     val cartItems by viewModel.cartItems.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -144,7 +143,6 @@ fun CartScreen(viewModel: CartViewModel, font: FontFamily) {
         cartItems.isEmpty() -> {
             EmptyCartView(
                 modifier = Modifier.fillMaxSize(),
-                font = font,
                 onContinueShopping = {
                     val intent = Intent(context, SearchActivity::class.java)
                     context.startActivity(intent)
@@ -163,7 +161,6 @@ fun CartScreen(viewModel: CartViewModel, font: FontFamily) {
                     items(cartItems, key = { it.id }) { item ->
                         CartItemCard(
                             cartItem = item,
-                            font = font,
                             onQuantityChange = { newQuantity ->
                                 viewModel.updateQuantity(item.id, newQuantity)
                             },
@@ -179,7 +176,6 @@ fun CartScreen(viewModel: CartViewModel, font: FontFamily) {
                 // Total and checkout section
                 CheckoutSection(
                     totalPrice = totalPrice,
-                    font = font,
                     onCheckout = {
                         Toast.makeText(context, "Checkout functionality coming soon!", Toast.LENGTH_SHORT).show()
                     }
@@ -192,7 +188,6 @@ fun CartScreen(viewModel: CartViewModel, font: FontFamily) {
 @Composable
 fun EmptyCartView(
     modifier: Modifier = Modifier,
-    font: FontFamily,
     onContinueShopping: () -> Unit
 ) {
     Box(
@@ -214,7 +209,6 @@ fun EmptyCartView(
                 style = TextStyle(
                     color = White,
                     fontSize = 20.sp,
-                    fontFamily = font,
                     fontWeight = FontWeight.Medium
                 )
             )
@@ -226,7 +220,6 @@ fun EmptyCartView(
             ) {
                 Text(
                     "Continue Shopping",
-                    fontFamily = font,
                     color = White
                 )
             }
@@ -237,7 +230,6 @@ fun EmptyCartView(
 @Composable
 fun CartItemCard(
     cartItem: CartItem,
-    font: FontFamily,
     onQuantityChange: (Int) -> Unit,
     onRemove: () -> Unit
 ) {
@@ -273,7 +265,6 @@ fun CartItemCard(
                 ) {
                     Text(
                         text = cartItem.product.name,
-                        fontFamily = font,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         color = text
@@ -283,7 +274,6 @@ fun CartItemCard(
 
                     Text(
                         text = "Rs.${cartItem.product.price}",
-                        fontFamily = font,
                         color = buttton,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
@@ -291,7 +281,6 @@ fun CartItemCard(
 
                     Text(
                         text = cartItem.product.condition,
-                        fontFamily = font,
                         color = text.copy(alpha = 0.7f),
                         fontSize = 12.sp
                     )
@@ -321,12 +310,10 @@ fun CartItemCard(
                 QuantitySelector(
                     currentQuantity = cartItem.quantity,
                     onQuantityChange = onQuantityChange,
-                    font = font
                 )
 
                 Text(
                     text = "Rs.${itemTotal}",
-                    fontFamily = font,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = text
@@ -340,7 +327,6 @@ fun CartItemCard(
 fun QuantitySelector(
     currentQuantity: Int,
     onQuantityChange: (Int) -> Unit,
-    font: FontFamily
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -361,7 +347,6 @@ fun QuantitySelector(
         ) {
             Text(
                 text = "-",
-                fontFamily = font,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 color = buttton
@@ -370,7 +355,6 @@ fun QuantitySelector(
 
         Text(
             text = currentQuantity.toString(),
-            fontFamily = font,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp,
             color = text,
@@ -383,7 +367,6 @@ fun QuantitySelector(
         ) {
             Text(
                 text = "+",
-                fontFamily = font,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 color = buttton
@@ -395,7 +378,6 @@ fun QuantitySelector(
 @Composable
 fun CheckoutSection(
     totalPrice: Double,
-    font: FontFamily,
     onCheckout: () -> Unit
 ) {
     Card(
@@ -416,14 +398,12 @@ fun CheckoutSection(
             ) {
                 Text(
                     "Total:",
-                    fontFamily = font,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                     color = text
                 )
                 Text(
                     "Rs.${totalPrice}",
-                    fontFamily = font,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                     color = buttton
@@ -451,7 +431,6 @@ fun CheckoutSection(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         "Proceed to Checkout",
-                        fontFamily = font,
                         fontWeight = FontWeight.Bold,
                         color = White
                     )

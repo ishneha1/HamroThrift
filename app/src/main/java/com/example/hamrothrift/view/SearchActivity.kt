@@ -128,7 +128,6 @@ fun SearchScreen(viewModel: SearchViewModel) {
             placeholder = {
                 Text(
                     "Search for products...",
-                    fontFamily = font,
                     color = text.copy(alpha = 0.6f)
                 )
             },
@@ -183,7 +182,6 @@ fun SearchScreen(viewModel: SearchViewModel) {
                     history = searchHistory,
                     onHistoryClick = { query -> viewModel.selectFromHistory(query) },
                     onClearHistory = { viewModel.clearSearchHistory() },
-                    font = font
                 )
             }
 
@@ -203,13 +201,11 @@ fun SearchScreen(viewModel: SearchViewModel) {
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             "No products found",
-                            fontFamily = font,
                             fontSize = 18.sp,
                             color = text.copy(alpha = 0.7f)
                         )
                         Text(
                             "Try different keywords",
-                            fontFamily = font,
                             fontSize = 14.sp,
                             color = text.copy(alpha = 0.5f)
                         )
@@ -221,7 +217,6 @@ fun SearchScreen(viewModel: SearchViewModel) {
                 // Show search results
                 SearchResultsSection(
                     results = searchResults,
-                    font = font
                 )
             }
         }
@@ -232,8 +227,7 @@ fun SearchScreen(viewModel: SearchViewModel) {
 fun SearchHistorySection(
     history: List<String>,
     onHistoryClick: (String) -> Unit,
-    onClearHistory: () -> Unit,
-    font: FontFamily
+    onClearHistory: () -> Unit
 ) {
     Column {
         Row(
@@ -243,7 +237,6 @@ fun SearchHistorySection(
         ) {
             Text(
                 "Recent Searches",
-                fontFamily = font,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = text
@@ -252,7 +245,6 @@ fun SearchHistorySection(
             TextButton(onClick = onClearHistory) {
                 Text(
                     "Clear All",
-                    fontFamily = font,
                     color = buttton
                 )
             }
@@ -284,7 +276,6 @@ fun SearchHistorySection(
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
                             query,
-                            fontFamily = font,
                             color = text,
                             modifier = Modifier.weight(1f)
                         )
@@ -303,12 +294,10 @@ fun SearchHistorySection(
 @Composable
 fun SearchResultsSection(
     results: List<ProductModel>,
-    font: FontFamily
 ) {
     Column {
         Text(
             "${results.size} products found",
-            fontFamily = font,
             fontSize = 14.sp,
             color = text.copy(alpha = 0.7f),
             modifier = Modifier.padding(bottom = 8.dp)
@@ -316,7 +305,7 @@ fun SearchResultsSection(
 
         LazyColumn {
             items(results) { product ->
-                ProductSearchCard(product = product, font = font)
+                ProductSearchCard(product = product)
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
@@ -325,8 +314,7 @@ fun SearchResultsSection(
 
 @Composable
 fun ProductSearchCard(
-    product: ProductModel,
-    font: FontFamily
+    product: ProductModel
 ) {
     Card(
         modifier = Modifier
@@ -356,7 +344,6 @@ fun ProductSearchCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = product.name,
-                    fontFamily = font,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = text,
@@ -367,7 +354,6 @@ fun ProductSearchCard(
 
                 Text(
                     text = "Rs. ${String.format("%.0f", product.price)}",
-                    fontFamily = font,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = buttton
@@ -377,7 +363,6 @@ fun ProductSearchCard(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = product.category,
-                        fontFamily = font,
                         fontSize = 12.sp,
                         color = text.copy(alpha = 0.6f)
                     )
@@ -387,7 +372,6 @@ fun ProductSearchCard(
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "Condition: ${product.condition}",
-                        fontFamily = font,
                         fontSize = 12.sp,
                         color = text.copy(alpha = 0.6f)
                     )

@@ -35,6 +35,7 @@ import com.example.hamrothrift.repository.ProductRepoImpl
 import com.example.hamrothrift.view.NotificationActivity
 import com.example.hamrothrift.view.ProfileActivity
 import com.example.hamrothrift.view.components.*
+import com.example.hamrothrift.view.buy.SaleActivity
 import com.example.hamrothrift.view.sell.DashboardSellActivity
 import com.example.hamrothrift.view.theme.ui.theme.bg
 import com.example.hamrothrift.view.theme.ui.theme.buttton
@@ -96,8 +97,7 @@ fun DashboardBuyBody(viewModel: ProductViewModel) {
                     selectedTab = index
                     when (index) {
                         0 -> {
-                            context.startActivity(Intent(context, DashboardActivityBuy::class.java))
-                            activity?.finish()
+                            // Already on Buy dashboard - do nothing
                         }
                         1 -> {
                             context.startActivity(Intent(context, SaleActivity::class.java))

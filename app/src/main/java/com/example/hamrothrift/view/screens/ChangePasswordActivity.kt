@@ -205,7 +205,7 @@ fun ChangePasswordScreen(viewModel: PasswordChangeViewModel) {
                     OutlinedTextField(
                         value = currentPassword,
                         onValueChange = { currentPassword = it },
-                        label = { Text("Current Password", fontFamily = font) },
+                        label = { Text("Current Password") },
                         visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
                             IconButton(onClick = { showPassword = !showPassword }) {
@@ -228,7 +228,15 @@ fun ChangePasswordScreen(viewModel: PasswordChangeViewModel) {
                         value = newPassword,
                         onValueChange = { newPassword = it },
                         label = { Text("New Password") },
-                        visualTransformation = PasswordVisualTransformation(),
+                        visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = { showPassword = !showPassword }) {
+                                Icon(
+                                    imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                    contentDescription = if (showPassword) "Hide password" else "Show password"
+                                )
+                            }
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = buttton,
@@ -242,7 +250,15 @@ fun ChangePasswordScreen(viewModel: PasswordChangeViewModel) {
                         value = confirmPassword,
                         onValueChange = { confirmPassword = it },
                         label = { Text("Confirm New Password") },
-                        visualTransformation = PasswordVisualTransformation(),
+                        visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = { showPassword = !showPassword }) {
+                                Icon(
+                                    imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                    contentDescription = if (showPassword) "Hide password" else "Show password"
+                                )
+                            }
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = buttton,
@@ -344,13 +360,12 @@ fun ChangePasswordScreen(viewModel: PasswordChangeViewModel) {
                     Icon(
                         imageVector = if (isSuccess) Icons.Default.CheckCircle else Icons.Default.Error,
                         contentDescription = null,
-                        tint = if (isSuccess) Color(0xFF4CAF50) else Color(0xFFF44336)
+                        tint = if (isSuccess) Green else Red
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = msg,
-                        color = if (isSuccess) Color(0xFF2E7D32) else Color(0xFFC62828),
-                        fontFamily = font
+                        color = if (isSuccess) Green else Red,
                     )
                 }
             }
