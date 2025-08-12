@@ -1,60 +1,75 @@
 package com.example.hamrothrift.repository
 
 import com.example.hamrothrift.model.ProductModel
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class ProductRepoImpl : ProductRepo {
-    private val firestore = FirebaseFirestore.getInstance()
-    private val productsCollection = firestore.collection("products")
+    private val database = FirebaseDatabase.getInstance()
+    private val productsRef: DatabaseReference = database.reference.child("products")
 
     override suspend fun getAllProducts(): Flow<List<ProductModel>> = callbackFlow {
-        val snapshotListener = productsCollection
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
-                }
-
-                if (snapshot != null) {
-                    val products = snapshot.documents.mapNotNull { document ->
-                        document.toObject(ProductModel::class.java)
+        val snapshotListener = database.reference.child("products")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val products = mutableListOf<ProductModel>()
+                    for (childSnapshot in snapshot.children) {
+                        try {
+                            val product = childSnapshot.getValue(ProductModel::class.java)
+                            product?.let {
+                                products.add(it.copy(id = childSnapshot.key ?: ""))
+                            }
+                        } catch (e: Exception) {
+                            android.util.Log.e("ProductRepo", "Error parsing product", e)
+                        }
                     }
                     trySend(products)
                 }
-            }
-        awaitClose { snapshotListener.remove() }
+
+                override fun onCancelled(error: DatabaseError) {
+                    android.util.Log.e("ProductRepo", "Database error: ${error.message}")
+                    // Don't crash the app, just send empty list
+                    trySend(emptyList())
+                }
+            })
+
+        awaitClose { database.reference.child("products").removeEventListener(snapshotListener) }
     }
 
+
+
     override suspend fun getHotSaleProducts(): Flow<List<ProductModel>> = callbackFlow {
-        val snapshotListener = productsCollection
-            .whereEqualTo("isHotSale", true)
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
+        val snapshotListener = productsRef
+            .orderByChild("isOnSale")
+            .equalTo(true)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val products = mutableListOf<ProductModel>()
+                    for (childSnapshot in snapshot.children) {
+                        val product = childSnapshot.getValue(ProductModel::class.java)
+                        product?.let { products.add(it) }
+                    }
+                    trySend(products.sortedByDescending { it.timestamp })
                 }
 
-                if (snapshot != null) {
-                    val products = snapshot.documents.mapNotNull { document ->
-                        document.toObject(ProductModel::class.java)
-                    }
-                    trySend(products)
+                override fun onCancelled(error: DatabaseError) {
+                    close(error.toException())
                 }
-            }
-        awaitClose { snapshotListener.remove() }
+            })
+        awaitClose { productsRef.removeEventListener(snapshotListener) }
     }
 
     override suspend fun getProductById(productId: String): ProductModel? {
         return try {
-            val document = productsCollection.document(productId).get().await()
-            document.toObject(ProductModel::class.java)
+            val snapshot = productsRef.child(productId).get().await()
+            snapshot.getValue(ProductModel::class.java)
         } catch (e: Exception) {
             null
         }
@@ -62,7 +77,14 @@ class ProductRepoImpl : ProductRepo {
 
     override suspend fun addProduct(product: ProductModel): Boolean {
         return try {
-            productsCollection.add(product).await()
+            val productId = if (product.id.isEmpty()) {
+                productsRef.push().key ?: return false
+            } else {
+                product.id
+            }
+
+            val productWithId = product.copy(id = productId)
+            productsRef.child(productId).setValue(productWithId).await()
             true
         } catch (e: Exception) {
             false
@@ -71,7 +93,7 @@ class ProductRepoImpl : ProductRepo {
 
     override suspend fun updateProduct(product: ProductModel): Boolean {
         return try {
-            productsCollection.document(product.id).set(product).await()
+            productsRef.child(product.id).setValue(product).await()
             true
         } catch (e: Exception) {
             false
@@ -80,7 +102,7 @@ class ProductRepoImpl : ProductRepo {
 
     override suspend fun deleteProduct(productId: String): Boolean {
         return try {
-            productsCollection.document(productId).delete().await()
+            productsRef.child(productId).removeValue().await()
             true
         } catch (e: Exception) {
             false
@@ -88,42 +110,52 @@ class ProductRepoImpl : ProductRepo {
     }
 
     override suspend fun getProductsByCategory(category: String): Flow<List<ProductModel>> = callbackFlow {
-        val snapshotListener = productsCollection
-            .whereEqualTo("category", category)
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
+        val snapshotListener = productsRef
+            .orderByChild("category")
+            .equalTo(category)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val products = mutableListOf<ProductModel>()
+                    for (childSnapshot in snapshot.children) {
+                        val product = childSnapshot.getValue(ProductModel::class.java)
+                        product?.let { products.add(it) }
+                    }
+                    trySend(products.sortedByDescending { it.timestamp })
                 }
 
-                if (snapshot != null) {
-                    val products = snapshot.documents.mapNotNull { document ->
-                        document.toObject(ProductModel::class.java)
-                    }
-                    trySend(products)
+                override fun onCancelled(error: DatabaseError) {
+                    close(error.toException())
                 }
-            }
-        awaitClose { snapshotListener.remove() }
+            })
+        awaitClose { productsRef.removeEventListener(snapshotListener) }
     }
 
     override suspend fun getProductsBySeller(sellerId: String): Flow<List<ProductModel>> = callbackFlow {
-        val snapshotListener = productsCollection
-            .whereEqualTo("sellerId", sellerId)
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
+        val snapshotListener = productsRef
+            .orderByChild("sellerId")
+            .equalTo(sellerId)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val products = mutableListOf<ProductModel>()
+                    for (childSnapshot in snapshot.children) {
+                        val product = childSnapshot.getValue(ProductModel::class.java)
+                        product?.let { products.add(it) }
+                    }
+                    trySend(products.sortedByDescending { it.timestamp })
                 }
 
-                if (snapshot != null) {
-                    val products = snapshot.documents.mapNotNull { document ->
-                        document.toObject(ProductModel::class.java)
-                    }
-                    trySend(products)
+                override fun onCancelled(error: DatabaseError) {
+                    close(error.toException())
                 }
-            }
-        awaitClose { snapshotListener.remove() }
+            })
+        awaitClose { productsRef.removeEventListener(snapshotListener) }
+    }
+
+    override suspend fun updateProductFields(productId: String, updates: Map<String, Any?>) {
+        try {
+            productsRef.child(productId).updateChildren(updates).await()
+        } catch (e: Exception) {
+            throw e
+        }
     }
 }

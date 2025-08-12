@@ -47,4 +47,17 @@ interface UserRepo {
     fun uploadImage(context: Context,imageUri: Uri, callback: (String?) -> Unit)
 
     fun getFileNameFromUri(context: Context,uri: Uri): String?
+
+    fun updateUserProfile(
+        userId: String,
+        userModel: UserModel,
+        onResult: (Boolean, String) -> Unit
+    )
+
+    fun getCurrentUserProfile(
+        userId: String,
+        onResult: (UserModel?, String) -> Unit
+    )
+
+    fun updateProfileImage(userId: String, imageUrl: String, callback: (Boolean, String) -> Unit)
 }

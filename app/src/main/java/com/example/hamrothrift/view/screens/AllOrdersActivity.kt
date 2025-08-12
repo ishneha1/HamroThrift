@@ -22,12 +22,14 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hamrothrift.R
 import com.example.hamrothrift.model.Order
 import com.example.hamrothrift.repository.OrderRepositoryImpl
+import com.example.hamrothrift.view.components.OrderCard
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.OrderViewModel
 import com.example.hamrothrift.viewmodel.OrderViewModelFactory
@@ -110,11 +112,10 @@ fun AllOrdersBody(viewModel: OrderViewModel) {
                 ) {
                     Text(
                         text = "All Orders",
-                        fontSize = 30.sp,
+                        fontSize = 25.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = text,
-                        fontFamily = font,
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom =20.dp)
                     )
 
                     if (orders.isEmpty()) {
@@ -129,7 +130,10 @@ fun AllOrdersBody(viewModel: OrderViewModel) {
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(orders) { order ->
-                                OrderCard(order = order)
+                                OrderCard(
+                                    order = order,
+                                    showBuyerInfo = true // Show buyer info in All Orders
+                                )
                             }
                         }
                     }
@@ -139,40 +143,3 @@ fun AllOrdersBody(viewModel: OrderViewModel) {
     }
 }
 
-@Composable
-fun OrderCard(order: Order) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = Teal)
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = "Order ID: ${order.orderId}",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "Buyer: ${order.buyerName}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.DarkGray
-            )
-            Text(
-                text = "Item: ${order.itemName}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.DarkGray
-            )
-            Text(
-                text = "Price: $${order.price}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.DarkGray
-            )
-        }
-    }
-}

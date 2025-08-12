@@ -79,6 +79,37 @@ class ProductViewModel(
     fun resetMessageSent() {
         _messageSent.value = false
     }
+    fun updateProductSaleStatus(
+        productId: String,
+        isOnSale: Boolean,
+        originalPrice: Double? = null,
+        discount: Double? = null
+    ) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+
+                val calculatedPrice = if (isOnSale && originalPrice != null && discount != null) {
+                    originalPrice - (originalPrice * discount / 100)
+                } else null
+
+                val updates = mapOf(
+                    "isOnSale" to isOnSale,
+                    "originalPrice" to originalPrice,
+                    "discount" to discount,
+                    "price" to calculatedPrice
+                )
+
+                repository.updateProductFields(productId, updates)
+                loadInitialProducts() // Refresh the list
+
+            } catch (e: Exception) {
+                // Handle error if needed
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
 }
 
 class ProductViewModelFactory(private val repository: ProductRepo) : ViewModelProvider.Factory {

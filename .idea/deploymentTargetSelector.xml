@@ -5,13 +5,60 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ProfileActivity (2)">
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+      <SelectionState runConfigName="DashboardActivityBuy">
+<<<<<<< HEAD
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+=======
+>>>>>>> a328abcd90b52d931bf9d78b1debe7e29c8bc4ca
       <SelectionState runConfigName="SplashScreenActivity">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="ProfileActivity">
+=======
+>>>>>>> 00d086fdc719a403498a79f4e4b976b83dcfa67d
+=======
+      <SelectionState runConfigName="UploadActivity">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="DashboardSellActivity (1)">
+>>>>>>> a17c7a975105fa40d433b14a6bec03feae0f03d3
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="SaleActivity">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="DashboardActivity">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="DashboardActivity (1)">
+=======
+      <SelectionState runConfigName="ProfileActivity">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
       <SelectionState runConfigName="DashboardActivityBuy">
+>>>>>>> a538386aa7bd8c0153cab066bbfa507ef50f9df4
+=======
+      <SelectionState runConfigName="SplashScreenActivity">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2025-07-25T12:56:15.879974200Z">
+          <Target type="DEFAULT_BOOT">
+            <handle>
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Asus\.android\avd\Medium_Phone.avd" />
+            </handle>
+          </Target>
+        </DropdownSelection>
+        <DialogSelection />
+      </SelectionState>
+      <SelectionState runConfigName="HomepageActivity">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="SplashScreenActivity (1)">
+>>>>>>> 94fb2d84ad7832afaa6c5073cab98ae297c58b89
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

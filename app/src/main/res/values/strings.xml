@@ -1,4 +1,37 @@
 <resources>
     <string name="app_name">HamroThrift</string>
+<<<<<<< HEAD
     <string name="title_activity_welcome_and_onboarding_screen">WelcomeAndOnboardingScreen</string>
+=======
+    <string name="title_activity_homepage">HomepageActivity</string>
+    <string name="title_activity_splash_screen">SplashScreenActivity</string>
+    <string name="title_activity_register">RegisterActivity</string>
+    <string name="title_activity_sale">SaleActivity</string>
+    <string name="title_activity_notification">NotificationActivity</string>
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="title_activity_dashboard_buy">DashboardActivityBuy</string>
+    <string name="webClientID">255594141988-udma6e3ujbt5hrcacr7u8boh3p0ttl6o.apps.googleusercontent.com</string>
+    <string name="title_activity_dashboard">DashboardActivity</string>
+    <string name="title_activity_welcome_onboarding">WelcomeOnboardingActivity</string>
+    <string name="title_activity_dashboard_sell">DashboardSellActivity</string>
+    <string name="title_activity_forgot_password">ForgotPasswordActivity</string>
+    <string name="title_activity_profile_screen">ProfileScreen</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_all_orders">AllOrdersActivity</string>
+    <string name="title_activity_navigation_handler">NavigationHandler</string>
+    <string name="title_activity_common_bottom_bar">CommonBottomBar</string>
+    <string name="title_activity_my_orders">MyOrders</string>
+    <string name="title_activity_change_password">ChangePasswordActivity</string>
+    <string name="title_activity_billing_address">BillingAddressActivity</string>
+    <string name="title_activity_upload">UploadActivity</string>
+    <string name="title_activity_edit_profile">EditProfileActivity</string>
+    <string name="title_activity_cart">CartActivity</string>
+    <string name="title_activity_chat">ChatActivity</string>
+    <string name="title_activity_chat_screen">ChatScreen</string>
+    <string name="title_activity_chat_dialog">ChatDialogActivity</string>
+    <string name="title_activity_notification_list_screen">NotificationListScreen</string>
+    <string name="title_activity_checkout">CheckoutActivity</string>
+    <string name="title_activity_payment">PaymentActivity</string>
+    <string name="title_activity_order_confirmation">OrderConfirmationActivity</string>
+>>>>>>> 8654e8112003acd333c5a7603b01f52554b0d556
 </resources>

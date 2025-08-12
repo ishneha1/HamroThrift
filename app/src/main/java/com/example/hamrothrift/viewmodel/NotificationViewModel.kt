@@ -21,20 +21,38 @@ class NotificationViewModel(
 
     private val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
 
+    private val auth = FirebaseAuth.getInstance()
+
+    init {
+        checkAuthState()
+    }
+
+    private fun checkAuthState() {
+        if (currentUserId == null) {
+            _error.value = "User not authenticated"
+            return
+        }else{
+            loadNotifications()
+        }
+
+    }
+
     fun loadNotifications() {
+        if (currentUserId == null) {
+            _error.value = "User not authenticated"
+            return
+        }
+
         _loading.value = true
-        currentUserId?.let { userId ->
-            notificationRepo.getNotificationsByUserId(userId) { success, message, notifications ->
-                _loading.value = false
-                if (success) {
-                    _notifications.value = notifications.sortedByDescending { it.time }
-                } else {
-                    _error.value = message
-                }
+        notificationRepo.getNotificationsByUserId(currentUserId) { success, message, notifications ->
+            _loading.value = false
+            if (success) {
+                _notifications.value = notifications.sortedByDescending { it.timestamp }
+            } else {
+                _error.value = message
             }
         }
     }
-
     fun clearAllNotifications() {
         _loading.value = true
         currentUserId?.let { userId ->
@@ -65,14 +83,19 @@ class NotificationViewModel(
         }
     }
 
-    fun addNotification(title: String, message: String, type: String) {
+    fun addNotification(title: String, message: String, type: String,
+                        senderId : String ="",
+                        productId : String = "") {
         currentUserId?.let { userId ->
             val notification = NotificationModel(
                 title = title,
                 message = message,
-                timestamp =  System.currentTimeMillis().toString(),
+                timestamp = System.currentTimeMillis(),
                 userId = userId,
-                type = type
+                type = type,
+                senderId = senderId,
+                productId = productId,
+                relatedId = productId
             )
 
             notificationRepo.addNotification(notification) { success, message ->

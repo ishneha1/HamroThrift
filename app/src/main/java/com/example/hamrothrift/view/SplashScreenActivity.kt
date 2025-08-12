@@ -54,8 +54,6 @@ fun SplashScreenBody(){
 
     var value by remember { mutableStateOf(0) }
 
-    val localEmail: String = sharedPreferences.getString("email", "").toString()
-
 
     val imageLoader = ImageLoader.Builder(context)
         .components {
@@ -66,11 +64,6 @@ fun SplashScreenBody(){
             }
         }
         .build()
-
-
-
-
-
     LaunchedEffect(Unit)
     {
         delay(1000)
@@ -79,13 +72,8 @@ fun SplashScreenBody(){
             context.startActivity(intent)
             activity?.finish()
         }
-        if (localEmail.isEmpty()) {
-            val intent = Intent(context, HomepageActivity::class.java)
-            context.startActivity(intent)
-            activity?.finish()
-        }
         else {
-            val intent = Intent(context, DashboardActivity::class.java)
+            val intent = Intent(context, HomepageActivity::class.java)
             context.startActivity(intent)
             activity?.finish()
         }

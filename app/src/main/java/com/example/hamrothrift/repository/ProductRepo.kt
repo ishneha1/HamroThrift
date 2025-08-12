@@ -12,4 +12,5 @@ interface ProductRepo {
     suspend fun deleteProduct(productId: String): Boolean
     suspend fun getProductsByCategory(category: String): Flow<List<ProductModel>>
     suspend fun getProductsBySeller(sellerId: String): Flow<List<ProductModel>>
+    suspend fun updateProductFields(productId: String, updates: Map<String, Any?>)
 }

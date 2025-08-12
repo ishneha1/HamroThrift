@@ -1,6 +1,6 @@
-package com.example.hamrothrift.view.buy
+package com.example.hamrothrift.view
 
-import com.google.firebase.Timestamp
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,7 +12,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -30,50 +33,74 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hamrothrift.R
-import com.example.hamrothrift.model.NavigationItem
 import com.example.hamrothrift.model.NotificationModel
 import com.example.hamrothrift.repository.NotificationRepoImpl
-import com.example.hamrothrift.view.ProfileActivity
+import com.example.hamrothrift.view.buy.DashboardActivityBuy
+import com.example.hamrothrift.view.buy.SaleActivity
+import com.example.hamrothrift.view.buy.SearchActivity
+import com.example.hamrothrift.view.sell.DashboardSellActivity
+import com.example.hamrothrift.view.sell.UploadActivity
+import com.example.hamrothrift.view.components.CommonBottomBar
+import com.example.hamrothrift.view.components.CommonBottomBarSell
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.NotificationViewModel
 import com.example.hamrothrift.viewmodel.NotificationViewModelFactory
-
+import com.google.firebase.auth.FirebaseAuth
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 class NotificationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
         setContent {
             val notificationRepo = NotificationRepoImpl()
             val viewModel: NotificationViewModel = viewModel(
                 factory = NotificationViewModelFactory(notificationRepo)
             )
-            NotificationScreen(viewModel)
+            val mode = intent.getStringExtra("mode") ?: "buy"
+            NotificationListScreen()
         }
     }
 }
 
+
+@Composable
+fun NotificationListScreen() {
+    val notificationRepo = NotificationRepoImpl()
+    val viewModel: NotificationViewModel = viewModel(
+        factory = NotificationViewModelFactory(notificationRepo)
+    )
+    val context = LocalContext.current
+    val mode = if (context is Activity) {
+        context.intent?.getStringExtra("mode") ?: "buy"
+    } else {
+        "buy"
+    }
+    NotificationScreen(viewModel, mode)
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationScreen(viewModel: NotificationViewModel) {
+fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
     val context = LocalContext.current
+    val activity = context as? Activity
     val gradientColors = listOf(White, deepBlue, Color.Black)
     var selectedTab by remember { mutableStateOf(2) }
     val font = FontFamily(Font(R.font.handmade))
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
 
-    // Observe ViewModel states
     val notifications by viewModel.notifications.observeAsState(initial = emptyList<NotificationModel>())
     val isLoading by viewModel.loading.observeAsState(initial = false)
     val error by viewModel.error.observeAsState(initial = null)
 
-    // Load notifications when screen is created
     LaunchedEffect(Unit) {
         viewModel.loadNotifications()
     }
 
-    // Show error if any
     error?.let { errorMessage ->
         LaunchedEffect(errorMessage) {
-            // Handle error (e.g., show a toast)
             viewModel.clearError()
         }
     }
@@ -94,39 +121,72 @@ fun NotificationScreen(viewModel: NotificationViewModel) {
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = appBar),
                 actions = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {
+                        context.startActivity(Intent(context, CartActivity::class.java))
+                    }) {
                         Icon(Icons.Default.ShoppingCart, "Cart", tint = Color.White)
                     }
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {
+                        context.startActivity(Intent(context, SearchActivity::class.java))
+                    }) {
                         Icon(Icons.Default.Search, "Search", tint = Color.White)
                     }
                 }
             )
         },
         bottomBar = {
-            NavigationBar(containerColor = appBar) {
-                val items = listOf(
-                    NavigationItem(label = "Home", icon = Icons.Default.Home, index = 0),
-                    NavigationItem(label = "Sale", icon = Icons.Default.Star, index = 1),
-                    NavigationItem(label = "Notification", icon = Icons.Default.Notifications, index = 2),
-                    NavigationItem(label = "Profile", icon = Icons.Default.Person, index = 3)
-                )
-
-                items.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) },
-                        selected = selectedTab == index,
-                        onClick = {
-                            selectedTab = index
-                            when (index) {
-                                0 -> context.startActivity(Intent(context, DashboardActivityBuy::class.java))
-                                1 -> context.startActivity(Intent(context, SaleActivity::class.java))
-                                3 -> context.startActivity(Intent(context, ProfileActivity::class.java))
+            if (mode == "sell") {
+                CommonBottomBarSell(
+                    selectedTab = selectedTab,
+                    onTabSelected = { index ->
+                        selectedTab = index
+                        when (index) {
+                            0 -> {
+                                context.startActivity(Intent(context, DashboardSellActivity::class.java))
+                                activity?.finish()
+                            }
+                            1 -> {
+                                context.startActivity(Intent(context, UploadActivity::class.java))
+                                activity?.finish()
+                            }
+                            2 -> {
+                                // Just reload this screen, do nothing or show a toast
+                            }
+                            3 -> {
+                                val intent = Intent(context, ProfileActivity::class.java)
+                                intent.putExtra("mode", mode)
+                                context.startActivity(intent)
+                                activity?.finish()
                             }
                         }
-                    )
-                }
+                    }
+                )
+            } else {
+                CommonBottomBar(
+                    selectedTab = selectedTab,
+                    onTabSelected = { index ->
+                        selectedTab = index
+                        when (index) {
+                            0 -> {
+                                context.startActivity(Intent(context, DashboardActivityBuy::class.java))
+                                activity?.finish()
+                            }
+                            1 -> {
+                                context.startActivity(Intent(context, SaleActivity::class.java))
+                                activity?.finish()
+                            }
+                            2 -> {
+                                // Just reload this screen, do nothing or show a toast
+                            }
+                            3 -> {
+                                val intent = Intent(context, ProfileActivity::class.java)
+                                intent.putExtra("mode", mode)
+                                context.startActivity(intent)
+                                activity?.finish()
+                            }
+                        }
+                    }
+                )
             }
         }
     ) { innerPadding ->
@@ -166,7 +226,12 @@ fun NotificationScreen(viewModel: NotificationViewModel) {
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    if (notifications.isEmpty()) {
+                    // Only show MESSAGE notifications where current user is the receiver
+                    val filteredNotifications = notifications.filter {
+                        it.type == "MESSAGE" && it.userId == currentUserId
+                    }
+
+                    if (filteredNotifications.isEmpty()) {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -179,7 +244,7 @@ fun NotificationScreen(viewModel: NotificationViewModel) {
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(notifications) { notification ->
+                            items(filteredNotifications) { notification ->
                                 NotificationCard(
                                     notification = notification,
                                     onDelete = { viewModel.deleteNotification(notification.notificationId) }
@@ -198,15 +263,9 @@ fun NotificationCard(
     notification: NotificationModel,
     onDelete: () -> Unit
 ) {
-    val icon = when (notification.type) {
-        "ORDER" -> Icons.Default.CheckCircle
-        "MESSAGE" -> Icons.Default.Email
-        "OFFER" -> Icons.Default.Star
-        else -> Icons.Default.Notifications
-    }
-
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Teal)
     ) {
@@ -217,7 +276,7 @@ fun NotificationCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = icon,
+                imageVector = Icons.Default.Email,
                 contentDescription = notification.title,
                 tint = Color.Black,
                 modifier = Modifier.size(35.dp)
@@ -238,7 +297,7 @@ fun NotificationCard(
                     color = Color.DarkGray
                 )
                 Text(
-                    text = formatFirebaseTimestamp(notification.timestamp),
+                    text = formatTimestamp(notification.timestamp),
                     fontSize = 15.sp,
                     color = Color.Gray
                 )
@@ -255,8 +314,7 @@ fun NotificationCard(
     }
 }
 
-// Update the helper function to handle Firebase Timestamp
-private fun formatFirebaseTimestamp(timestamp: com.google.firebase.Timestamp): String {
-    val formatter = java.text.SimpleDateFormat("MMM dd, yyyy HH:mm", java.util.Locale.getDefault())
-    return formatter.format(timestamp.toDate())
+private fun formatTimestamp(timestamp: Long): String {
+    val formatter = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
+    return formatter.format(Date(timestamp))
 }
