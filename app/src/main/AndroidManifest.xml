@@ -17,226 +17,8 @@
         android:theme="@style/Theme.HamroThrift"
         tools:replace="android:fullBackupContent"
         tools:targetApi="31">
-        <activity
-            android:name=".view.CartActivity"
-            android:exported="true"
-            android:label="@string/title_activity_cart"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.SearchActivity"
-            android:exported="true"
-            android:label="@string/title_activity_search"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.sell.EditProfileActivity"
-            android:exported="true"
-            android:label="@string/title_activity_edit_profile"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.sell.UploadActivity"
-            android:exported="true"
-            android:label="@string/title_activity_upload"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.screens.BillingAddressActivity"
-            android:exported="true"
-            android:label="@string/title_activity_billing_address"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.screens.ChangePasswordActivity"
-            android:exported="true"
-            android:label="@string/title_activity_change_password"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.screens.MyOrders"
-            android:exported="true"
-            android:label="@string/title_activity_my_orders"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.buy.DashboardActivityBuy"
-            android:exported="true"
-            android:label="@string/title_activity_dashboard_buy"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.components.CommonBottomBar"
-            android:exported="true"
-            android:label="@string/title_activity_common_bottom_bar"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".navigation.NavigationHandler"
-            android:exported="true"
-            android:label="@string/title_activity_navigation_handler"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.screens.AllOrdersActivity"
-            android:exported="true"
-            android:label="@string/title_activity_all_orders"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.ProfileActivity"
-            android:exported="true"
-            android:label="@string/title_activity_profile"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.screens.ProfileScreen"
-            android:exported="true"
-            android:label="@string/title_activity_profile_screen"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.ForgotPasswordActivity"
-            android:exported="true"
-            android:label="@string/title_activity_forgot_password"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.sell.DashboardSellActivity"
-            android:exported="true"
-            android:label="@string/title_activity_dashboard_sell"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.WelcomeAndOnboardingActivity"
-            android:exported="true"
-            android:label="@string/title_activity_welcome_onboarding"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.DashboardActivity"
-            android:exported="true"
-            android:label="@string/title_activity_dashboard"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.NotificationActivity"
-            android:exported="true"
-            android:label="@string/title_activity_notification"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.buy.SaleActivity"
-            android:exported="true"
-            android:label="@string/title_activity_sale"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".view.RegisterActivity"
-            android:exported="true"
-            android:label="@string/title_activity_register"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <!-- Splash Screen Activity (Launcher) -->
         <activity
             android:name=".view.SplashScreenActivity"
             android:exported="true"
@@ -244,32 +26,154 @@
             android:theme="@style/Theme.HamroThrift">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".view.HomepageActivity"
-            android:exported="true"
-            android:label="@string/title_activity_homepage"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <!-- Main Activity -->
         <activity
             android:name=".view.MainActivity"
-            android:exported="true"
+            android:exported="false"
             android:label="@string/app_name"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:theme="@style/Theme.HamroThrift" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <!-- Authentication Activities -->
+        <activity
+            android:name=".view.RegisterActivity"
+            android:exported="false"
+            android:label="@string/title_activity_register"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <activity
+            android:name=".view.ForgotPasswordActivity"
+            android:exported="false"
+            android:label="@string/title_activity_forgot_password"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <!-- Welcome and Onboarding -->
+        <activity
+            android:name=".view.WelcomeAndOnboardingActivity"
+            android:exported="false"
+            android:label="@string/title_activity_welcome_onboarding"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <!-- Dashboard Activities -->
+        <activity
+            android:name=".view.DashboardActivity"
+            android:exported="false"
+            android:label="@string/title_activity_dashboard"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <activity
+            android:name=".view.HomepageActivity"
+            android:exported="false"
+            android:label="@string/title_activity_homepage"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <!-- Buy Related Activities -->
+        <activity
+            android:name=".view.buy.DashboardActivityBuy"
+            android:exported="false"
+            android:label="@string/title_activity_dashboard_buy"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <activity
+            android:name=".view.buy.SaleActivity"
+            android:exported="false"
+            android:label="@string/title_activity_sale"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <!-- FIXED: CartActivity should be in .view not .view.buy -->
+        <activity
+            android:name=".view.CartActivity"
+            android:exported="false"
+            android:label="@string/title_activity_cart"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <activity
+            android:name=".view.buy.SearchActivity"
+            android:exported="false"
+            android:label="@string/title_activity_search"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <!-- FIXED: CheckoutActivity should be in .view not .view.buy -->
+        <activity
+            android:name=".view.CheckoutActivity"
+            android:exported="false"
+            android:theme="@style/Theme.HamroThrift" />
+
+       
+        <!-- Sell Related Activities -->
+        <activity
+            android:name=".view.sell.DashboardSellActivity"
+            android:exported="false"
+            android:label="@string/title_activity_dashboard_sell"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <activity
+            android:name=".view.sell.UploadActivity"
+            android:exported="false"
+            android:label="@string/title_activity_upload"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <!-- Profile and Settings Activities -->
+        <activity
+            android:name=".view.ProfileActivity"
+            android:exported="false"
+            android:label="@string/title_activity_profile"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <activity
+            android:name=".view.EditProfileActivity"
+            android:exported="false"
+            android:label="@string/title_activity_edit_profile"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <!-- Screen Activities -->
+        <activity
+            android:name=".view.screens.BillingAddressActivity"
+            android:exported="false"
+            android:label="@string/title_activity_billing_address"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <activity
+            android:name=".view.screens.ChangePasswordActivity"
+            android:exported="false"
+            android:label="@string/title_activity_change_password"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <activity
+            android:name=".view.screens.MyOrdersActivity"
+            android:exported="false"
+            android:label="@string/title_activity_my_orders"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <activity
+            android:name=".view.screens.AllOrdersActivity"
+            android:exported="false"
+            android:label="@string/title_activity_all_orders"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <!-- Chat Activities -->
+        <activity
+            android:name=".view.ChatActivity"
+            android:exported="false"
+            android:label="@string/title_activity_chat"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <activity
+            android:name=".view.ChatDialogActivity"
+            android:exported="false"
+            android:label="@string/title_activity_chat_dialog"
+            android:theme="@style/Theme.HamroThrift" />
+
+        <!-- Notification Activity -->
+        <activity
+            android:name=".view.NotificationActivity"
+            android:exported="false"
+            android:label="@string/title_activity_notification"
+            android:theme="@style/Theme.HamroThrift" />
+
     </application>
 
 </manifest>

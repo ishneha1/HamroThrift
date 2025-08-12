@@ -1,6 +1,5 @@
 package com.example.hamrothrift.view.components
 
-import android.app.Activity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -10,28 +9,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.hamrothrift.R
-import com.example.hamrothrift.navigation.NavigationHandler
 import com.example.hamrothrift.view.theme.ui.theme.*
-import com.example.hamrothrift.viewmodel.NavigationViewModel
 
 @Composable
 fun CommonBottomBar(
-    navigationViewModel: NavigationViewModel,
-    selectedTab: Int
+    selectedTab: Int,
+    onTabSelected: (Int) -> Unit
 ) {
-    val context = LocalContext.current
-    val activity = context as? Activity
-    val font = FontFamily(Font(R.font.handmade))
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = card),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -43,18 +34,38 @@ fun CommonBottomBar(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            navigationViewModel.navigationItems.forEach { item ->
-                BottomNavItem(
-                    icon = item.icon,
-                    label = item.label,
-                    isSelected = selectedTab == item.index,
-                    onClick = {
-                        navigationViewModel.updateTab(item.index)
-                        NavigationHandler.navigateToScreen(context, activity, item.index)
-                    },
+            // Analytics Tab
+            BottomNavItem(
+                icon = Icons.Default.Home,
+                label = "Home",
+                isSelected = selectedTab == 0,
+                onClick = { onTabSelected(0) }
+            )
 
-                )
-            }
+            // Upload Tab
+            BottomNavItem(
+                icon = Icons.Default.Star,
+                label = "Sale",
+                isSelected = selectedTab == 1,
+                onClick = { onTabSelected(1) }
+            )
+
+
+            // Notifications Tab
+            BottomNavItem(
+                icon = Icons.Default.Notifications,
+                label = "Notifications",
+                isSelected = selectedTab == 2,
+                onClick = { onTabSelected(2) },
+            )
+
+            // Profile Tab
+            BottomNavItem(
+                icon = Icons.Default.Person,
+                label = "Profile",
+                isSelected = selectedTab == 3,
+                onClick = { onTabSelected(3) },
+            )
         }
     }
 }

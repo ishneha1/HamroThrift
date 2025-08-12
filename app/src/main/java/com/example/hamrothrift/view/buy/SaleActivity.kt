@@ -28,12 +28,13 @@ import com.example.hamrothrift.R
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.ProductRepoImpl
 import com.example.hamrothrift.repository.NotificationRepoImpl
+import com.example.hamrothrift.view.NotificationActivity
+import com.example.hamrothrift.view.ProfileActivity
 import com.example.hamrothrift.view.components.CommonBottomBar
 import com.example.hamrothrift.view.components.CommonTopAppBar
 import com.example.hamrothrift.view.components.ProductCard
 import com.example.hamrothrift.view.sell.DashboardSellActivity
 import com.example.hamrothrift.view.theme.ui.theme.*
-import com.example.hamrothrift.viewmodel.NavigationViewModel
 import com.example.hamrothrift.viewmodel.ProductViewModel
 import com.example.hamrothrift.viewmodel.ProductViewModelFactory
 import com.example.hamrothrift.viewmodel.NotificationViewModel
@@ -52,8 +53,8 @@ class SaleActivity : ComponentActivity() {
             val notificationViewModel: NotificationViewModel = viewModel(
                 factory = NotificationViewModelFactory(notificationRepository)
             )
-            val navigationViewModel: NavigationViewModel = viewModel()
-            SaleActivityBody(productViewModel, notificationViewModel, navigationViewModel )
+            SaleActivityBody(productViewModel, notificationViewModel)
+
         }
     }
 }
@@ -62,8 +63,7 @@ class SaleActivity : ComponentActivity() {
 @Composable
 fun SaleActivityBody(
     productViewModel: ProductViewModel,
-    notificationViewModel: NotificationViewModel,
-    navigationViewModel:NavigationViewModel
+    notificationViewModel: NotificationViewModel
 ) {
     var selectedTab by remember { mutableIntStateOf(1) }
     val context = LocalContext.current
@@ -110,8 +110,27 @@ fun SaleActivityBody(
         topBar = { CommonTopAppBar() },
         bottomBar = {
             CommonBottomBar(
-                navigationViewModel = navigationViewModel,
-                selectedTab = selectedTab
+                selectedTab = selectedTab,
+                onTabSelected = { index ->
+                    selectedTab = index
+                    when (index) {
+                        0 -> {
+                            context.startActivity(Intent(context, DashboardActivityBuy::class.java))
+                            activity?.finish()
+                        }
+                        1 -> {
+                            // Just stay on current screen
+                        }
+                        2 -> {
+                            context.startActivity(Intent(context, NotificationActivity::class.java))
+                            activity?.finish()
+                        }
+                        3 -> {
+                            context.startActivity(Intent(context, ProfileActivity::class.java))
+                            activity?.finish()
+                        }
+                    }
+                }
             )
         }
     ) { paddingValues ->

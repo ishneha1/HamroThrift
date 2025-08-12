@@ -7,8 +7,10 @@ data class NotificationModel(
     val userId: String = "",
     val title: String = "",
     val message: String = "",
-    val timestamp: Timestamp = Timestamp.now(),
+    val timestamp: Long = 0L,
     val isRead: Boolean = false,
+    val senderId: String,
+    val productId: String?,
     val type: String = "", // "BUYER_MESSAGE", "SELLER_REPLY", "ORDER", etc.
     val relatedId: String = "", // productId, orderId, etc.
     val senderInfo: String = "" // Additional sender information

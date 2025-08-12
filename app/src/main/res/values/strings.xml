@@ -23,4 +23,11 @@
     <string name="title_activity_upload">UploadActivity</string>
     <string name="title_activity_edit_profile">EditProfileActivity</string>
     <string name="title_activity_cart">CartActivity</string>
+    <string name="title_activity_chat">ChatActivity</string>
+    <string name="title_activity_chat_screen">ChatScreen</string>
+    <string name="title_activity_chat_dialog">ChatDialogActivity</string>
+    <string name="title_activity_notification_list_screen">NotificationListScreen</string>
+    <string name="title_activity_checkout">CheckoutActivity</string>
+    <string name="title_activity_payment">PaymentActivity</string>
+    <string name="title_activity_order_confirmation">OrderConfirmationActivity</string>
 </resources>

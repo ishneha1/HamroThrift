@@ -7,5 +7,5 @@ data class UserModel(
     var gender: String="",
     var email : String="",
     var password: String="",
-    var userImage : String ="",
+    var profileImageUrl : String ="",
 )

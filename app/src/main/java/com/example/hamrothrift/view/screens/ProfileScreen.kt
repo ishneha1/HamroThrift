@@ -1,3 +1,4 @@
+// app/src/main/java/com/example/hamrothrift/view/screens/ProfileScreen.kt
 package com.example.hamrothrift.view.screens
 
 import android.content.Intent
@@ -19,20 +20,23 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
+import com.example.hamrothrift.view.EditProfileActivity
 import com.example.hamrothrift.view.HomepageActivity
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.UserViewModel
-import com.example.hamrothrift.view.screens.AllOrdersActivity
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun ProfileScreen(viewModel: UserViewModel = viewModel()) {
+fun ProfileScreen(viewModel: UserViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
     val context = LocalContext.current
     val user = FirebaseAuth.getInstance().currentUser
     var userName by remember { mutableStateOf("") }
     var profileImageUrl by remember { mutableStateOf<String?>(null) }
+
+    // Dialog state
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(user) {
         user?.uid?.let { uid ->
@@ -42,7 +46,7 @@ fun ProfileScreen(viewModel: UserViewModel = viewModel()) {
 
     viewModel.users.observeAsState().value?.let { userModel ->
         userName = "${userModel.firstName} ${userModel.lastName}"
-        profileImageUrl = userModel.userImage
+        profileImageUrl = userModel.profileImageUrl
     }
 
     Column(
@@ -89,8 +93,7 @@ fun ProfileScreen(viewModel: UserViewModel = viewModel()) {
 
         Button(
             onClick = {
-                // TODO: Create EditProfileActivity and navigate
-                // context.startActivity(Intent(context, EditProfileActivity::class.java))
+                context.startActivity(Intent(context, EditProfileActivity::class.java))
             },
             colors = ButtonDefaults.buttonColors(containerColor = buttton),
             modifier = Modifier.fillMaxWidth(0.8f)
@@ -119,14 +122,61 @@ fun ProfileScreen(viewModel: UserViewModel = viewModel()) {
             context.startActivity(intent)
         }
         ProfileOption("Logout", Icons.Default.ExitToApp) {
-            viewModel.logout { success, message ->
-                if (success) {
-                    FirebaseAuth.getInstance().signOut()
-                    val intent = Intent(context, HomepageActivity::class.java)
-                    context.startActivity(intent)
-                }
-            }
+            showLogoutDialog = true
         }
+        ProfileOption("Delete Account", Icons.Default.Delete) {
+            showDeleteDialog = true
+        }
+    }
+
+    // Logout confirmation dialog
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            title = { Text("Confirm Logout") },
+            text = { Text("Are you sure you want to logout?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showLogoutDialog = false
+                    viewModel.logout { success, _ ->
+                        if (success) {
+                            FirebaseAuth.getInstance().signOut()
+                            val intent = Intent(context, HomepageActivity::class.java)
+                            context.startActivity(intent)
+                        }
+                    }
+                }) { Text("Logout") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutDialog = false }) { Text("Cancel") }
+            }
+        )
+    }
+
+    // Delete account confirmation dialog
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Account") },
+            text = { Text("Are you sure you want to delete your account? This action cannot be undone.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDeleteDialog = false
+                    user?.uid?.let { uid ->
+                        viewModel.deleteAccount(uid) { success, _ ->
+                            if (success) {
+                                FirebaseAuth.getInstance().signOut()
+                                val intent = Intent(context, HomepageActivity::class.java)
+                                context.startActivity(intent)
+                            }
+                        }
+                    }
+                }) { Text("Delete") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) { Text("Cancel") }
+            }
+        )
     }
 }
 

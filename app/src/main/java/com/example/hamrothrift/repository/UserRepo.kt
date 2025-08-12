@@ -58,4 +58,6 @@ interface UserRepo {
         userId: String,
         onResult: (UserModel?, String) -> Unit
     )
+
+    fun updateProfileImage(userId: String, imageUrl: String, callback: (Boolean, String) -> Unit)
 }

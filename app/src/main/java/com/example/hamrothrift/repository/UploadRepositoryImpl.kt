@@ -2,23 +2,33 @@ package com.example.hamrothrift.repository
 
 import android.content.Context
 import android.net.Uri
+import com.cloudinary.Cloudinary
+import com.cloudinary.utils.ObjectUtils
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.model.ProductUploadRequest
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.database.FirebaseDatabase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
-import java.util.UUID
-import kotlin.text.category
-import kotlin.toString
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 
 class UploadRepositoryImpl : UploadRepository {
 
-    private val storage = FirebaseStorage.getInstance()
-    private val firestore = FirebaseFirestore.getInstance()
+    private val database = FirebaseDatabase.getInstance()
+    private val productsRef = database.reference.child("products")
     private val auth = FirebaseAuth.getInstance()
+
+    private val cloudinary = Cloudinary(
+        mapOf(
+            "cloud_name" to "dbmwufxbn",
+            "api_key" to "511933986824672",
+            "api_secret" to "C7WUm7KiQWZl7XaR9guDFTW3wU0"
+        )
+    )
 
     override suspend fun uploadProduct(
         context: Context,
@@ -27,29 +37,39 @@ class UploadRepositoryImpl : UploadRepository {
         try {
             emit(UploadResult.Loading)
 
-            // Step 1: Upload image
-            val imageUrl = uploadImageToFirebase(uploadRequest.imageUri)
+            val currentUserId = auth.currentUser?.uid
+                ?: throw Exception("User not authenticated")
 
-            // Step 2: Create product object with correct constructor
+            // Upload image to Cloudinary if provided
+            val imageUrl = if (uploadRequest.imageUri != null) {
+                uploadImageToCloudinary(context, uploadRequest.imageUri)
+            } else {
+                ""
+            }
+
+            // Generate product ID
+            val productId = productsRef.push().key ?: throw Exception("Failed to generate product ID")
+
+            // Create product with the generated ID and sellerId
             val product = ProductModel(
-                id = UUID.randomUUID().toString(),
+                id = productId,
                 name = uploadRequest.name,
                 category = uploadRequest.category,
-                price = uploadRequest.price.toDoubleOrNull() ?: 0.0,
+                price = uploadRequest.price.toDouble(),
+                condition = uploadRequest.condition,
                 description = uploadRequest.description,
-                condition = uploadRequest.condition, // Add this line
                 imageUrl = imageUrl,
-                sellerId = getCurrentUserId()
+                sellerId = currentUserId,
+                isOnSale = uploadRequest.isOnSale,
+                originalPrice = uploadRequest.originalPrice,
+                discount = uploadRequest.discount,
+                timestamp = System.currentTimeMillis()
             )
 
-            // Step 3: Save to database
-            val success = saveProductToFirestore(product)
+            // Save the product to Realtime Database
+            productsRef.child(productId).setValue(product).await()
 
-            if (success) {
-                emit(UploadResult.Success(product))
-            } else {
-                emit(UploadResult.Error("Failed to save product to database"))
-            }
+            emit(UploadResult.Success(product))
 
         } catch (e: Exception) {
             emit(UploadResult.Error(e.message ?: "Upload failed"))
@@ -57,73 +77,53 @@ class UploadRepositoryImpl : UploadRepository {
     }
 
     override suspend fun uploadImage(uri: Uri): Flow<String> = flow {
-        try {
-            // Create a unique filename for the image
-            val fileName = "product_${System.currentTimeMillis()}_${UUID.randomUUID()}.jpg"
-            val storageRef = storage.reference
-                .child("products")
-                .child("images")
-                .child(fileName)
-
-            // Upload the file
-            val uploadTask = storageRef.putFile(uri).await()
-
-            // Get the download URL
-            val downloadUrl = storageRef.downloadUrl.await()
-
-            emit(downloadUrl.toString())
-
-        } catch (e: Exception) {
-            throw Exception("Failed to upload image: ${e.message}")
-        }
+        throw UnsupportedOperationException("Use uploadProduct method instead")
     }
 
     override suspend fun saveProductToDatabase(product: ProductModel): Flow<Boolean> = flow {
         try {
-            // Save product to Firestore
-            firestore.collection("products")
-                .document(product.id)
-                .set(product)
-                .await()
-
+            productsRef.child(product.id).setValue(product).await()
             emit(true)
         } catch (e: Exception) {
             throw Exception("Failed to save product to database: ${e.message}")
         }
     }
 
-    private suspend fun uploadImageToFirebase(uri: Uri): String {
-        try {
-            val fileName = "product_${System.currentTimeMillis()}_${UUID.randomUUID()}.jpg"
-            val storageRef = storage.reference
-                .child("products")
-                .child("images")
-                .child(fileName)
+    private suspend fun uploadImageToCloudinary(context: Context, uri: Uri): String {
+        return withContext(Dispatchers.IO) {
+            try {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                    ?: throw Exception("Cannot open image file")
 
-            // Upload the file
-            storageRef.putFile(uri).await()
+                val file = File(context.cacheDir, "temp_image_${System.currentTimeMillis()}.jpg")
+                val outputStream = FileOutputStream(file)
 
-            // Get and return the download URL
-            return storageRef.downloadUrl.await().toString()
+                inputStream.use { input ->
+                    outputStream.use { output ->
+                        input.copyTo(output)
+                    }
+                }
 
-        } catch (e: Exception) {
-            throw Exception("Failed to upload image to Firebase Storage: ${e.message}")
+                val uploadResult = cloudinary.uploader().upload(
+                    file.absolutePath,
+                    ObjectUtils.asMap(
+                        "folder", "hamrothrift/products",
+                        "resource_type", "image",
+                        "quality", "auto",
+                        "fetch_format", "auto"
+                    )
+                )
+
+                file.delete()
+
+                val imageUrl = uploadResult["secure_url"] as? String
+                    ?: throw Exception("Failed to get image URL from Cloudinary response")
+
+                imageUrl
+
+            } catch (e: Exception) {
+                throw Exception("Failed to upload image to Cloudinary: ${e.message}")
+            }
         }
-    }
-
-    private suspend fun saveProductToFirestore(product: ProductModel): Boolean {
-        return try {
-            firestore.collection("products")
-                .document(product.id)
-                .set(product)
-                .await()
-            true
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    private fun getCurrentUserId(): String {
-        return auth.currentUser?.uid ?: "anonymous_${System.currentTimeMillis()}"
     }
 }

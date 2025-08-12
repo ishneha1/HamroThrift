@@ -105,6 +105,9 @@ class UserViewModel(val repo : UserRepo): ViewModel() {
         return firstName.isNotBlank() &&
                 lastName.isNotBlank()
     }
+    fun updateProfileImage(userId: String, imageUrl: String, callback: (Boolean, String) -> Unit) {
+        repo.updateProfileImage(userId, imageUrl, callback)
+    }
 
 }
 

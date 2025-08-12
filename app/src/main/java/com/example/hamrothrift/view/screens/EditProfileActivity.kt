@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -48,9 +49,6 @@ import com.example.hamrothrift.repository.UserRepoImpl
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
 
 class EditProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,13 +69,11 @@ fun EditProfileScreen() {
     val currentUser = auth.currentUser
 
     val font = FontFamily(Font(R.font.handmade))
-
     val gradientColors = listOf(White, deepBlue, Color.Black)
 
     val repo = remember { UserRepoImpl() }
     val userViewModel = remember { UserViewModel(repo) }
 
-    // State variables
     var isLoading by remember { mutableStateOf(true) }
     var isUpdating by remember { mutableStateOf(false) }
     var firstName by remember { mutableStateOf("") }
@@ -89,20 +85,28 @@ fun EditProfileScreen() {
 
     val genderOptions = listOf("Male", "Female", "Others")
 
-    // Image picker launcher
+    // Image picker launcher using Cloudinary upload
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
             currentUser?.uid?.let { userId ->
-                uploadProfileImage(userId, it) { success, message, imageUrl ->
-                    if (success) {
-                        profileImageUrl = imageUrl ?: ""
-                        Toast.makeText(context, "Profile image updated!", Toast.LENGTH_SHORT).show()
+                isImageUploading = true
+                userViewModel.uploadImage(context, it) { imageUrl ->
+                    if (imageUrl != null) {
+                        userViewModel.updateProfileImage(userId, imageUrl) { success, message ->
+                            isImageUploading = false
+                            if (success) {
+                                profileImageUrl = imageUrl
+                                Toast.makeText(context, "Profile image updated!", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                            }
+                        }
                     } else {
-                        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                        isImageUploading = false
+                        Toast.makeText(context, "Failed to upload image", Toast.LENGTH_LONG).show()
                     }
-                    isImageUploading = false
                 }
             }
         }
@@ -117,16 +121,12 @@ fun EditProfileScreen() {
                     firstName = user.firstName
                     lastName = user.lastName
                     selectedGender = user.gender
-                    // Load profile image URL from Firestore
-                    Firebase.firestore.collection("users").document(userId)
-                        .get()
-                        .addOnSuccessListener { document ->
-                            profileImageUrl = document.getString("profileImageUrl") ?: ""
-                        }
+                    profileImageUrl = user.profileImageUrl ?: ""
+                    isLoading = false
                 } else {
                     Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                    isLoading = false
                 }
-                isLoading = false
             }
         } ?: run {
             Toast.makeText(context, "User not authenticated", Toast.LENGTH_LONG).show()
@@ -160,7 +160,6 @@ fun EditProfileScreen() {
                 }
             )
         }
-
     ) { innerPadding ->
         if (isLoading) {
             Box(
@@ -179,7 +178,7 @@ fun EditProfileScreen() {
                     .padding(innerPadding)
                     .background(bg)
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
+                    .padding(10.dp, top = 40.dp, end = 10.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Card(
@@ -198,7 +197,6 @@ fun EditProfileScreen() {
                             text = "Edit Your Profile",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
-                            fontFamily = font,
                             color = text,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
@@ -213,7 +211,10 @@ fun EditProfileScreen() {
                                 CircularProgressIndicator(color = buttton)
                             } else {
                                 val painter = rememberAsyncImagePainter(
-                                    model = profileImageUrl.ifEmpty { R.drawable.profilephoto }
+                                    model = if (profileImageUrl.isNotEmpty() && !profileImageUrl.contains("android.resource"))
+                                        profileImageUrl
+                                    else
+                                        R.drawable.profilephoto
                                 )
 
                                 Image(
@@ -224,7 +225,6 @@ fun EditProfileScreen() {
                                         .clip(CircleShape)
                                         .border(3.dp, buttton, CircleShape)
                                         .clickable {
-                                            isImageUploading = true
                                             imagePickerLauncher.launch("image/*")
                                         },
                                     contentScale = ContentScale.Crop
@@ -235,7 +235,6 @@ fun EditProfileScreen() {
                         Text(
                             text = "Tap image to change",
                             fontSize = 12.sp,
-                            fontFamily = font,
                             color = text.copy(alpha = 0.7f),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
@@ -250,7 +249,11 @@ fun EditProfileScreen() {
                                 onValueChange = { firstName = it },
                                 label = { Text("First Name", color = text) },
                                 leadingIcon = {
-                                    Icon(Icons.Default.Person, contentDescription = "Name", tint = buttton)
+                                    Icon(
+                                        Icons.Default.Person,
+                                        contentDescription = "Name",
+                                        tint = buttton
+                                    )
                                 },
                                 modifier = Modifier.weight(1f),
                                 singleLine = true,
@@ -272,7 +275,11 @@ fun EditProfileScreen() {
                                 onValueChange = { lastName = it },
                                 label = { Text("Last Name", color = text) },
                                 leadingIcon = {
-                                    Icon(Icons.Default.Person, contentDescription = "Name", tint = buttton)
+                                    Icon(
+                                        Icons.Default.Person,
+                                        contentDescription = "Name",
+                                        tint = buttton
+                                    )
                                 },
                                 modifier = Modifier.weight(1f),
                                 singleLine = true,
@@ -294,32 +301,30 @@ fun EditProfileScreen() {
                             text = "Gender",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
-                            fontFamily = font,
                             color = text
                         )
 
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             genderOptions.forEach { gender ->
                                 Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     RadioButton(
                                         selected = (gender == selectedGender),
                                         onClick = { selectedGender = gender },
                                         colors = RadioButtonDefaults.colors(
                                             selectedColor = buttton,
-                                            unselectedColor = text.copy(alpha = 0.6f)
+                                            unselectedColor = text.copy(alpha = 0.2f)
                                         )
                                     )
                                     Text(
                                         text = gender,
                                         color = text,
-                                        fontFamily = font,
-                                        modifier = Modifier.padding(start = 4.dp)
                                     )
                                 }
                             }
@@ -330,7 +335,11 @@ fun EditProfileScreen() {
                             onValueChange = { email = it },
                             label = { Text("Email", color = text) },
                             leadingIcon = {
-                                Icon(Icons.Default.Email, contentDescription = "Email", tint = buttton)
+                                Icon(
+                                    Icons.Default.Email,
+                                    contentDescription = "Email",
+                                    tint = buttton
+                                )
                             },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
@@ -351,11 +360,14 @@ fun EditProfileScreen() {
                             enabled = false
                         )
 
-
-
                         Button(
                             onClick = {
-                                if (userViewModel.validateProfileData(firstName, lastName, selectedGender)) {
+                                if (userViewModel.validateProfileData(
+                                        firstName,
+                                        lastName,
+                                        selectedGender
+                                    )
+                                ) {
                                     isUpdating = true
                                     val updatedUser = UserModel(
                                         userId = currentUser?.uid ?: "",
@@ -363,15 +375,23 @@ fun EditProfileScreen() {
                                         lastName = lastName,
                                         gender = selectedGender,
                                         email = email,
-                                        password = ""
+                                        password = "",
+                                        profileImageUrl = profileImageUrl
                                     )
 
-                                    userViewModel.updateUserProfile(currentUser?.uid ?: "", updatedUser) { success, message ->
+                                    userViewModel.updateUserProfile(
+                                        currentUser?.uid ?: "",
+                                        updatedUser
+                                    ) { success, message ->
                                         isUpdating = false
                                         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                                     }
                                 } else {
-                                    Toast.makeText(context, "Please fill all fields correctly", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(
+                                        context,
+                                        "Please fill all fields correctly",
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                 }
                             },
                             modifier = Modifier
@@ -392,7 +412,6 @@ fun EditProfileScreen() {
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(
                                     text = "Updating...",
-                                    fontFamily = font,
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White
@@ -400,7 +419,6 @@ fun EditProfileScreen() {
                             } else {
                                 Text(
                                     text = "Save Changes",
-                                    fontFamily = font,
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White
@@ -412,31 +430,4 @@ fun EditProfileScreen() {
             }
         }
     }
-}
-
-private fun uploadProfileImage(
-    userId: String,
-    imageUri: Uri,
-    onResult: (Boolean, String, String?) -> Unit
-) {
-    val storageRef = Firebase.storage.reference
-    val profileImagesRef = storageRef.child("profile_images/$userId.jpg")
-
-    profileImagesRef.putFile(imageUri)
-        .addOnSuccessListener {
-            profileImagesRef.downloadUrl.addOnSuccessListener { uri ->
-                Firebase.firestore.collection("users")
-                    .document(userId)
-                    .update("profileImageUrl", uri.toString())
-                    .addOnSuccessListener {
-                        onResult(true, "Profile image updated successfully!", uri.toString())
-                    }
-                    .addOnFailureListener { e ->
-                        onResult(false, "Failed to save image URL: ${e.message}", null)
-                    }
-            }
-        }
-        .addOnFailureListener { e ->
-            onResult(false, "Failed to upload image: ${e.message}", null)
-        }
 }

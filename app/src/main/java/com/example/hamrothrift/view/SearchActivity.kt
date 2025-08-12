@@ -1,6 +1,5 @@
 package com.example.hamrothrift.view.buy
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -30,15 +29,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.hamrothrift.repository.CartRepositoryImpl
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 import com.example.hamrothrift.R
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.SearchRepositoryImpl
-import com.example.hamrothrift.view.ProfileActivity
-import com.example.hamrothrift.view.components.CommonBottomBar
-import com.example.hamrothrift.view.components.CommonTopAppBar
 import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.SearchViewModel
 import com.example.hamrothrift.viewmodel.SearchViewModelFactory
+import kotlin.text.category
 
 class SearchActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -128,7 +128,6 @@ fun SearchScreen(viewModel: SearchViewModel) {
             placeholder = {
                 Text(
                     "Search for products...",
-                    fontFamily = font,
                     color = text.copy(alpha = 0.6f)
                 )
             },
@@ -183,7 +182,6 @@ fun SearchScreen(viewModel: SearchViewModel) {
                     history = searchHistory,
                     onHistoryClick = { query -> viewModel.selectFromHistory(query) },
                     onClearHistory = { viewModel.clearSearchHistory() },
-                    font = font
                 )
             }
 
@@ -203,13 +201,11 @@ fun SearchScreen(viewModel: SearchViewModel) {
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             "No products found",
-                            fontFamily = font,
                             fontSize = 18.sp,
                             color = text.copy(alpha = 0.7f)
                         )
                         Text(
                             "Try different keywords",
-                            fontFamily = font,
                             fontSize = 14.sp,
                             color = text.copy(alpha = 0.5f)
                         )
@@ -221,7 +217,6 @@ fun SearchScreen(viewModel: SearchViewModel) {
                 // Show search results
                 SearchResultsSection(
                     results = searchResults,
-                    font = font
                 )
             }
         }
@@ -232,8 +227,7 @@ fun SearchScreen(viewModel: SearchViewModel) {
 fun SearchHistorySection(
     history: List<String>,
     onHistoryClick: (String) -> Unit,
-    onClearHistory: () -> Unit,
-    font: FontFamily
+    onClearHistory: () -> Unit
 ) {
     Column {
         Row(
@@ -243,7 +237,6 @@ fun SearchHistorySection(
         ) {
             Text(
                 "Recent Searches",
-                fontFamily = font,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = text
@@ -252,7 +245,6 @@ fun SearchHistorySection(
             TextButton(onClick = onClearHistory) {
                 Text(
                     "Clear All",
-                    fontFamily = font,
                     color = buttton
                 )
             }
@@ -284,7 +276,6 @@ fun SearchHistorySection(
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
                             query,
-                            fontFamily = font,
                             color = text,
                             modifier = Modifier.weight(1f)
                         )
@@ -303,12 +294,13 @@ fun SearchHistorySection(
 @Composable
 fun SearchResultsSection(
     results: List<ProductModel>,
-    font: FontFamily
 ) {
+    var showDetailsDialog by remember { mutableStateOf(false) }
+    var selectedProduct by remember { mutableStateOf<ProductModel?>(null) }
+
     Column {
         Text(
             "${results.size} products found",
-            fontFamily = font,
             fontSize = 14.sp,
             color = text.copy(alpha = 0.7f),
             modifier = Modifier.padding(bottom = 8.dp)
@@ -316,22 +308,77 @@ fun SearchResultsSection(
 
         LazyColumn {
             items(results) { product ->
-                ProductSearchCard(product = product, font = font)
+                ProductSearchCard(
+                    product = product,
+                    onProductClick = {
+                        selectedProduct = it
+                        showDetailsDialog = true
+                    }
+                )
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
+    }
+
+    if (showDetailsDialog && selectedProduct != null) {
+        // Use the same dialog as in ProductCard
+        AlertDialog(
+            onDismissRequest = {
+                showDetailsDialog = false
+                selectedProduct = null
+            },
+            title = { Text(selectedProduct!!.name) },
+            text = {
+                Column {
+                    AsyncImage(
+                        model = selectedProduct!!.imageUrl,
+                        contentDescription = selectedProduct!!.name,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Price: Rs.${selectedProduct!!.price}", fontWeight = FontWeight.Bold)
+                    Text("Category: ${selectedProduct!!.category}")
+                    Text("Condition: ${selectedProduct!!.condition}")
+                    Text("Description: ${selectedProduct!!.description}")
+                    if (selectedProduct!!.isOnSale) {
+                        Text("On Sale!", color = Color.Red)
+                        selectedProduct!!.originalPrice?.let {
+                            Text("Original Price: Rs.$it")
+                        }
+                        selectedProduct!!.discount?.let {
+                            Text("Discount: $it%")
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDetailsDialog = false
+                    selectedProduct = null
+                }) {
+                    Text("Close")
+                }
+            }
+        )
     }
 }
 
 @Composable
 fun ProductSearchCard(
     product: ProductModel,
-    font: FontFamily
+    onProductClick: (ProductModel) -> Unit
 ) {
+    val context = LocalContext.current
+    val cartRepository = remember { CartRepositoryImpl(context) }
+    var isAdding by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { /* Navigate to product detail */ },
+            .clickable { onProductClick(product) },
         colors = CardDefaults.cardColors(containerColor = card),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -356,7 +403,6 @@ fun ProductSearchCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = product.name,
-                    fontFamily = font,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = text,
@@ -367,7 +413,6 @@ fun ProductSearchCard(
 
                 Text(
                     text = "Rs. ${String.format("%.0f", product.price)}",
-                    fontFamily = font,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = buttton
@@ -377,7 +422,6 @@ fun ProductSearchCard(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = product.category,
-                        fontFamily = font,
                         fontSize = 12.sp,
                         color = text.copy(alpha = 0.6f)
                     )
@@ -387,9 +431,51 @@ fun ProductSearchCard(
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "Condition: ${product.condition}",
-                        fontFamily = font,
                         fontSize = 12.sp,
                         color = text.copy(alpha = 0.6f)
+                    )
+                }
+            }
+
+            // Add Cart Button
+            IconButton(
+                onClick = {
+                    if (!isAdding) {
+                        val user = FirebaseAuth.getInstance().currentUser
+                        if (user == null) {
+                            Toast.makeText(
+                                context,
+                                "Please log in to add to cart",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return@IconButton
+                        }
+                        isAdding = true
+                        coroutineScope.launch {
+                            cartRepository.addToCart(product, 1).collect { success ->
+                                Toast.makeText(
+                                    context,
+                                    if (success) "Added to cart!" else "Failed to add to cart",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                isAdding = false
+                            }
+                        }
+                    }
+                },
+                enabled = !isAdding
+            ) {
+                if (isAdding) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = buttton
+                    )
+                } else {
+                    Icon(
+                        Icons.Default.ShoppingCart,
+                        contentDescription = "Add to Cart",
+                        tint = buttton
                     )
                 }
             }

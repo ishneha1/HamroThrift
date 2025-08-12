@@ -41,7 +41,7 @@ class CartViewModel(
             try {
                 repository.getCartItems().collect { items ->
                     _cartItems.value = items
-                    _totalPrice.value = items.sumOf { it.product.price * it.quantity }
+                    _totalPrice.value = items.sumOf { (it.product?.price ?: 0.0) * it.quantity }
                     _isLoading.value = false
                 }
             } catch (e: Exception) {

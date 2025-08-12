@@ -20,7 +20,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -67,7 +68,7 @@ class UploadActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UploadSellBody(viewModel: UploadViewModel) {
-    var selectedTab by remember { mutableStateOf(1) } // Upload tab selected
+    var selectedTab by remember { mutableStateOf(1) }
     val context = LocalContext.current
     val activity = context as? Activity
     val font = FontFamily(Font(R.font.handmade))
@@ -83,18 +84,19 @@ fun UploadSellBody(viewModel: UploadViewModel) {
                     selectedTab = index
                     when (index) {
                         0 -> {
-                            // Navigate to Dashboard
                             context.startActivity(Intent(context, DashboardSellActivity::class.java))
                             activity?.finish()
                         }
                         1 -> { /* Already on Upload - do nothing */ }
                         2 -> {
-                            // Navigate to Notifications
-                            context.startActivity(Intent(context, NotificationActivity::class.java))
+                            val intent = Intent(context, NotificationActivity::class.java)
+                            intent.putExtra("mode", "sell")
+                            context.startActivity(intent)
                         }
                         3 -> {
-                            // Navigate to Profile
-                            context.startActivity(Intent(context, ProfileActivity::class.java))
+                            val intent = Intent(context, ProfileActivity::class.java)
+                            intent.putExtra("mode", "sell")
+                            context.startActivity(intent)
                         }
                     }
                 }
@@ -131,23 +133,20 @@ fun UploadSellBody(viewModel: UploadViewModel) {
                             FilterChip(
                                 onClick = {
                                     viewModel.setSelectedMode(mode)
-                                    // Add navigation logic here
                                     when (mode) {
                                         "Buy" -> {
                                             val intent = Intent(context, DashboardActivityBuy::class.java)
                                             context.startActivity(intent)
-                                            activity?.finish() // Close current activity
+                                            activity?.finish()
                                         }
                                         "Sell" -> {
-                                            // Already on Sell dashboard - just update the mode
-                                            // Or navigate to a specific Sell activity if needed
+                                            // Already on Sell dashboard
                                         }
                                     }
                                 },
                                 label = {
                                     Text(
                                         text = mode,
-                                        //fontFamily = font,
                                         fontSize = 12.sp
                                     )
                                 },
@@ -182,10 +181,15 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
     val price = remember { mutableStateOf("") }
     val condition = remember { mutableStateOf("") }
     val description = remember { mutableStateOf("") }
+    var isOnSale by remember { mutableStateOf(false) }
+    var originalPrice = remember { mutableStateOf("") }
+    var discount = remember { mutableStateOf("") }
 
     // ViewModel state
     val uploadState by viewModel.uploadState.collectAsState()
-    val uploadedProduct by viewModel.uploadedProduct.collectAsState()
+
+    // Track if we've shown success state
+    var hasShownSuccess by remember { mutableStateOf(false) }
 
     // Image picker launcher
     val imagePickerLauncher = rememberLauncherForActivityResult(
@@ -199,11 +203,16 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
         val currentState = uploadState
         when (currentState) {
             is UploadResult.Success -> {
+                // Show success toast immediately
                 Toast.makeText(
                     context,
                     "Product '${currentState.product.name}' uploaded successfully!",
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_LONG
                 ).show()
+
+                // Wait a bit to show the success state, then reset
+                kotlinx.coroutines.delay(1500)
+
                 // Reset form
                 imageUri.value = null
                 name.value = ""
@@ -211,6 +220,11 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                 price.value = ""
                 condition.value = ""
                 description.value = ""
+                isOnSale = false
+                originalPrice.value = ""
+                discount.value = ""
+
+                // Clear the upload state
                 viewModel.clearUploadState()
             }
             is UploadResult.Error -> {
@@ -219,12 +233,18 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                     "Upload failed: ${currentState.message}",
                     Toast.LENGTH_LONG
                 ).show()
+                // Don't delay for error, clear immediately
+                kotlinx.coroutines.delay(500)
                 viewModel.clearUploadState()
             }
-            else -> { /* Do nothing for Loading or null states */ }
+            is UploadResult.Loading -> {
+                // Do nothing, just show loading state
+            }
+            null -> {
+                // Do nothing for null state
+            }
         }
     }
-
 
     Column(
         modifier = Modifier
@@ -232,7 +252,7 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
             .verticalScroll(rememberScrollState())
     ) {
         Text(
-            text = "Sell Your Item",
+            text = "Add Your Product",
             fontSize = 24.sp,
             fontWeight = FontWeight.SemiBold,
             color = text,
@@ -298,14 +318,15 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                 focusedTextColor = text,
                 unfocusedTextColor = text,
                 unfocusedContainerColor = Color.White,
-                focusedContainerColor = Color.White            )
+                focusedContainerColor = Color.White
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Category Dropdown
         var expandedCategory by remember { mutableStateOf(false) }
-        val categories = listOf("Electronics", "Clothing", "Books", "Home & Garden", "Sports", "Others")
+        val categories = listOf("Electronics", "Clothing", "Books", "Home & Garden", "Shoes","Sports", "Others")
 
         ExposedDropdownMenuBox(
             expanded = expandedCategory,
@@ -339,12 +360,7 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
             ) {
                 categories.forEach { cat ->
                     DropdownMenuItem(
-                        text = {
-                            Text(
-                                cat,
-                                color = text
-                            )
-                        },
+                        text = { Text(cat, color = text) },
                         onClick = {
                             category.value = cat
                             expandedCategory = false
@@ -390,7 +406,7 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                 value = condition.value,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Condition",  color = text) },
+                label = { Text("Condition", color = text) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCondition) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -414,13 +430,7 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
             ) {
                 conditions.forEach { cond ->
                     DropdownMenuItem(
-                        text = {
-                            Text(
-                                cond,
-                                fontFamily = font,
-                                color = text
-                            )
-                        },
+                        text = { Text(cond, color = text) },
                         onClick = {
                             condition.value = cond
                             expandedCondition = false
@@ -436,7 +446,7 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
         OutlinedTextField(
             value = description.value,
             onValueChange = { description.value = it },
-            label = { Text("Description",  color = text) },
+            label = { Text("Description", color = text) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(120.dp),
@@ -453,6 +463,82 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                 focusedContainerColor = Color.White
             )
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Sale Option Card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = card),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = isOnSale,
+                        onCheckedChange = { isOnSale = it },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = buttton,
+                            uncheckedColor = text.copy(alpha = 0.6f)
+                        )
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "List item on sale",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = text
+                    )
+                }
+
+                if (isOnSale) {
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    OutlinedTextField(
+                        value = originalPrice.value,
+                        onValueChange = { originalPrice.value = it },
+                        label = { Text("Original Price (Rs.)", color = text) },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = buttton,
+                            focusedLabelColor = buttton,
+                            unfocusedBorderColor = text.copy(alpha = 0.3f),
+                            unfocusedLabelColor = text.copy(alpha = 0.7f),
+                            focusedTextColor = text,
+                            unfocusedTextColor = text,
+                            unfocusedContainerColor = Color.White,
+                            focusedContainerColor = Color.White
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = discount.value,
+                        onValueChange = { discount.value = it },
+                        label = { Text("Discount (%)", color = text) },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = buttton,
+                            focusedLabelColor = buttton,
+                            unfocusedBorderColor = text.copy(alpha = 0.3f),
+                            unfocusedLabelColor = text.copy(alpha = 0.7f),
+                            focusedTextColor = text,
+                            unfocusedTextColor = text,
+                            unfocusedContainerColor = Color.White,
+                            focusedContainerColor = Color.White
+                        )
+                    )
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -471,12 +557,15 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                     is ValidationResult.Valid -> {
                         viewModel.uploadProduct(
                             context = context,
-                            imageUri = imageUri.value!!,
+                            imageUri = imageUri.value,
                             name = name.value,
                             category = category.value,
                             price = price.value,
                             condition = condition.value,
-                            description = description.value
+                            description = description.value,
+                            isOnSale = isOnSale,
+                            originalPrice = if (isOnSale && originalPrice.value.isNotEmpty()) originalPrice.value.toDoubleOrNull() else null,
+                            discount = if (isOnSale && discount.value.isNotEmpty()) discount.value.toDoubleOrNull() else null
                         )
                     }
                     is ValidationResult.Invalid -> {
@@ -492,38 +581,72 @@ fun UploadSellScreen(viewModel: UploadViewModel) {
                 .fillMaxWidth()
                 .height(56.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = buttton,
+                containerColor = when (uploadState) {
+                    is UploadResult.Success -> Color(0xFF4CAF50) // Green for success
+                    else -> buttton
+                },
                 disabledContainerColor = buttton.copy(alpha = 0.5f)
             ),
             shape = RoundedCornerShape(12.dp),
             enabled = uploadState !is UploadResult.Loading
         ) {
-            if (uploadState is UploadResult.Loading) {
-                CircularProgressIndicator(
-                    color = Color.White,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = "Uploading...",
-                    fontFamily = font,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    tint = Color.White
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = "List Item for Sale",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
+            // FIX: Use uploadState directly here instead of capturing it
+            when (uploadState) {
+                is UploadResult.Loading -> {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = "Uploading...",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+                is UploadResult.Success -> {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = "Product Added!",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+                is UploadResult.Error -> {
+                    Icon(
+                        imageVector = Icons.Default.CloudUpload,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = "Upload Product",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+                null -> {
+                    Icon(
+                        imageVector = Icons.Default.CloudUpload,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = "Upload Product",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
             }
         }
 

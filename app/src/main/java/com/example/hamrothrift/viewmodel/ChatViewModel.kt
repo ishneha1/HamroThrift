@@ -3,6 +3,7 @@ package com.example.hamrothrift.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hamrothrift.model.ChatMessage
+import com.example.hamrothrift.model.NotificationModel
 import com.example.hamrothrift.repository.ChatRepo
 import com.example.hamrothrift.repository.NotificationRepo
 import com.google.firebase.auth.FirebaseAuth
@@ -40,6 +41,20 @@ class ChatViewModel(
 
             val success = chatRepo.sendMessage(chatMessage)
             _isLoading.value = false
+
+            // Create notification for receiver
+            notificationRepo.addNotification(
+                NotificationModel(
+                    userId = sellerId,  // receiver's ID
+                    title = "New Message",
+                    message = message,
+                    timestamp = System.currentTimeMillis(),
+                    type = "MESSAGE",
+                    senderId = currentUserId,  // sender's ID
+                    productId = productId,
+                    relatedId = productId
+                )
+            ) { _, _ -> }
         }
     }
 

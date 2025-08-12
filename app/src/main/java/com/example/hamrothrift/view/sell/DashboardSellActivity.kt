@@ -73,11 +73,15 @@ fun DashboardSellBody(viewModel: SalesOverviewViewModel) {
                         }
                         2 -> {
                             // Navigate to Notifications
-                            context.startActivity(Intent(context, NotificationActivity::class.java))
+                            val intent = Intent(context, NotificationActivity::class.java)
+                            intent.putExtra("mode", "sell")
+                            context.startActivity(intent)
                         }
                         3 -> {
                             // Navigate to Profile
-                            context.startActivity(Intent(context, ProfileActivity::class.java))
+                            val intent = Intent(context, ProfileActivity::class.java)
+                            intent.putExtra("mode", "sell")
+                            context.startActivity(intent)
                         }
                     }
                 }
