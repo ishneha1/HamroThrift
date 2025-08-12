@@ -4,8 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.google.gms.google.services)
-
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -14,23 +13,14 @@ android {
 
     defaultConfig {
         applicationId = "com.example.hamrothrift"
-        minSdk = 27
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-    packaging {
-        resources {
-            excludes += setOf(
-                "META-INF/DEPENDENCIES",
-                "META-INF/LICENSE",
-                "META-INF/LICENSE.txt",
-                "META-INF/NOTICE",
-                "META-INF/NOTICE.txt",
-                "META-INF/ASL2.0"
-            )
+        vectorDrawables {
+            useSupportLibrary = true
         }
     }
 
@@ -43,20 +33,38 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
     }
 
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
 
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/DEPENDENCIES"
+            excludes += "/META-INF/LICENSE"
+            excludes += "/META-INF/LICENSE.txt"
+            excludes += "/META-INF/license.txt"
+            excludes += "/META-INF/NOTICE"
+            excludes += "/META-INF/NOTICE.txt"
+            excludes += "/META-INF/notice.txt"
+            excludes += "/META-INF/ASL2.0"
+        }
+    }
 }
-
 dependencies {
     val nav_version = "2.7.7"
 
@@ -71,11 +79,11 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
 
     // ViewModel and LiveData
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    implementation("androidx.compose.runtime:runtime-livedata:1.6.0")
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
 
     // Navigation
     implementation("androidx.navigation:navigation-compose:$nav_version")
@@ -102,9 +110,15 @@ dependencies {
     implementation("com.cloudinary:cloudinary-android:2.5.0")
     implementation("com.cloudinary:cloudinary-core:1.36.0")
     implementation("com.cloudinary:cloudinary-http44:1.36.0")
-    implementation ("androidx.activity:activity-compose:1.8.0")
+    implementation("androidx.activity:activity-compose:1.8.0")
+
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
+
+    // Charts - MPAndroidChart with correct version
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+
 
     // Test dependencies
     testImplementation(libs.junit)

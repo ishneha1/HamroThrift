@@ -65,8 +65,6 @@ fun WelcomeAndOnboardingBody(modifier: Modifier = Modifier) {
         value==1
     }
 
-
-
     Surface(
         modifier = modifier.fillMaxSize(),
         color = bg

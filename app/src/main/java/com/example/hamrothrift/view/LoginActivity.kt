@@ -102,7 +102,6 @@ fun HomepageBody() {
     val repo = remember { UserRepoImpl() }
     val userViewModel = remember { UserViewModel(repo) }
 
-
     email = localEmail
     password = localPassword
 
@@ -298,8 +297,6 @@ fun HomepageBody() {
                                     val intent = Intent(context, ForgotPasswordActivity::class.java)
                                     context.startActivity(intent)
                                 }
-
-
                         )
                     }
 

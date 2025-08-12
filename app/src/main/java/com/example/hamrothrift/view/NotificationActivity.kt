@@ -3,18 +3,19 @@ package com.example.hamrothrift.view
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -34,7 +35,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hamrothrift.R
 import com.example.hamrothrift.model.NotificationModel
 import com.example.hamrothrift.repository.NotificationRepoImpl
-import com.example.hamrothrift.view.buy.CartActivity
 import com.example.hamrothrift.view.buy.DashboardActivityBuy
 import com.example.hamrothrift.view.buy.SaleActivity
 import com.example.hamrothrift.view.buy.SearchActivity
@@ -49,16 +49,9 @@ import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
 class NotificationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val auth = FirebaseAuth.getInstance()
-        if (auth.currentUser == null) {
-            startActivity(Intent(this, WelcomeAndOnboardingActivity::class.java))
-            finish()
-            return
-        }
 
         enableEdgeToEdge()
         setContent {
@@ -67,9 +60,25 @@ class NotificationActivity : ComponentActivity() {
                 factory = NotificationViewModelFactory(notificationRepo)
             )
             val mode = intent.getStringExtra("mode") ?: "buy"
-            NotificationScreen(viewModel, mode)
+            NotificationListScreen()
         }
     }
+}
+
+
+@Composable
+fun NotificationListScreen() {
+    val notificationRepo = NotificationRepoImpl()
+    val viewModel: NotificationViewModel = viewModel(
+        factory = NotificationViewModelFactory(notificationRepo)
+    )
+    val context = LocalContext.current
+    val mode = if (context is Activity) {
+        context.intent?.getStringExtra("mode") ?: "buy"
+    } else {
+        "buy"
+    }
+    NotificationScreen(viewModel, mode)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,6 +89,7 @@ fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
     val gradientColors = listOf(White, deepBlue, Color.Black)
     var selectedTab by remember { mutableStateOf(2) }
     val font = FontFamily(Font(R.font.handmade))
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
 
     val notifications by viewModel.notifications.observeAsState(initial = emptyList<NotificationModel>())
     val isLoading by viewModel.loading.observeAsState(initial = false)
@@ -112,14 +122,12 @@ fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = appBar),
                 actions = {
                     IconButton(onClick = {
-                        val intent = Intent(context, CartActivity::class.java)
-                        context.startActivity(intent)
+                        context.startActivity(Intent(context, CartActivity::class.java))
                     }) {
                         Icon(Icons.Default.ShoppingCart, "Cart", tint = Color.White)
                     }
                     IconButton(onClick = {
-                        val intent = Intent(context, SearchActivity::class.java)
-                        context.startActivity(intent)
+                        context.startActivity(Intent(context, SearchActivity::class.java))
                     }) {
                         Icon(Icons.Default.Search, "Search", tint = Color.White)
                     }
@@ -142,10 +150,7 @@ fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
                                 activity?.finish()
                             }
                             2 -> {
-                                val intent = Intent(context, NotificationActivity::class.java)
-                                intent.putExtra("mode", mode)
-                                context.startActivity(intent)
-                                activity?.finish()
+                                // Just reload this screen, do nothing or show a toast
                             }
                             3 -> {
                                 val intent = Intent(context, ProfileActivity::class.java)
@@ -171,10 +176,7 @@ fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
                                 activity?.finish()
                             }
                             2 -> {
-                                val intent = Intent(context, NotificationActivity::class.java)
-                                intent.putExtra("mode", mode)
-                                context.startActivity(intent)
-                                activity?.finish()
+                                // Just reload this screen, do nothing or show a toast
                             }
                             3 -> {
                                 val intent = Intent(context, ProfileActivity::class.java)
@@ -224,7 +226,12 @@ fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    if (notifications.isEmpty()) {
+                    // Only show MESSAGE notifications where current user is the receiver
+                    val filteredNotifications = notifications.filter {
+                        it.type == "MESSAGE" && it.userId == currentUserId
+                    }
+
+                    if (filteredNotifications.isEmpty()) {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -237,7 +244,7 @@ fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(notifications) { notification ->
+                            items(filteredNotifications) { notification ->
                                 NotificationCard(
                                     notification = notification,
                                     onDelete = { viewModel.deleteNotification(notification.notificationId) }
@@ -256,40 +263,9 @@ fun NotificationCard(
     notification: NotificationModel,
     onDelete: () -> Unit
 ) {
-    val context = LocalContext.current
-    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
-    val icon = when (notification.type) {
-        "ORDER" -> Icons.Default.CheckCircle
-        "MESSAGE" -> Icons.Default.Email
-        "OFFER" -> Icons.Default.Star
-        else -> Icons.Default.Notifications
-    }
-
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                if (notification.type == "MESSAGE") {
-                    try {
-                        // Determine the correct otherUserId
-                        val otherUserId = if (currentUserId == notification.userId) {
-                            notification.senderId
-                        } else {
-                            notification.userId
-                        }
-
-                        val intent = Intent(context, ChatDialogActivity::class.java).apply {
-                            putExtra("productId", notification.productId)
-                            putExtra("otherUserId", otherUserId)
-                            putExtra("message", notification.message)
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        }
-                        context.startActivity(intent)
-                    } catch (e: Exception) {
-                        Log.e("NotificationCard", "Error launching ChatDialog", e)
-                    }
-                }
-            },
+            .fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Teal)
     ) {
@@ -300,7 +276,7 @@ fun NotificationCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = icon,
+                imageVector = Icons.Default.Email,
                 contentDescription = notification.title,
                 tint = Color.Black,
                 modifier = Modifier.size(35.dp)
@@ -338,7 +314,6 @@ fun NotificationCard(
     }
 }
 
-// Updated helper function to handle Long timestamp (Realtime Database)
 private fun formatTimestamp(timestamp: Long): String {
     val formatter = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
     return formatter.format(Date(timestamp))

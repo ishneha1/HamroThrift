@@ -143,18 +143,3 @@ fun AllOrdersBody(viewModel: OrderViewModel) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun AllOrdersPreview() {
-    val sampleOrder = Order(
-        orderId = "12345",
-        buyerName = "John Doe",
-        itemName = "Vintage Jacket",
-        price = 49.99
-    )
-    AllOrdersBody(
-        viewModel=viewModel(
-            factory = OrderViewModelFactory(OrderRepositoryImpl()))
-
-    )
-}

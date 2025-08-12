@@ -64,11 +64,6 @@ fun SplashScreenBody(){
             }
         }
         .build()
-
-
-
-
-
     LaunchedEffect(Unit)
     {
         delay(1000)

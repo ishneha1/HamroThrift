@@ -16,24 +16,34 @@ class ProductRepoImpl : ProductRepo {
     private val productsRef: DatabaseReference = database.reference.child("products")
 
     override suspend fun getAllProducts(): Flow<List<ProductModel>> = callbackFlow {
-        val snapshotListener = productsRef
-            .orderByChild("timestamp")
+        val snapshotListener = database.reference.child("products")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val products = mutableListOf<ProductModel>()
                     for (childSnapshot in snapshot.children) {
-                        val product = childSnapshot.getValue(ProductModel::class.java)
-                        product?.let { products.add(0, it) } // Add to beginning for DESC order
+                        try {
+                            val product = childSnapshot.getValue(ProductModel::class.java)
+                            product?.let {
+                                products.add(it.copy(id = childSnapshot.key ?: ""))
+                            }
+                        } catch (e: Exception) {
+                            android.util.Log.e("ProductRepo", "Error parsing product", e)
+                        }
                     }
                     trySend(products)
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    close(error.toException())
+                    android.util.Log.e("ProductRepo", "Database error: ${error.message}")
+                    // Don't crash the app, just send empty list
+                    trySend(emptyList())
                 }
             })
-        awaitClose { productsRef.removeEventListener(snapshotListener) }
+
+        awaitClose { database.reference.child("products").removeEventListener(snapshotListener) }
     }
+
+
 
     override suspend fun getHotSaleProducts(): Flow<List<ProductModel>> = callbackFlow {
         val snapshotListener = productsRef

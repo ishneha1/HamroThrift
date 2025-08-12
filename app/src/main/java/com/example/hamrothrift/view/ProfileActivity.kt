@@ -30,7 +30,6 @@ import com.example.hamrothrift.view.theme.ui.theme.*
 import com.example.hamrothrift.viewmodel.UserViewModel
 import android.content.Intent
 import androidx.compose.ui.graphics.Color
-import com.example.hamrothrift.view.buy.CartActivity
 import com.example.hamrothrift.view.buy.DashboardActivityBuy
 import com.example.hamrothrift.view.buy.SaleActivity
 import com.example.hamrothrift.view.buy.SearchActivity

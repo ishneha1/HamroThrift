@@ -29,6 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.hamrothrift.repository.CartRepositoryImpl
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 import com.example.hamrothrift.R
 import com.example.hamrothrift.model.ProductModel
 import com.example.hamrothrift.repository.SearchRepositoryImpl
@@ -367,6 +370,11 @@ fun ProductSearchCard(
     product: ProductModel,
     onProductClick: (ProductModel) -> Unit
 ) {
+    val context = LocalContext.current
+    val cartRepository = remember { CartRepositoryImpl(context) }
+    var isAdding by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -425,6 +433,49 @@ fun ProductSearchCard(
                         text = "Condition: ${product.condition}",
                         fontSize = 12.sp,
                         color = text.copy(alpha = 0.6f)
+                    )
+                }
+            }
+
+            // Add Cart Button
+            IconButton(
+                onClick = {
+                    if (!isAdding) {
+                        val user = FirebaseAuth.getInstance().currentUser
+                        if (user == null) {
+                            Toast.makeText(
+                                context,
+                                "Please log in to add to cart",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return@IconButton
+                        }
+                        isAdding = true
+                        coroutineScope.launch {
+                            cartRepository.addToCart(product, 1).collect { success ->
+                                Toast.makeText(
+                                    context,
+                                    if (success) "Added to cart!" else "Failed to add to cart",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                isAdding = false
+                            }
+                        }
+                    }
+                },
+                enabled = !isAdding
+            ) {
+                if (isAdding) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = buttton
+                    )
+                } else {
+                    Icon(
+                        Icons.Default.ShoppingCart,
+                        contentDescription = "Add to Cart",
+                        tint = buttton
                     )
                 }
             }

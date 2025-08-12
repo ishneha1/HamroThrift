@@ -21,7 +21,7 @@ import java.util.*
 fun OrderCard(
     order: Order,
     showBuyerInfo: Boolean = false,
-    billingAddress: BillingAddress? = null // Optional billing address parameter
+    billingAddress: BillingAddress? = null
 ) {
     val font = FontFamily(Font(R.font.handmade))
 
@@ -47,9 +47,9 @@ fun OrderCard(
                     fontFamily = font
                 )
                 Text(
-                    text = order.status,
+                    text = order.status.name,
                     fontSize = 14.sp,
-                    color = when (order.status.lowercase()) {
+                    color = when (order.status.name.lowercase(Locale.getDefault())) {
                         "delivered" -> Color(0xFF4CAF50)
                         "pending" -> Color(0xFFFF9800)
                         "cancelled" -> Color(0xFFF44336)
@@ -68,7 +68,6 @@ fun OrderCard(
                 fontFamily = font
             )
 
-            // Show billing address if available and showBuyerInfo is true
             if (showBuyerInfo && billingAddress != null) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
@@ -98,7 +97,7 @@ fun OrderCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Total: Rs. ${String.format("%.2f", order.totalPrice)}",
+                text = "Total: Rs. ${String.format("%.2f", order.totalAmount)}",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = buttton,
