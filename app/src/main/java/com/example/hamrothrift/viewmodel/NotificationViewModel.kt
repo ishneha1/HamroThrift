@@ -7,9 +7,8 @@ import com.example.hamrothrift.model.NotificationModel
 import com.example.hamrothrift.repository.NotificationRepo
 import com.google.firebase.auth.FirebaseAuth
 
-class NotificationViewModel(
-    private val notificationRepo: NotificationRepo
-) : ViewModel() {
+class NotificationViewModel(private val repository: NotificationRepo) : ViewModel() {
+
     private val _notifications = MutableLiveData<List<NotificationModel>>()
     val notifications: LiveData<List<NotificationModel>> = _notifications
 
@@ -21,44 +20,14 @@ class NotificationViewModel(
 
     private val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
 
-    private val auth = FirebaseAuth.getInstance()
-
-    init {
-        checkAuthState()
-    }
-
-    private fun checkAuthState() {
-        if (currentUserId == null) {
-            _error.value = "User not authenticated"
-            return
-        }else{
-            loadNotifications()
-        }
-
-    }
-
     fun loadNotifications() {
-        if (currentUserId == null) {
-            _error.value = "User not authenticated"
-            return
-        }
-
-        _loading.value = true
-        notificationRepo.getNotificationsByUserId(currentUserId) { success, message, notifications ->
-            _loading.value = false
-            if (success) {
-                _notifications.value = notifications.sortedByDescending { it.timestamp }
-            } else {
-                _error.value = message
-            }
-        }
-    }
-    fun clearAllNotifications() {
-        _loading.value = true
         currentUserId?.let { userId ->
-            notificationRepo.clearAllNotifications(userId) { success, message ->
+            _loading.value = true
+            repository.getNotificationsByUserId(userId) { success, message, notificationList ->
                 _loading.value = false
-                if (!success) {
+                if (success) {
+                    _notifications.value = notificationList.sortedByDescending { it.timestamp }
+                } else {
                     _error.value = message
                 }
             }
@@ -66,42 +35,60 @@ class NotificationViewModel(
     }
 
     fun deleteNotification(notificationId: String) {
-        _loading.value = true
-        notificationRepo.deleteNotification(notificationId) { success, message ->
-            _loading.value = false
-            if (!success) {
+        repository.deleteNotification(notificationId) { success, message ->
+            if (success) {
+                loadNotifications() // Reload after deletion
+            } else {
                 _error.value = message
+            }
+        }
+    }
+
+    fun clearAllNotifications() {
+        currentUserId?.let { userId ->
+            repository.clearAllNotifications(userId) { success, message ->
+                if (success) {
+                    _notifications.value = emptyList()
+                } else {
+                    _error.value = message
+                }
             }
         }
     }
 
     fun markAsRead(notificationId: String) {
-        notificationRepo.updateNotificationStatus(notificationId, true) { success, message ->
-            if (!success) {
+        repository.updateNotificationStatus(notificationId, true) { success, message ->
+            if (success) {
+                loadNotifications() // Reload to update UI
+            } else {
                 _error.value = message
             }
         }
     }
 
-    fun addNotification(title: String, message: String, type: String,
-                        senderId : String ="",
-                        productId : String = "") {
-        currentUserId?.let { userId ->
-            val notification = NotificationModel(
-                title = title,
-                message = message,
-                timestamp = System.currentTimeMillis(),
-                userId = userId,
-                type = type,
-                senderId = senderId,
-                productId = productId,
-                relatedId = productId
-            )
+    // Function to send message notification to buyer/seller
+    fun sendMessageNotification(
+        receiverId: String,
+        senderName: String,
+        messageText: String,
+        productId: String? = null
+    ) {
+        val notification = NotificationModel(
+            userId = receiverId,
+            title = "New Message from $senderName",
+            message = messageText,
+            timestamp = System.currentTimeMillis(),
+            isRead = false,
+            senderId = currentUserId ?: "",
+            productId = productId,
+            type = "MESSAGE",
+            relatedId = productId ?: "",
+            senderInfo = senderName
+        )
 
-            notificationRepo.addNotification(notification) { success, message ->
-                if (!success) {
-                    _error.value = message
-                }
+        repository.addNotification(notification) { success, message ->
+            if (!success) {
+                _error.value = message
             }
         }
     }

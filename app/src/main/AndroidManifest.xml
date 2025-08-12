@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.mythriftstore">
+    package="com.example.hamrothrift">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:name=".HamroThriftApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -16,22 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HamroThrift"
-        tools:replace="android:fullBackupContent"
         tools:targetApi="31">
-<<<<<<< HEAD
-
-
-
-        <!-- Main Activity (app launcher) -->
-        <activity
-            android:name=".view.components.CommonBottomBar"
-            android:exported="true"
-            android:label="@string/title_activity_common_bottom_bar"
-            android:theme="@style/Theme.HamroThrift">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-=======
->>>>>>> 8654e8112003acd333c5a7603b01f52554b0d556
 
         <!-- Splash Screen Activity (Launcher) -->
         <activity
@@ -48,16 +32,6 @@
         <!-- Main Activity -->
         <activity
             android:name=".view.MainActivity"
-<<<<<<< HEAD
-            android:exported="true"
-            android:label="@string/title_activity_main"
-            android:theme="@style/Theme.MyThriftStore">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-=======
             android:exported="false"
             android:label="@string/app_name"
             android:theme="@style/Theme.HamroThrift" />
@@ -108,7 +82,6 @@
             android:label="@string/title_activity_sale"
             android:theme="@style/Theme.HamroThrift" />
 
-        <!-- FIXED: CartActivity should be in .view not .view.buy -->
         <activity
             android:name=".view.CartActivity"
             android:exported="false"
@@ -121,13 +94,13 @@
             android:label="@string/title_activity_search"
             android:theme="@style/Theme.HamroThrift" />
 
-        <!-- FIXED: CheckoutActivity should be in .view not .view.buy -->
         <activity
             android:name=".view.CheckoutActivity"
             android:exported="false"
+            android:label="@string/title_activity_checkout"
             android:theme="@style/Theme.HamroThrift" />
 
-       
+
         <!-- Sell Related Activities -->
         <activity
             android:name=".view.sell.DashboardSellActivity"
@@ -191,14 +164,12 @@
             android:exported="false"
             android:label="@string/title_activity_chat_dialog"
             android:theme="@style/Theme.HamroThrift" />
-
         <!-- Notification Activity -->
         <activity
             android:name=".view.NotificationActivity"
             android:exported="false"
             android:label="@string/title_activity_notification"
             android:theme="@style/Theme.HamroThrift" />
->>>>>>> 8654e8112003acd333c5a7603b01f52554b0d556
 
     </application>
 

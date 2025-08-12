@@ -49,6 +49,7 @@ import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
 class NotificationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,7 +65,6 @@ class NotificationActivity : ComponentActivity() {
         }
     }
 }
-
 
 @Composable
 fun NotificationListScreen() {
@@ -91,12 +91,19 @@ fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
     val font = FontFamily(Font(R.font.handmade))
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
 
-    val notifications by viewModel.notifications.observeAsState(initial = emptyList<NotificationModel>())
+    val notifications by viewModel.notifications.observeAsState(initial = emptyList())
     val isLoading by viewModel.loading.observeAsState(initial = false)
     val error by viewModel.error.observeAsState(initial = null)
 
+    // Auto-refresh notifications every 30 seconds for real-time updates
     LaunchedEffect(Unit) {
         viewModel.loadNotifications()
+
+        // Real-time refresh every 30 seconds
+        while (true) {
+            kotlinx.coroutines.delay(30000) // 30 seconds
+            viewModel.loadNotifications()
+        }
     }
 
     error?.let { errorMessage ->
@@ -150,7 +157,8 @@ fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
                                 activity?.finish()
                             }
                             2 -> {
-                                // Just reload this screen, do nothing or show a toast
+                                // Stay on notifications - reload
+                                viewModel.loadNotifications()
                             }
                             3 -> {
                                 val intent = Intent(context, ProfileActivity::class.java)
@@ -176,7 +184,8 @@ fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
                                 activity?.finish()
                             }
                             2 -> {
-                                // Just reload this screen, do nothing or show a toast
+                                // Stay on notifications - reload
+                                viewModel.loadNotifications()
                             }
                             3 -> {
                                 val intent = Intent(context, ProfileActivity::class.java)
@@ -212,23 +221,38 @@ fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Notifications",
+                            text = "Messages & Notifications",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = text
                         )
-                        TextButton(
-                            onClick = { viewModel.clearAllNotifications() }
-                        ) {
-                            Text("Clear All", fontSize = 15.sp, color = text)
+                        Row {
+                            TextButton(onClick = { viewModel.loadNotifications() }) {
+                                Text("Refresh", fontSize = 15.sp, color = text)
+                            }
+                            TextButton(onClick = { viewModel.clearAllNotifications() }) {
+                                Text("Clear All", fontSize = 15.sp, color = text)
+                            }
                         }
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Only show MESSAGE notifications where current user is the receiver
-                    val filteredNotifications = notifications.filter {
-                        it.type == "MESSAGE" && it.userId == currentUserId
+                    // Filter notifications for current user (both MESSAGE and other types)
+                    val filteredNotifications = notifications.filter { notification ->
+                        notification.userId == currentUserId
+                    }
+
+                    // Show unread count
+                    val unreadCount = filteredNotifications.count { !it.isRead }
+                    if (unreadCount > 0) {
+                        Text(
+                            text = "$unreadCount unread notifications",
+                            fontSize = 14.sp,
+                            color = Color.Red,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
                     }
 
                     if (filteredNotifications.isEmpty()) {
@@ -238,7 +262,15 @@ fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
                                 .padding(top = 40.dp),
                             contentAlignment = Alignment.TopCenter
                         ) {
-                            Text("No notifications", color = Color.Gray)
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("No notifications yet", color = Color.Gray, fontSize = 18.sp)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    "Messages from buyers and sellers will appear here",
+                                    color = Color.Gray,
+                                    fontSize = 14.sp
+                                )
+                            }
                         }
                     } else {
                         LazyColumn(
@@ -247,7 +279,12 @@ fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
                             items(filteredNotifications) { notification ->
                                 NotificationCard(
                                     notification = notification,
-                                    onDelete = { viewModel.deleteNotification(notification.notificationId) }
+                                    onDelete = { viewModel.deleteNotification(notification.notificationId) },
+                                    onMarkAsRead = {
+                                        if (!notification.isRead) {
+                                            viewModel.markAsRead(notification.notificationId)
+                                        }
+                                    }
                                 )
                             }
                         }
@@ -261,13 +298,16 @@ fun NotificationScreen(viewModel: NotificationViewModel, mode: String) {
 @Composable
 fun NotificationCard(
     notification: NotificationModel,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onMarkAsRead: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Teal)
+        colors = CardDefaults.cardColors(
+            containerColor = if (notification.isRead) Teal.copy(alpha = 0.7f) else Teal
+        )
     ) {
         Row(
             modifier = Modifier
@@ -275,10 +315,15 @@ fun NotificationCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Different icons based on notification type
             Icon(
-                imageVector = Icons.Default.Email,
+                imageVector = when (notification.type) {
+                    "MESSAGE" -> Icons.Default.Email
+                    "ORDER" -> Icons.Default.ShoppingCart
+                    else -> Icons.Default.Email
+                },
                 contentDescription = notification.title,
-                tint = Color.Black,
+                tint = if (notification.isRead) Color.Gray else Color.Black,
                 modifier = Modifier.size(35.dp)
             )
 
@@ -287,28 +332,46 @@ fun NotificationCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = notification.title,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = if (notification.isRead) FontWeight.Normal else FontWeight.Bold,
                     fontSize = 19.sp,
-                    color = Color.Black
+                    color = if (notification.isRead) Color.Gray else Color.Black
                 )
                 Text(
                     text = notification.message,
                     fontSize = 16.sp,
-                    color = Color.DarkGray
+                    color = if (notification.isRead) Color.Gray else Color.DarkGray,
+                    maxLines = 2
                 )
                 Text(
                     text = formatTimestamp(notification.timestamp),
                     fontSize = 15.sp,
                     color = Color.Gray
                 )
+
+                // Show sender info if available
+                if (notification.senderInfo.isNotEmpty()) {
+                    Text(
+                        text = "From: ${notification.senderInfo}",
+                        fontSize = 13.sp,
+                        color = Color.Gray,
+                        fontStyle = FontStyle.Italic
+                    )
+                }
             }
 
-            IconButton(onClick = onDelete) {
-                Icon(
-                    Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = Color.Black
-                )
+            Column {
+                if (!notification.isRead) {
+                    TextButton(onClick = onMarkAsRead) {
+                        Text("Read", color = Color.Blue, fontSize = 12.sp)
+                    }
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = Color.Black
+                    )
+                }
             }
         }
     }

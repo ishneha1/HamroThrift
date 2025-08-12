@@ -94,12 +94,14 @@ fun SaleActivityBody(
 
     // Function to handle message click
     fun handleMessageClick(product: ProductModel) {
-        notificationViewModel.addNotification(
-            title = "New Message",
-            message = "Someone is interested in your product: ${product.name}",
-            type = "message"
+        notificationViewModel.sendMessageNotification(
+            receiverId = product.sellerId ?: "",
+            senderName = "Buyer",
+            messageText = "Someone is interested in your product: ${product.name}",
+            productId = product.id ?: "" // Use the correct property here
         )
     }
+
 
     // Fetch products when composable is first created
     LaunchedEffect(Unit) {

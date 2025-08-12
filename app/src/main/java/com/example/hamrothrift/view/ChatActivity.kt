@@ -8,20 +8,26 @@ import com.example.hamrothrift.repository.NotificationRepoImpl
 import com.example.hamrothrift.view.components.ChatScreen
 import com.example.hamrothrift.viewmodel.ChatViewModel
 import com.example.hamrothrift.viewmodel.ChatViewModelFactory
+import com.example.hamrothrift.viewmodel.NotificationViewModel
+import com.google.firebase.auth.FirebaseAuth
 
+// Example: In your ChatActivity or MessageActivity
 class ChatActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val productId = intent.getStringExtra("productId") ?: ""
-        val otherUserId = intent.getStringExtra("otherUserId") ?: ""
-        setContent {
-            val chatViewModel = ChatViewModelFactory(ChatRepoImpl(), NotificationRepoImpl())
-                .create(ChatViewModel::class.java)
-            ChatScreen(
-                productId = productId,
-                otherUserId = otherUserId,
-                chatViewModel = chatViewModel
-            )
-        }
+    private lateinit var notificationViewModel: NotificationViewModel
+
+    private fun sendMessage(messageText: String, receiverId: String, receiverName: String) {
+        val productId = intent.getStringExtra("PRODUCT_ID") ?: ""
+
+        notificationViewModel.sendMessageNotification(
+            receiverId = receiverId,
+            senderName = getCurrentUserName(), // Get current user's name
+            messageText = messageText,
+            productId = productId // If related to a specific product
+        )
+    }
+
+    private fun getCurrentUserName(): String {
+        // Return current user's display name
+        return FirebaseAuth.getInstance().currentUser?.displayName ?: "Unknown User"
     }
 }
